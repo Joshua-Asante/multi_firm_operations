@@ -1,0 +1,58 @@
+# Guardian conflict risk overlay
+
+**Status:** ACTIVE as of 2026-04-16
+**Scope:** Guardian Gold strategy (XAUUSD 15min)
+**Type:** Regime overlay — temporary risk adjustment, not a parameter change to the strategy itself
+
+## Current state
+
+| Field | Baseline | Under overlay |
+|---|---|---|
+| Per-trade risk | 0.55% | **0.25%** |
+| Strategy parameters | v5.1 locked | unchanged |
+
+The overlay modifies the risk multiplier applied to Guardian position sizing. The Pine strategy itself is unchanged. All other strategy parameters (EMA, SL, TP, session, hour blocks, maxHold, grace stop) operate identically to the locked v5.1 specification.
+
+## Trigger that activated the overlay
+
+Iran-Israel conflict onset 2026-02-28. Strait of Hormuz closure 2026-03-02. GVZ (Gold volatility index) spiked above 25 and has remained elevated. Guardian drew down through its worst-ever losing streak Mar 2–30.
+
+XAUUSD under conflict regime exhibits:
+- Elevated realized vol that violates the ATR-based SL calibration's implicit assumptions
+- Discontinuous gap risk on headline-driven moves
+- Correlation breakdown between Guardian's trend signal and actual price action
+
+The overlay cuts risk to 0.25% to reduce exposure while the regime is active. The strategy continues to run on its normal schedule.
+
+## Revert conditions
+
+Both conditions must hold, sustained for 5 sessions:
+
+1. **GVZ closes below 25** (returning to non-crisis vol regime)
+2. **Hormuz transit volume above 50% of pre-closure baseline** (physical flow normalization)
+
+When both conditions are met and sustained, revert per-trade risk from 0.25% to 0.55%.
+
+## Extension rule
+
+If neither signal fires within 8–12 weeks of the overlay activation (2026-04-16), **extend the overlay; do not revert on calendar.** The overlay is tied to regime state, not to elapsed time. A calendar-based revert would reintroduce full risk into a regime where risk was reduced for measurable reasons — that's worse than leaving the overlay in place indefinitely.
+
+## What this overlay does NOT do
+
+- Does not change Guardian's Pine code
+- Does not change Guardian's signal logic, session, or hour blocks
+- Does not affect Striker or Aegis (they have separate regime exposures — Striker via equity-vol whipsaw from oil shock repricing, Aegis via BOJ/Fed divergence and yen safe-haven flows)
+- Does not modify `dd_protection.py` thresholds
+
+## Log of changes
+
+| Date | Change |
+|---|---|
+| 2026-04-16 | Overlay activated. Risk reduced 0.55% → 0.25%. |
+| _(future)_ | _(revert, extension, or modification events logged here)_ |
+
+## Cross-references
+
+- Notion: [Guardian conflict risk overlay — 2026-04-16](https://www.notion.so/344dc0b53c118152bf97eca9c931050b)
+- Code: Guardian v5.1 base parameters unchanged in `strategies/guardian/guardian_v5.1.pine`; overlay applied at risk-sizing layer only
+- Related: `docs/operational_rules.md` (hard rule: never override a valid signal based on macro volatility forecast)

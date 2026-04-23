@@ -24,10 +24,10 @@ Pine Script being the source of truth for strategy parameters.
 ## Portfolio MC
 
 ```bash
-python -m prop_firm_pipeline.portfolio_mc                 # default two-tier run
+python -m prop_firm_pipeline.portfolio_mc                 # default run at locked allocations
 python -m prop_firm_pipeline.portfolio_mc --historical    # deterministic backtest
 python -m prop_firm_pipeline.portfolio_mc --sensitivity   # DD-tier grid
-python -m prop_firm_pipeline.portfolio_mc --guardian-risk 0.0025   # overlay sim
+python -m prop_firm_pipeline.portfolio_mc --guardian-risk 0.0025   # what-if at reduced Guardian
 ```
 
 TradingView exports belong at `data/tv_exports/{guardian,striker,aegis}.csv`.

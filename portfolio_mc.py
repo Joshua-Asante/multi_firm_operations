@@ -13,7 +13,7 @@ Invocation:
     python -m prop_firm_pipeline.portfolio_mc --sensitivity     # DD-trigger grid
     python -m prop_firm_pipeline.portfolio_mc --dd-trigger 0.01 --dd-scale 0.40
     python -m prop_firm_pipeline.portfolio_mc --no-protection
-    python -m prop_firm_pipeline.portfolio_mc --guardian-risk 0.0025
+    python -m prop_firm_pipeline.portfolio_mc --guardian-risk 0.0025   # what-if at reduced Guardian risk
 """
 
 from __future__ import annotations
@@ -40,7 +40,7 @@ SIMS_PER_SEED = 10_000
 SEEDS = (42, 123, 2026)
 
 ALLOCATIONS: Dict[str, float] = {
-    "guardian": 0.0030,
+    "guardian": 0.0034,
     "striker":  0.0100,
     "aegis":    0.0150,
 }
@@ -336,7 +336,7 @@ def main():
     p.add_argument("--sensitivity", action="store_true",
                    help="DD-trigger sensitivity grid")
     p.add_argument("--guardian-risk", type=float, default=None,
-                   help="Override Guardian allocation (e.g. 0.0025 for conflict overlay)")
+                   help="Override Guardian allocation for what-if MC (e.g. 0.0025 to simulate a reduced-risk overlay)")
     args = p.parse_args()
 
     allocs = dict(ALLOCATIONS)

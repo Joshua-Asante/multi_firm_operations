@@ -30,37 +30,37 @@ Pine Script indicators handle ATR and lot sizing for the $200K baseline. The `lo
 multiplier = (account_balance * account_risk_pct) / (200,000 * baseline_risk_pct)
 ```
 
-Baseline risk = current locked risk (Guardian 0.30%, Striker 1.00%, Aegis 1.50%). Challenge and funded tiers are unified as of 2026-04-17; the phase field is retained for flags/DD tracking but no longer adjusts risk.
+Baseline risk = current locked risk (Guardian 0.34%, Striker 1.00%, Aegis 1.50%). Challenge and funded tiers are unified as of 2026-04-17; Guardian re-locked 0.30% → 0.34% on 2026-04-23 after Pepperstone-sourced panel showed available headroom. The phase field is retained for flags/DD tracking but no longer adjusts risk.
 
 Multipliers update weekly when balances update (via `python cli.py update`), not daily. Always rounded down (never round up on risk).
 
-## Strategy Reference (LOCKED 2026-04-17 — do not modify)
+## Strategy Reference (LOCKED 2026-04-17; Guardian re-locked 2026-04-23 — do not modify)
 
 Unified allocations: challenge phase = funded phase. No re-sizing at pass.
 
 | Strategy      | Instrument / TF | Risk/trade              | Version       | DXTrade contractValue                             |
 |---------------|-----------------|-------------------------|---------------|---------------------------------------------------|
-| Guardian Gold | XAUUSD 15m      | 0.30% (cold-start base) | v5.1 LOCKED   | 100                                               |
+| Guardian Gold | XAUUSD 15m      | 0.34% (cold-start base) | v5.1 LOCKED   | 100                                               |
 | Striker DJ30  | DJ30 15m        | 1.00%                   | v4.3 LOCKED   | **10** (critical — default of 1 gives ~7% risk)   |
 | Aegis USDJPY  | USDJPY 15m      | 1.50%                   | v4.1 LOCKED   | default (1)                                       |
 
-Guardian conflict overlay: currently running at 0.25% (not 0.30%) due to Iran-Israel / Hormuz regime.
-This is a live override, NOT a parameter change. Base stays 0.30% in config; overlay is applied via
-`portfolio_mc --guardian-risk 0.0025`. Revert triggers (both, sustained 5 sessions): GVZ sub-25 AND
-Hormuz transit > 50% baseline.
+No active overlays. Guardian runs at its locked base risk. The Iran-Israel /
+Hormuz conflict overlay was deactivated 2026-04-23 after revert triggers met;
+`docs/overlays/guardian_conflict_risk.md` retains the historical record.
 
 Strategy parameters (SL/TP/ATR/hour-blocks/session/BE/trail/pyramid/etc.) live in Pine Script
 and are NOT duplicated here. See Key Principle.
 
 Source of truth: https://www.notion.so/346dc0b53c1181d1b8d5e12df4bd3810
 
-## Protection (single-tier, production-locked 2026-04-17)
+## Protection (single-tier, production-locked 2026-04-17; revalidated 2026-04-23)
 
 Single rule in `dd_protection.py`. `portfolio_mc` validates.
 
 * **DD tier**: if `(equity - peak) / peak <= -0.010`, multiply day's sizing by 0.40×.
 * Clears automatically when equity returns to peak.
-* MC at this config: **93.00% pass / 1.55% bust / ~5.45% timeout** (10K sims × 3 seeds).
+* MC at current config (G 0.34% / S 1.00% / A 1.50%, Pepperstone 2022→2026, 223 week-blocks, 10K × 3 seeds):
+  **92.73% pass / 0.65% bust (0.00% daily + 0.65% static) / 6.62% timeout**, p99 DD 4.94%, median days-to-pass 32.
 * The prior equity tier was deleted on 2026-04-17 after it was proven to be dead code under the live `min()` combining semantics. Revert triggers for reintroducing a second tier are documented in the FINAL decision page.
 * Constants frozen — do not change without re-running `portfolio_mc`.
 

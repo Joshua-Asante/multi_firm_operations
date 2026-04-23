@@ -18,14 +18,15 @@ FIRM_RULES = {
     # "BrightFunded": { ... },
 }
 
-# Unified allocations as of 2026-04-17 — challenge phase = funded phase.
+# Unified allocations — challenge phase = funded phase.
 # Source of truth: https://www.notion.so/346dc0b53c1181d1b8d5e12df4bd3810
-# No re-sizing at pass; both tiers intentionally identical.
+# Unified 2026-04-17; Guardian re-locked 0.30% → 0.34% on 2026-04-23 after
+# Pepperstone-sourced CSVs (2022→2026) showed headroom under 1% bust + 5% p99 DD.
 RISK_TIERS = {
-    "challenge": {"guardian": 0.0030, "striker": 0.0100, "aegis": 0.0150},
-    "funded":    {"guardian": 0.0030, "striker": 0.0100, "aegis": 0.0150},
+    "challenge": {"guardian": 0.0034, "striker": 0.0100, "aegis": 0.0150},
+    "funded":    {"guardian": 0.0034, "striker": 0.0100, "aegis": 0.0150},
 }
 
 # Baseline: Pine Script indicators output lot sizes for this account
 BASELINE_BALANCE = 200_000
-BASELINE_RISK = RISK_TIERS["challenge"]  # Guardian 0.30%, Striker 1.00%, Aegis 1.50%
+BASELINE_RISK = RISK_TIERS["challenge"]  # Guardian 0.34%, Striker 1.00%, Aegis 1.50%

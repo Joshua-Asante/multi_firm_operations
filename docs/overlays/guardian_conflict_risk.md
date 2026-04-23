@@ -1,14 +1,25 @@
 # Guardian conflict risk overlay
 
-**Status:** ACTIVE as of 2026-04-16
+**Status:** DEACTIVATED 2026-04-23 (historical record preserved below)
 **Scope:** Guardian Gold strategy (XAUUSD 15min)
 **Type:** Regime overlay — temporary risk adjustment, not a parameter change to the strategy itself
 
-## Current state
+Guardian is currently running at its locked base risk (see `firm_rules.py` / `CLAUDE.md`).
+No overlay active. This document is retained as the operational template for a
+future overlay and as a record of the Iran-Israel / Hormuz regime episode.
 
-| Field | Baseline | Under overlay |
+## Final state (deactivation, 2026-04-23)
+
+| Field | Value |
+|---|---|
+| Per-trade risk | Reverted to locked base (see `firm_rules.py`) |
+| Strategy parameters | v5.1 locked, unchanged throughout |
+
+## Historical state (while active, 2026-04-16 → 2026-04-23)
+
+| Field | Baseline (at activation) | Under overlay |
 |---|---|---|
-| Per-trade risk | 0.55% | **0.25%** |
+| Per-trade risk | 0.55% | 0.25% |
 | Strategy parameters | v5.1 locked | unchanged |
 
 The overlay modifies the risk multiplier applied to Guardian position sizing. The Pine strategy itself is unchanged. All other strategy parameters (EMA, SL, TP, session, hour blocks, maxHold, grace stop) operate identically to the locked v5.1 specification.
@@ -49,7 +60,7 @@ If neither signal fires within 8–12 weeks of the overlay activation (2026-04-1
 | Date | Change |
 |---|---|
 | 2026-04-16 | Overlay activated. Risk reduced 0.55% → 0.25%. |
-| _(future)_ | _(revert, extension, or modification events logged here)_ |
+| 2026-04-23 | Overlay deactivated. Revert conditions met; Guardian returned to locked base risk. |
 
 ## Cross-references
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-# Single-tier protection (validated 2026-04-17):
-#   - 10K-sim MC: bust 1.55% / pass 93.00% at current portfolio
+# Single-tier protection (validated 2026-04-17, revalidated 2026-04-23):
+#   - 10K-sim MC: bust 0.65% / pass 92.73% at current portfolio
+#     (G 0.34% / S 1.00% / A 1.50%, Pepperstone 2022→2026 panel, 223 week-blocks)
 #   - Equity tier deleted after Claude Code proved it was dead code under min semantics
 #   - Do not change without re-running portfolio_mc
 # See: https://www.notion.so/346dc0b53c11816085bbf2292be934cc
@@ -35,9 +36,9 @@ STATIC_DD_LIMIT = 0.05        # 5% = $10,000
 DD_TRIGGER = 0.010            # 1.0% DD from peak triggers scaling
 DD_SCALE = 0.40               # multiply risk by 0.40x when triggered
 
-# Unified allocations (locked 2026-04-17, challenge = funded)
+# Unified allocations (locked 2026-04-17, Guardian re-locked 2026-04-23; challenge = funded)
 BASE_RISK = {
-    "Guardian": 0.0030,       # 0.30%
+    "Guardian": 0.0034,       # 0.34%
     "Striker":  0.0100,       # 1.00%
     "Aegis":    0.0150,       # 1.50%
 }

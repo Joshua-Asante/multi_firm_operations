@@ -97,46 +97,139 @@ conservative direction that does not threaten DD calibration.
 of contemporaneous equity" statement applies to the live pipeline, with
 intra-week balance drift bounded by `dd_protection`'s 1% trigger.
 
-#### Striker tail — Forward-bucket question for a future session
+#### Striker — pyramid decomposition (corrects an initial misframing)
 
-The 1R diagnosis above is Guardian-specific. The same panel-summary script
-extended to Striker / Aegis (`analysis/correlated_day_check.py`) surfaced a
-finding worth flagging — **not actioning** in this brief because
-`dd_protection` constants are explicitly out-of-scope:
+The 1R diagnosis above is Guardian-specific. Extending the same equity-
+normalized loss measurement to Striker and Aegis surfaced a 17% mean
+inflation on Striker (1.1715% per-loss vs designed 1.00%). An initial
+reading framed this as "Striker tail-of-loss event" — that framing was
+wrong. Pyramid decomposition (`analysis/striker_pyramid_decomposition.py`)
+shows the 17% is primarily an artefact of treating each pyramid layer as
+an independent Trade-# in the per-Trade mean, not a system-wide
+overshoot.
 
-- Striker mean per-loss = **1.1715%** of equity at entry vs designed 1.00%
-  (~17% inflation). Aegis mean per-loss = 0.4962% vs designed 1.50% (BE/partial
-  exits soaking up; expected sub-1R behaviour for v4.3 architecture).
-  Guardian mean per-loss = 0.3437% vs designed 0.34% (matches).
-- Worst observed combined-day loss across G+S+A on the panel: **3.56%** of
-  equity at entry, on 2025-02-07. Source: a single Striker trade (3.56% on one
-  trade alone — ~3.5× designed; pyramid stack or gap event).
-- Daily-total combined-loss distribution across 230 loss-days (4-year panel):
-  p50 = 0.34%, p75 = 1.00%, p90 = 1.35%, p95 = 1.67%, p99 = 2.37%, max = 3.56%.
-- **Zero 3-strategy correlated loss days** in the 4-year panel; 16 days had
-  2-strategy losses (max 1.81%); the 3.56% worst day was 1-strategy.
-- FXIFY daily floor is 5.00%. p99 daily combined sits 2.63 percentage points
-  inside the floor; the max sits 1.44 percentage points inside. Worst day on
-  this panel did not breach.
+Per-signal-class loss decomposition (n=62 losses, OANDA panel):
 
-**Forward question (cheapest-falsification-first ordering):** Does Striker's
-single-trade tail (max ~3.56% of equity at entry) plus a hypothetical
-correlated G or A loss day produce a combined-day total within `dd_protection`'s
-working envelope? Inputs: existing OANDA panel, no re-MC. Output: a single
-table comparing observed correlated-day distribution against
-`dd_protection`'s 1% trigger latency (the trigger fires for the *next* day,
-not within-day). If the answer surfaces an envelope hole, it routes to an
-**Action**-bucket dd_protection re-pressure-test under documented
-re-MC trigger rules. If not, **Closed**.
+| Bucket                            | n  | mean loss% | median | max     | inflation vs 1.00% designed |
+|-----------------------------------|----|------------|--------|---------|----------------------------:|
+| Initial entries (`Long`/`Short`)  | 50 | **1.0289%**| 1.0062%| 3.5611% | **+2.9%** (= sized correctly) |
+| Pyramid layers (`*_Add`)          | 12 | **1.7658%**| 1.9129%| 2.5261% | **+76.6%** (against pyramid-layer equity) |
+| Combined per-Trade-#              | 62 | 1.1715%    | 1.0058%| 3.5611% | +17.2% (= the 17% headline)   |
 
-This question is logged here rather than spawned as a separate workstream
-because (a) it does not require new data, (b) it is not the brief's primary
-ask, (c) the brief's MC calibration scope is explicitly off-limits, and (d) the
-observation routing gate (`docs/methodology/observation_routing.md`) puts this
-in Forward — a question gated downstream on its own logic, not pulled forward
-into the current session.
+Pyramid penetration: 29 of 204 initial entries extended (14.2%), of which
+22 wins and 7 losses on the trade-group level. The pyramid sizing
+multiplier in the panel is **3.50× initial qty exactly** (matches the
+"350% pyramid" parameter to 4 decimal places).
 
-Reproducible: `python analysis/correlated_day_check.py`.
+Trade-group decomposition (initial + same-bar pyramid exits collapsed,
+sum of P&L per group / equity at first-entry of group):
+
+| Group size | n   | wins | losses | BE | mean loss% | max group-loss% |
+|------------|-----|------|--------|----|------------|----------------:|
+| 1-leg      | 175 | 125  | 50     | 0  | 1.0289%    | **3.5611%**     |
+| 2-leg      |  29 |  22  |  7     | 0  | 0.8021%    | 2.0092%         |
+| 3-leg+     |   0 |   —  |  —     | —  | —          | —               |
+
+**Corrected framing.**
+
+1. **Striker initial entries are sized correctly.** Mean +2.9% vs designed,
+   median 1.0062%. The system hits 1R on essentially every full-stop
+   single-leg trade.
+2. **The 17% headline inflation is a measurement artefact** of counting
+   each pyramid leg as an equal-weight observation in the per-Trade-# mean.
+   Pyramid layers run at 3.50× initial qty and stop out at ~1.77% of
+   pyramid-layer equity, which by construction is larger than initial-
+   layer equity at the moment the pyramid was added.
+3. **Trade-group risk is *better* than non-pyramided would be**, not worse.
+   2-leg groups (initial + pyramid that both close together) have mean
+   group-loss 0.8021% — *smaller* than 1-leg's 1.0289%. Mechanism: the
+   pyramid only triggers after the initial moves favorably; on reversal,
+   the initial closes near or above breakeven while the pyramid takes
+   the SL hit. The layer-1 cushion absorbs.
+4. **The 3.56% worst-observed combined day** (2025-02-07, the figure that
+   prompted the original tail concern) was a **1-leg initial entry**, not
+   a pyramid event. It is a regular gap/slippage outlier on DJ30 — the
+   real fat-tail signal is on the initial-entry distribution at its
+   max, not on pyramid mechanics.
+
+**Re-cal-trigger candidacy.** The original Forward-bucket framing flagged
+this for re-cal candidacy on the assumption that Striker was systematically
+under-risk-stated. After decomposition, that framing is weaker:
+
+- The pyramid-layer-only +76.6% inflation is real but **already baked into
+  MC calibration** because `portfolio_mc.py` consumes raw trade P&Ls per
+  Trade-# (including pyramid-leg rows) — the simulator sees the actual
+  realized losses.
+- The initial-entry +2.9% inflation is within measurement noise of zero.
+- The 3.56% one-event outlier is a fat tail on the initial-entry
+  distribution, not a structural mis-sizing.
+
+The Forward question therefore narrows: **does the initial-entry
+distribution's max (3.56%) plus realistic correlated-day pairings
+challenge `dd_protection`'s working envelope?** This is decidable from the
+existing panel + the existing simulator output without re-MC and without
+new data. **Tag: re-cal-trigger candidate** — flag this for the next MC
+pre-flight reconciliation so it surfaces immediately rather than being
+re-discovered. The trigger does not fire today (no version bump, no 6mo
+live data, no allocation change, no `dd_protection` constant change), but
+it is the kind of structural finding that justifies an early MC pass if
+the inflation factor *grows* in live data.
+
+#### Live ↔ backtest pyramid divergence (one-liner caveat)
+
+The live-calibration equivalence stated above is **first-order, initial-
+entry only.** Pyramid sizing has a tracked divergence:
+
+- **Backtest:** layer-2 sizes off `strategy.equity`, which credits
+  layer-1's open profit at the moment layer-2 enters. So backtest layer-2
+  qty reflects the favorable mid-trade equity position.
+- **Live:** layer-2 sizes off the same weekly balance snapshot as
+  layer-1; no open-profit credit. Layer-2 qty is undersized relative to
+  backtest.
+
+Asymmetric impact: live undersizes layer-2 in winning extensions (drag on
+PF since 94% of Striker profit historically comes from pyramid extensions
+per the v4.3-pyramid ADR) and undersizes in losing extensions (modest
+benefit on the rare reversal-at-pyramid case). Net direction: live PF on
+Striker tracks below backtest PF; magnitude scales with how favorable
+layer-1 was at the moment layer-2 fires. Quantification requires per-trade
+open-profit data, which the current CSV panel does not directly expose.
+Routed Forward as part of the same re-cal-trigger-candidate question.
+
+#### Quantization bias in `calc_multiplier` (sub-1% sizing drag, not actioned)
+
+`accounts.calc_multiplier` returns `floor((balance × tier_pct) /
+(200K × baseline_pct) × 100) / 100` — i.e., the multiplier is rounded
+down to 2 decimal places, equivalent to a 1% balance step (every $2K of
+balance change). At $201,999 the multiplier is `floor(1.00999, 2dp) = 1.00`
+(sized for $200K equivalent); at $202,000 it steps to 1.01.
+
+Combined with the weekly update cadence, mid-week growth is systematically
+under-weighted. This is a sub-1% sizing drag — small at current scale,
+asymmetrically helpful on the DD side (under-compounded after positive
+weeks = smaller loss exposure if next-week reverses) and unhelpful on the
+upside compounding. Direction is conservative; not worth fixing now;
+documenting that it exists.
+
+#### Striker correlated-day pressure test (panel reference)
+
+The original observed-pressure-test results are unchanged by the
+decomposition above; logged here for traceability:
+
+- Worst observed combined-day loss across G+S+A: **3.56%** of equity at
+  entry, on 2025-02-07. Single-strategy (Striker), single-trade, 1-leg
+  initial entry.
+- Daily-total combined-loss distribution across 230 loss-days (4-year
+  panel): p50 0.34%, p75 1.00%, p90 1.35%, p95 1.67%, p99 2.37%, max 3.56%.
+- **Zero 3-strategy correlated loss days** across the 4-year panel; 16
+  days had 2-strategy losses (max 1.81%); the 3.56% worst day was
+  1-strategy.
+- FXIFY 5.00% daily floor not breached on observed history; p99 daily
+  combined sits 2.63 percentage points inside the floor; max sits 1.44
+  percentage points inside.
+
+Reproducible: `python analysis/correlated_day_check.py` and
+`python analysis/striker_pyramid_decomposition.py`.
 
 #### Trade-count reconciliation vs canonical 201 / 20.40% WR
 
@@ -172,6 +265,7 @@ The revised MC is the accepted result. Do not revert to median-loss 1R without e
 - Code: `portfolio_mc.py` (normalization layer uses per-strategy 1R)
 - Code: `analysis/1r_diagnosis.py` (Guardian equity-normalized 1R recompute, reproduces the table above)
 - Code: `analysis/correlated_day_check.py` (G+S+A correlated-day pressure test referenced in the Striker tail subsection)
+- Code: `analysis/striker_pyramid_decomposition.py` (signal-class and trade-group decomposition that corrects the initial Striker-tail framing)
 - Code: `accounts.py` and `firm_rules.py` (live-sizing model verified inline above)
 - Related: ADR 2026-04-17-dd-trigger-calibration (MC outputs used this methodology)
 - Related: ADR 2026-04-17-portfolio-allocations (allocation decisions used this methodology)
@@ -180,3 +274,4 @@ The revised MC is the accepted result. Do not revert to median-loss 1R without e
 
 - **2026-04-25** — Equity-compounding clarification added for Guardian v5.5. The previous "0.58% / 0.66%" figure was a fixed-$200K normalization artefact; equity_at_entry-normalized median is 0.3405% (= designed 0.34%). MC calibration unchanged (it consumes raw trade P&Ls). Reproducible via `analysis/1r_diagnosis.py`.
 - **2026-04-25 (follow-up)** — Live-sizing Rule 0 cross-check added: `accounts.calc_multiplier` is balance-compounding at weekly resolution, equivalent to Pine's per-trade compounding to within one week of P&L drift; intra-week DD covered by `dd_protection`'s 1% trigger. Striker single-trade tail (max ~3.56% of equity at entry on 2025-02-07) and combined daily loss distribution logged as a Forward-bucket question. Reproducible via `analysis/correlated_day_check.py`. Feed citation added — this analysis ran on OANDA; canonical lock-of-record MC ran on Pepperstone.
+- **2026-04-25 (second follow-up)** — Striker decomposition corrects the initial 17%-inflation framing. Initial entries +2.9% vs designed (sized correctly); pyramid layers +76.6% (against own larger equity at entry, expected for 350% pyramid sizing); 2-leg trade-groups average smaller losses than 1-leg (0.80% vs 1.03%). The 3.56% worst day is a 1-leg gap event, not a pyramid event. Forward question tagged **re-cal-trigger candidate** for surface in next MC pre-flight. Live↔backtest pyramid divergence (layer-2 backtest credits open profit, live does not) noted as first-order-only equivalence caveat. Quantization bias in `floor(balance/200K, 2dp)` documented as known sub-1% conservative sizing drag, not fixed. Reproducible via `analysis/striker_pyramid_decomposition.py`.

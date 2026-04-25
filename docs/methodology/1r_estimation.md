@@ -209,6 +209,50 @@ re-cal-trigger-candidate tag should look for in live: a *second*
 single-trade outlier within the budget-consumption window of a first one,
 not the steady-state tail of routine losses.
 
+**Confirmation: canonical MC metrics are net-of-rule.** `portfolio_mc.py`
+applies `dd_protection` in-loop (`portfolio_mc.py:148-150`: `scale =
+dd_scale if dd_from_peak <= -dd_trigger else 1.0`); the scaled P&L feeds
+both the bust checks (lines 154-157) and the peak tracking (line 161). So
+the locked headline figures (92.73% pass / 0.65% bust / p99 DD 4.94%) are
+**already attenuated by the rule** — `dd_protection` is part of the
+calibrated system, not a detachable post-hoc overlay. The 44.9% panel
+trigger frequency from the trace above is therefore a property of the same
+system whose pass/bust numbers are anchored.
+
+**Pre-staged Forward question — category-gap fix vs live-monitor.** The
+2025-02-07 result is a structural category gap, not a configuration miss:
+`dd_protection`'s daily cadence cannot, by construction, attenuate a
+fresh-peak single-trade outlier. Two structurally distinct responses are
+on the table; do not decide now (`dd_protection` constants are
+out-of-scope for this brief), but pre-stage the choice so the next
+allocation review or 6-month live reconciliation walks into a known
+question, not a fresh one:
+
+  1. **Within-day per-trade hard-cap** — a separate tripwire layered on
+     top of the existing daily-cadence rule, capping any single trade's
+     realized loss at e.g. 2.0% of equity at entry. Closes the category
+     gap by construction. Cost: adds operational surface area, requires
+     re-MC to confirm the cap value does not over-attenuate Striker's
+     pyramid-driven PF (94% of historical Striker profit sits above the
+     cap-clip threshold for the largest pyramid stacks).
+  2. **Leave the rule and observe live** — accept that the gap is real
+     but the base rate of fresh-peak single-trade outliers is, in the
+     panel, exactly one event in four years. With n=1, the conditional
+     probability of a *second* outlier inside the budget-consumption
+     window of a first is unestimable from history (you would be fitting
+     a Poisson on n=1). The honest framing is that this question may be
+     decidable **only from live data** — meaning the gap cannot be closed
+     pre-launch and has to be monitored live with a tripwire (e.g., an
+     alert that fires when any single trade exceeds 2.0% of equity at
+     entry, even if `dd_protection` itself does not engage).
+
+The choice is between closing-by-construction (option 1) and
+closing-by-observation (option 2 with a live tripwire). Option 2 is
+cheaper today and falsifiable in 6 months from live data; option 1 is
+permanent insurance whose price (potential PF drag on pyramid extensions)
+is currently unquantified. Tagged Forward, gated downstream on either
+allocation review or 6-month live reconciliation, whichever fires first.
+
 #### Live ↔ backtest pyramid divergence (one-liner caveat)
 
 The live-calibration equivalence stated above is **first-order, initial-
@@ -318,3 +362,4 @@ The revised MC is the accepted result. Do not revert to median-loss 1R without e
 - **2026-04-25 (follow-up)** — Live-sizing Rule 0 cross-check added: `accounts.calc_multiplier` is balance-compounding at weekly resolution, equivalent to Pine's per-trade compounding to within one week of P&L drift; intra-week DD covered by `dd_protection`'s 1% trigger. Striker single-trade tail (max ~3.56% of equity at entry on 2025-02-07) and combined daily loss distribution logged as a Forward-bucket question. Reproducible via `analysis/correlated_day_check.py`. Feed citation added — this analysis ran on OANDA; canonical lock-of-record MC ran on Pepperstone.
 - **2026-04-25 (second follow-up)** — Striker decomposition corrects the initial 17%-inflation framing. Initial entries +2.9% vs designed (sized correctly); pyramid layers +76.6% (against own larger equity at entry, expected for 350% pyramid sizing); 2-leg trade-groups average smaller losses than 1-leg (0.80% vs 1.03%). The 3.56% worst day is a 1-leg gap event, not a pyramid event. Forward question tagged **re-cal-trigger candidate** for surface in next MC pre-flight. Live↔backtest pyramid divergence (layer-2 backtest credits open profit, live does not) noted as first-order-only equivalence caveat. Quantization bias in `floor(balance/200K, 2dp)` documented as known sub-1% conservative sizing drag, not fixed. Reproducible via `analysis/striker_pyramid_decomposition.py`.
 - **2026-04-25 (third follow-up)** — Pyramid 3.50× multiplier verified directly from raw layer-1 / layer-2 qty pairs across all 29 events (min 3.499865, max 3.501093 — spread consistent with 4dp qty rounding); implementation-drift hypothesis refuted, finding locked. Pyramid PF gap one-liner added in Forward bucket so the 6-month live reconciliation knows what to look for. dd_protection trace on 2025-02-07 resolves to **Branch (b)**: account at peak going into the day, trigger did not engage, the -3.561% Striker loss consumed 71.2% of the 5.00% daily DD budget on a single trade. Trigger fires 44.9% of trade-days across the panel — design-intentional daily cadence; cannot prevent within-day single-trade tails by construction. Reproducible via `analysis/dd_protection_trace.py`.
+- **2026-04-25 (fourth follow-up)** — Confirmed canonical MC metrics are net-of-rule (`portfolio_mc.py:148-150` applies `dd_protection` in-loop). Pre-staged Forward question on the category-gap fix: **within-day per-trade hard-cap** (closes by construction; cost: re-MC + potential PF drag on pyramid extensions) vs **leave-and-monitor-live** (cheaper today; gap may be decidable only from live data given n=1 panel base rate). Decision deferred; staged for next allocation review or 6-month live reconciliation, whichever fires first.

@@ -94,6 +94,8 @@ assert_file_contains("strategies/aegis_v4_3.pine", "dayofmonth >= 29",
                      label="Aegis EOM rule")
 ```
 
+**Meta-example (deployment-time, 2026-04-24).** This very ADR was originally drafted as `00XX-mvd-discipline.md` (numeric-prefix convention). Listing `docs/adr/` before authoring the destination path surfaced that the repo uses `YYYY-MM-DD-<slug>.md` instead — caught and corrected pre-commit. The general form: before authoring a path string or convention claim, read peer artifacts in the target directory.
+
 ## Producer-side rule
 
 For any in-scope artifact: identity assertions appear within ~5 lines of identifier declaration. Cardinality and contract assertions appear at producing site, not consuming site (the author is the only one with full context to write them).

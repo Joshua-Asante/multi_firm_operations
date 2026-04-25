@@ -1,5 +1,7 @@
 # Changelog
 
+**Scope:** repo, methodology, and tooling changes only. Per-strategy version history lives in `strategies/<name>/<name>_CHANGELOG.md` (e.g. `strategies/aegis/aegis_CHANGELOG.md`).
+
 ## 2026-04-24
 
 - Added `docs/adr/2026-04-24-mvd-discipline.md` — ADR formalizing the Minimum Viable Defense discipline for load-bearing artifacts crossing the live capital boundary.

@@ -1,7 +1,6 @@
 # Live trading data — never commit
 accounts.json
 dd_protection_state.json
-*.csv
 *.json.bak
 
 # Python

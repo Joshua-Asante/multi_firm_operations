@@ -1,7 +1,7 @@
 # ADR: Portfolio allocations — G 0.30 / S 1.00 / A 1.50
 
 **Date:** 2026-04-17
-**Status:** Accepted
+**Status:** Partially superseded by [2026-04-23-guardian-risk-relock-0.34.md](2026-04-23-guardian-risk-relock-0.34.md) (Guardian 0.30% → 0.34%). Striker 1.00% and Aegis 1.50% allocations remain in force from this ADR.
 **Scope:** `firm_rules.py`, portfolio risk allocation
 
 ## Context

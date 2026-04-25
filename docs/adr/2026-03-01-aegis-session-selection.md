@@ -46,6 +46,6 @@ Risks:
 ## Cross-references
 
 - Notion: FXIFY Command Center — live parameter source of truth
-- Code: `strategies/aegis/aegis_v4.1.pine`
+- Code: `strategies/aegis/aegis_usdjpy_v4.3.txt` (decision was made against v4.1; session-selection logic carried forward unchanged through v4.3)
 - Related: ADR 2026-04-17-portfolio-allocations (Aegis 1.50% allocation rationale)
 - Related: `docs/overlays/guardian_conflict_risk.md` (conflict regime context affects Aegis positively)

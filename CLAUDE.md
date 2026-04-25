@@ -34,15 +34,21 @@ Baseline risk = current locked risk (Guardian 0.34%, Striker 1.00%, Aegis 1.50%)
 
 Multipliers update weekly when balances update (via `python cli.py update`), not daily. Always rounded down (never round up on risk).
 
-## Strategy Reference (LOCKED 2026-04-17; Guardian re-locked 2026-04-23 — do not modify)
+## Strategy Reference (LOCKED — do not modify)
 
-Unified allocations: challenge phase = funded phase. No re-sizing at pass.
+Unified allocations (locked 2026-04-17): challenge phase = funded phase. No re-sizing at pass.
+Strategy versions most recently re-locked 2026-04-23 (Guardian v5.4 → v5.5, Striker v4.3 → v4.4, Aegis v4.1 → v4.3). Guardian risk re-locked 0.30% → 0.34% same day. See lock MC notes below the table.
 
 | Strategy      | Instrument / TF | Risk/trade              | Version       | DXTrade contractValue                             |
 |---------------|-----------------|-------------------------|---------------|---------------------------------------------------|
-| Guardian Gold | XAUUSD 15m      | 0.34% (cold-start base) | v5.1 LOCKED   | 100                                               |
-| Striker DJ30  | DJ30 15m        | 1.00%                   | v4.3 LOCKED   | **10** (critical — default of 1 gives ~7% risk)   |
-| Aegis USDJPY  | USDJPY 15m      | 1.50%                   | v4.1 LOCKED   | default (1)                                       |
+| Guardian Gold | XAUUSD 15m      | 0.34% (cold-start base) | v5.5 LOCKED   | 100                                               |
+| Striker DJ30  | DJ30 15m        | 1.00%                   | v4.4 LOCKED   | **10** (critical — default of 1 gives ~7% risk)   |
+| Aegis USDJPY  | USDJPY 15m      | 1.50%                   | v4.3 LOCKED   | default (1)                                       |
+
+2026-04-23 lock MC anchors:
+* Alchemy reference (2026-04-20, Striker v4.4 + Aegis v4.2 era): **99.21% pass / 0.03% bust**.
+* Pepperstone directional (2026-04-23, all three at candidate versions, 10K × 3 seeds): **88.45% pass / 4.68% bust** raw; **84.37% pass / 1.03% bust** after correcting Aegis 1R for the n=1 full-stop thin-cohort artifact (median fallback inflates Aegis scale 4.4×). Bust gate passes under corrected 1R; pass-rate gap vs Alchemy attributed to feed-level drag + v5.5 added filters (blockMonH08, blockMonH09, blockH12 all-days, blockH12Day latch). Locked under brief-authorized directional read, not anchor-grade MC. Re-MC with v5.4 Pepperstone pending (would isolate feed effect from version effect).
+* Post-Guardian-risk-relock MC (G 0.34% / S 1.00% / A 1.50%, same panel): **92.73% pass / 0.65% bust / 6.62% timeout**, p99 DD 4.94%. See Protection section below.
 
 No active overlays. Guardian runs at its locked base risk. The Iran-Israel /
 Hormuz conflict overlay was deactivated 2026-04-23 after revert triggers met;

@@ -2,6 +2,14 @@
 
 **Scope:** repo, methodology, and tooling changes only. Per-strategy version history lives in `strategies/<name>/<name>_CHANGELOG.md` (e.g. `strategies/aegis/aegis_CHANGELOG.md`).
 
+## 2026-04-25 (retrofit)
+
+- Added `docs/adr/2026-04-25-mvd-retrofit.md` — ADR scoping the production-code retrofit: `portfolio_mc.py`, `dd_protection.py`, audit row #10.
+- Updated `docs/methodology/mvd.md` — added audit row #10 (DD label ambiguity, Identity-class), refreshed summary stats `9 → 10 instances`, `67% → 70% identity`, `6/9 → 7/10 single-line`. Top-of-section "67%" reference at line 42 also updated. Bottom MVD-attest refreshed.
+- `portfolio_mc.py` retrofit (separate commit): `implied_1r` returns `(r1, fell_back)`; canonical-config silent-fallback path now raises via `assert_no_fallback`. `load_trades` validates input panels via `assert_min_rows` + `assert_window`. Maps to methodology family **Contract** (audit instance #1) and **Cardinality** (audit instance #2).
+- `dd_protection.py` retrofit (separate commit): module-load `_validate_protection_rule()` runs `assert_guard_fired` (just-above trigger) + `assert_no_fallback` (just-below trigger). Catches future drift in `DD_TRIGGER` / `DD_SCALE`. Maps to methodology family **Contract**.
+- **MVD-attest:** numbers cited in the retrofit ADR (`~2 hrs`, `9→10`, `67%→70%`) trace to: time tracked on the retrofit conversation 2026-04-25; audit table at `docs/methodology/mvd.md` updated in this PR.
+
 ## 2026-04-25
 
 - Added `scripts/dryrun_aegis_v4_3.py` — MVD helper sanity gate. Exercises all 9 helpers in `lib/mvd.py` against the canonical Pepperstone 52mo Aegis v4.3 CSV (123 trades, Jan 2022 → Apr 2026). All 5 canonical numbers reproduce: net $178,208.42, PF 4.186, WR 60.16%, intra-trade DD 5.01%, trade-close DD 3.82%.

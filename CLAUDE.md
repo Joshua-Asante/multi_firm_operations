@@ -76,6 +76,13 @@ FINAL decision: https://www.notion.so/346dc0b53c11816085bbf2292be934cc
 
 To add a firm: define its rules in firm_rules.py as config. Everything downstream adapts automatically.
 
+## Methodology references
+
+* **The Algorithm** (default problem-solving framework — Question / Delete / Simplify / Accelerate / Automate, strict order): https://www.notion.so/34ddc0b53c11811eb6a0d9192b63d252 (permanent reference page).
+* **Observation routing** (three-bucket gate Closed / Action / Forward, replaces the prior Notice/Inquire framework): [`docs/methodology/observation_routing.md`](docs/methodology/observation_routing.md).
+* **1R estimation** (per-strategy 1R, equity-compounding normalization for Guardian-style equity-sized strategies): [`docs/methodology/1r_estimation.md`](docs/methodology/1r_estimation.md).
+* **Operational rules** (incl. doc/code skew audit trigger): [`docs/operational_rules.md`](docs/operational_rules.md).
+
 ## Key Principle
 
 The portfolio and strategies are LOCKED. This pipeline manages the *operational layer* — it never touches strategy parameters.

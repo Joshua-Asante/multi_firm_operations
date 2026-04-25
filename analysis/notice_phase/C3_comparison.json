@@ -1,0 +1,31 @@
+{
+  "delta_p90": 0.0,
+  "delta_p95": -1.0,
+  "delta_p99": -3.0,
+  "delta_mean": -0.075948186528497,
+  "delta_max": -6.0,
+  "empirical": {
+    "n_windows": 193,
+    "window_weeks": 32,
+    "n_total_weeks": 224,
+    "mean": 3.430051813471503,
+    "p50": 3.0,
+    "p75": 5.0,
+    "p90": 5.0,
+    "p95": 5.0,
+    "p99": 5.0,
+    "max": 5,
+    "share_of_neg_weeks": 0.41517857142857145
+  },
+  "bootstrap": {
+    "n_sims_total": 3000,
+    "window_weeks": 32,
+    "mean": 3.506,
+    "p50": 3.0,
+    "p75": 4.0,
+    "p90": 5.0,
+    "p95": 6.0,
+    "p99": 8.0,
+    "max": 11
+  }
+}

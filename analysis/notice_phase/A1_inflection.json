@@ -1,0 +1,20 @@
+{
+  "win_20": {
+    "crossover_date": "2026-01-20",
+    "vol_at_crossover_pct": 22.217606442901896,
+    "rolling_vol_post_min_pct": 15.480750408789554,
+    "rolling_vol_post_max_pct": 56.61069235981853
+  },
+  "win_30": {
+    "crossover_date": "2026-01-22",
+    "vol_at_crossover_pct": 21.49424655189828,
+    "rolling_vol_post_min_pct": 20.106859523838356,
+    "rolling_vol_post_max_pct": 47.06047224915431
+  },
+  "win_60": {
+    "crossover_date": "2025-11-12",
+    "vol_at_crossover_pct": 20.425676976587557,
+    "rolling_vol_post_min_pct": 16.728817563490516,
+    "rolling_vol_post_max_pct": 39.94642968445903
+  }
+}

@@ -26,6 +26,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+from lib.mvd import assert_guard_fired, assert_no_fallback
+
 # ── Configuration ──────────────────────────────────────────────
 STARTING_EQUITY = 200_000
 PROFIT_TARGET = 0.05          # 5% = $10,000
@@ -93,6 +95,67 @@ def calculate_protection(equity: float, peak: float) -> dict:
         "rule": rule,
         "scaled_risk": scaled_risk,
     }
+
+
+# ── MVD self-check (runs at import) ───────────────────────────
+
+def _validate_protection_rule():
+    """MVD self-check, runs at module import. Two-layer defense:
+
+    A. **Logic check** — boundary behavior is correct (guard fires when
+       crossed, doesn't fire when not). Catches sign-flips, off-by-one in
+       the comparison, wrong multiplier on trigger. Maps to methodology
+       family Contract.
+
+    B. **Spec pin** — current constants match the 2026-04-17 locked values
+       (`DD_TRIGGER = 0.010`, `DD_SCALE = 0.40`). The boundary check above
+       scales with the constants and so cannot detect a value drift on its
+       own. The pin forces any change to be a deliberate joint edit:
+       constant + literal in this function + re-MC at the new config (per
+       "any dd_protection constant change triggers re-MC" rule in the
+       2026-04-24 ADR).
+
+    Catches audit instance #3 (production-vs-memory drift, Rule 0 catalyst).
+    """
+    # --- A. Logic check: rule fires at its own trigger boundary ---
+    epsilon = 0.0001
+    eq_below = STARTING_EQUITY * (1 - DD_TRIGGER + epsilon)  # DD just under
+    eq_above = STARTING_EQUITY * (1 - DD_TRIGGER - epsilon)  # DD just over
+
+    below = calculate_protection(eq_below, STARTING_EQUITY)
+    above = calculate_protection(eq_above, STARTING_EQUITY)
+
+    fires_above = 1 if above["multiplier"] == DD_SCALE else 0
+    assert_guard_fired(
+        fires_above,
+        label=f"dd_protection fires when DD crosses DD_TRIGGER={DD_TRIGGER:.2%}",
+    )
+
+    spurious_below = 1 if below["multiplier"] < 1.0 else 0
+    assert_no_fallback(
+        spurious_below,
+        label=f"dd_protection silent when DD just under DD_TRIGGER={DD_TRIGGER:.2%}",
+    )
+
+    # --- B. Spec pin: constants match locked values per 2026-04-17 ADR ---
+    # Validated by 10K-sim MC at G/S/A current allocation:
+    # 92.73% pass / 0.65% bust / p99 DD 4.94%. Any future change to either
+    # constant must update both the constant AND this literal pin in the
+    # same commit, tied to a re-MC run.
+    if DD_TRIGGER != 0.010:
+        raise AssertionError(
+            f"MVD spec drift: DD_TRIGGER moved from locked 0.010 to {DD_TRIGGER}. "
+            f"Re-run portfolio_mc and update the pin literal in the same commit."
+        )
+    if DD_SCALE != 0.40:
+        raise AssertionError(
+            f"MVD spec drift: DD_SCALE moved from locked 0.40 to {DD_SCALE}. "
+            f"Re-run portfolio_mc and update the pin literal in the same commit."
+        )
+
+
+_validate_protection_rule()
+
 
 # ── Display ───────────────────────────────────────────────────
 

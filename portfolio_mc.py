@@ -27,8 +27,10 @@ import pandas as pd
 
 try:
     from .dd_protection import DD_TRIGGER, DD_SCALE
+    from .lib.mvd import assert_min_rows, assert_window, assert_no_fallback
 except ImportError:
     from dd_protection import DD_TRIGGER, DD_SCALE
+    from lib.mvd import assert_min_rows, assert_window, assert_no_fallback
 
 STARTING_EQUITY = 200_000
 PROFIT_TARGET = 210_000
@@ -56,23 +58,46 @@ def load_trades(path: Path) -> pd.DataFrame:
     for exit rows only (P&L is carried identically on entry+exit; we use exit
     for timing)."""
     df = pd.read_csv(path, encoding="utf-8-sig")
+    # MVD cardinality — catches OANDA short-fetch class (audit instance #2).
+    # Floor at 100 raw rows: panels are entry+exit pairs, so 100 ≈ 50 trades,
+    # well below any plausible 4yr canonical panel.
+    assert_min_rows(len(df), 100, label=f"MC input panel {path.name}")
     exits = df[df["Type"].astype(str).str.startswith("Exit")].copy()
     exits["exit_date"] = pd.to_datetime(exits["Date and time"]).dt.normalize()
     exits = exits.rename(columns={"Net P&L USD": "pnl"})
-    return exits[["exit_date", "pnl"]].sort_values("exit_date").reset_index(drop=True)
+    out = exits[["exit_date", "pnl"]].sort_values("exit_date").reset_index(drop=True)
+    if not out.empty:
+        # MVD window — catches "4yr panel actually 14mo" class (audit instance #8).
+        assert_window(
+            out["exit_date"].iloc[0].to_pydatetime(),
+            out["exit_date"].iloc[-1].to_pydatetime(),
+            expected_min_days=4 * 365,
+            label=f"MC input panel {path.name}",
+            tolerance_days=60,
+        )
+    return out
 
 
-def implied_1r(pnl: pd.Series, strategy: str, account: float = STARTING_EQUITY) -> float:
-    """Implied 1R in dollars. Guardian: median loss (pure trend-rider, no BE).
+def implied_1r(pnl: pd.Series, strategy: str,
+               account: float = STARTING_EQUITY) -> Tuple[float, bool]:
+    """Implied 1R in dollars. Returns (r1, fell_back).
+
+    Guardian: median loss (pure trend-rider, no BE) — by design, fell_back=False.
     Striker/Aegis: mean of |losses| > 1% of account (full-stop cohort).
-    Fallback to median if fewer than 5 full stops."""
+    Falls back to median if fewer than 5 full stops — fell_back=True.
+
+    The fallback path is the silent-trigger case named in audit instance #1
+    (user memory `portfolio_mc_1r_fallback_trap.md`). It can swing MC by ~10pp.
+    Callers must `assert_no_fallback` on the aggregated count for any
+    canonical run.
+    """
     abs_losses = pnl[pnl < 0].abs()
     if strategy == "guardian":
-        return float(abs_losses.median())
+        return float(abs_losses.median()), False
     full_stops = abs_losses[abs_losses > 0.01 * account]
     if len(full_stops) < 5:
-        return float(abs_losses.median())
-    return float(full_stops.mean())
+        return float(abs_losses.median()), True
+    return float(full_stops.mean()), False
 
 
 def build_daily_panel(trades_by_strat: Dict[str, pd.DataFrame],
@@ -82,10 +107,15 @@ def build_daily_panel(trades_by_strat: Dict[str, pd.DataFrame],
     scale_info: Dict[str, dict] = {}
     series = []
     for strat, trades in trades_by_strat.items():
-        r1 = implied_1r(trades["pnl"], strat)
+        r1, fell_back = implied_1r(trades["pnl"], strat)
         target_dollars = allocations[strat] * STARTING_EQUITY
         scale = target_dollars / r1 if r1 > 0 else 1.0
-        scale_info[strat] = {"implied_1r": r1, "scale": scale, "n_trades": len(trades)}
+        scale_info[strat] = {
+            "implied_1r": r1,
+            "scale": scale,
+            "n_trades": len(trades),
+            "fell_back": fell_back,
+        }
         s = trades.groupby("exit_date")["pnl"].sum() * scale
         s.name = strat
         series.append(s)
@@ -240,10 +270,22 @@ def _load_all(allocs: Dict[str, float]):
 def mode_default(dd_trigger: float, dd_scale: float, no_protection: bool,
                  allocs: Dict[str, float], verbose: bool = True):
     trades_by_strat, panel, blocks, scale_info = _load_all(allocs)
+
+    # MVD contract — catches the implied_1r silent-fallback case
+    # (audit instance #1). Guardian's median path is by design and reports
+    # fell_back=False. Striker/Aegis fall back to median when full-stop
+    # cohort is under-populated (n<5); for any canonical run this must be 0.
+    fallback_count = sum(1 for info in scale_info.values() if info["fell_back"])
+    assert_no_fallback(
+        fallback_count,
+        label="portfolio_mc implied_1r (Striker/Aegis full-stop cohort)",
+    )
+
     if verbose:
         print("Scale factors:")
         for s, info in scale_info.items():
-            print(f"  {s:<9} 1R=${info['implied_1r']:>7,.2f}  scale={info['scale']:>6.3f}  n={info['n_trades']}")
+            tag = "  [fallback: median]" if info["fell_back"] else ""
+            print(f"  {s:<9} 1R=${info['implied_1r']:>7,.2f}  scale={info['scale']:>6.3f}  n={info['n_trades']}{tag}")
         print(f"Historical panel: {panel.index.min().date()} → {panel.index.max().date()}  "
               f"({len(panel)} bdays, {len(blocks)} week-blocks)")
         print()

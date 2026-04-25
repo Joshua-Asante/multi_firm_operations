@@ -39,7 +39,7 @@ would have raised on first run.
 
 ### 2. Identity
 
-String identifiers (symbol, broker, version) verified at top of any script producing a load-bearing number. The most-leveraged single discipline: 67% of the audit-table instances are this class.
+String identifiers (symbol, broker, version) verified at top of any script producing a load-bearing number. The most-leveraged single discipline: 70% of the audit-table instances are this class.
 
 - `assert_symbol(actual, expected)` — strict equality. `USDJPY` and `USDJPY_X` are different feeds.
 - `assert_broker(actual, expected)` — strict equality.
@@ -108,7 +108,7 @@ Any brief, ADR, memory entry, or CHANGELOG entry that cites specific numbers or 
 
 If the check fails, the artifact is not promoted: either the producing script is hardened, or the citation is removed.
 
-## Audit table — 9 instances driving the library
+## Audit table — 10 instances driving the library
 
 Pre-MVD failure cases. Each row's "MVD" column is the one-line defense that would have caught it.
 
@@ -123,8 +123,9 @@ Pre-MVD failure cases. Each row's "MVD" column is the one-line defense that woul
 | 7 | pre-04-22 | Aegis EOM "last 3 trading days" vs Pine `dayofmonth >= 29` | `assert_file_contains("strategies/aegis/aegis_usdjpy_v4.3.txt", "dayofmonth >= 29")` | Code-vs-doc | Y (strict) |
 | 8 | 2026-04-23 | "4yr Alchemy panel" actually 14mo (no 2022 regime) | `assert_window(first, last, expected_min_days=4*365, "Alch panel")` | **Identity** + cardinality | Y (strict) |
 | 9 | pre-04-22 | TV `<30-day` P&L distortion on JPY pairs | `assert_reconciled(tv_pnl, csv_pnl, 0.05, "TV vs CSV")` | Cross-source | N |
+| 10 | 2026-04-25 | "DD" cited as 5.01% (intra-trade) on MVD page vs 3.76% (trade-close) in `aegis_CHANGELOG.md` — same metric name, different measurements | Use qualified labels in `assert_reconciled` (e.g. `"DD_intra vs canonical"`, never bare `"DD"`) — discipline at call site | **Identity** | Y (broad) |
 
-**Summary.** 5 families. 6/9 instances are identity-class (strict or broad) — labels-as-verification is the dominant sub-pattern. 6/9 reduce to a single one-line assertion; 3 require template-level discipline (brief preamble, "primary X" backing requirement).
+**Summary.** 5 families. 7/10 instances are identity-class (strict or broad) — labels-as-verification is the dominant sub-pattern. 7/10 reduce to a single one-line assertion; 3 require template-level discipline (brief preamble, "primary X" backing requirement).
 
 ## Update protocol
 
@@ -147,4 +148,4 @@ This is the defense against library decay (catching the previous war while curre
 
 ---
 
-**MVD-attest:** For each cited number above (e.g. "67%", "6/9", "9 instances"), the producing source is the audit table on this page. The audit table itself was assembled by manual review of the recent_updates section of the userMemories block on 2026-04-24 and is the canonical reference; numbers traced here on first read.
+**MVD-attest:** For each cited number above (e.g. "70%", "7/10", "10 instances"), the producing source is the audit table on this page. The audit table was assembled by manual review of the recent_updates section of the userMemories block on 2026-04-24 (instances 1–9) and extended on 2026-04-25 with instance #10 (DD label ambiguity, surfaced by [PR #2](https://github.com/Joshua-Asante/prop_firm_pipeline/pull/2)); numbers traced on first read.

@@ -5,7 +5,7 @@
 
 ## Why this matters
 
-Portfolio Monte Carlo (`portfolio_mc.py`) takes CSV backtest output from each strategy and normalizes P&L to a target risk allocation (e.g., scale Guardian's 0.55% backtest trades to 0.30% challenge allocation). The normalization requires a 1R estimator — the typical loss size in backtest-dollar terms — so that target allocation can be expressed as a simple multiplier on normalized P&L.
+Portfolio Monte Carlo (`portfolio_mc.py`) takes CSV backtest output from each strategy and normalizes P&L to a target risk allocation. The normalization requires a 1R estimator — the typical loss size in backtest-dollar terms — so that target allocation can be expressed as a simple multiplier on normalized P&L.
 
 **If the 1R estimator is wrong, every MC number downstream is wrong.** Bust rate, pass rate, DD distribution, bust attribution — all distorted by the normalization error.
 
@@ -23,15 +23,13 @@ Apply per-strategy 1R estimation based on the strategy's exit architecture:
 
 ### Strategies with no exit management (unimodal loss distribution)
 
-**Guardian v5.1** is the current example. No BE, no trail, no MFE-BE. All losses are full-stops. The loss distribution is unimodal and roughly symmetric around the mean stop size.
+**Guardian v5.5** is the current example. No BE, no trail, no MFE-BE. All losses are full-stops. The loss distribution is unimodal and roughly symmetric around the mean stop size.
 
 - **Estimator:** median loss is acceptable (mean ≈ median for unimodal symmetric).
-- **Guardian v5.1 observed:** full-stop mean ≈ median ≈ 1.37% of account equity at backtest risk setting.
+- **Guardian v5.5 observed:** full-stop median ≈ 0.58% / mean ≈ 0.66% of account equity at backtest risk setting (n=158 losing trades from 200-trade OANDA panel 2022-01 → 2026-04).
 - **Implementation:** `median(abs(loss_pnl))` where `loss_pnl` is filtered to loss trades only.
 
 ### Strategies with active exit management (bimodal loss distribution)
-
-**Striker v4.3** and **Aegis v4.1** both have BE and/or trail logic. The loss distribution has two modes.
 
 - **Estimator:** filter the CSV to **full-stop losses only** (losses that exited at or very near the initial SL, not at BE). Use the mean of that filtered subset as 1R.
 - **Identification:** a full-stop loss is defined as `abs(loss_pct - sl_size_pct) < tolerance` where `sl_size_pct` is the configured stop in the Pine strategy and `tolerance` is a small slippage allowance (e.g., 10% of SL size).

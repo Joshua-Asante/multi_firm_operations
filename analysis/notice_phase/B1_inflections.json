@@ -1,0 +1,98 @@
+{
+  "XAUUSD-US30": {
+    "full_60d_corr_mean": 0.16425286114920096,
+    "full_60d_corr_std": 0.26977591588188793,
+    "sustained_breaks_ge_30d": [
+      {
+        "start": "2022-03-13",
+        "end": "2022-05-05",
+        "direction": "below",
+        "duration_days": 53
+      },
+      {
+        "start": "2022-09-13",
+        "end": "2022-12-19",
+        "direction": "above",
+        "duration_days": 97
+      },
+      {
+        "start": "2023-05-02",
+        "end": "2023-07-12",
+        "direction": "below",
+        "duration_days": 71
+      },
+      {
+        "start": "2024-11-06",
+        "end": "2024-12-18",
+        "direction": "below",
+        "duration_days": 42
+      },
+      {
+        "start": "2025-06-19",
+        "end": "2025-08-22",
+        "direction": "below",
+        "duration_days": 64
+      }
+    ]
+  },
+  "XAUUSD-USDJPY": {
+    "full_60d_corr_mean": -0.3925753372470783,
+    "full_60d_corr_std": 0.19387168990039447,
+    "sustained_breaks_ge_30d": [
+      {
+        "start": "2022-10-21",
+        "end": "2023-07-28",
+        "direction": "below",
+        "duration_days": 280
+      },
+      {
+        "start": "2023-12-27",
+        "end": "2024-02-23",
+        "direction": "below",
+        "duration_days": 58
+      },
+      {
+        "start": "2025-10-30",
+        "end": "2026-01-27",
+        "direction": "above",
+        "duration_days": 89
+      },
+      {
+        "start": "2026-02-06",
+        "end": "2026-03-13",
+        "direction": "above",
+        "duration_days": 35
+      }
+    ]
+  },
+  "US30-USDJPY": {
+    "full_60d_corr_mean": -0.04535175257288548,
+    "full_60d_corr_std": 0.25486293358521117,
+    "sustained_breaks_ge_30d": [
+      {
+        "start": "2022-09-08",
+        "end": "2023-01-22",
+        "direction": "below",
+        "duration_days": 136
+      },
+      {
+        "start": "2023-05-07",
+        "end": "2023-07-10",
+        "direction": "above",
+        "duration_days": 64
+      },
+      {
+        "start": "2024-01-08",
+        "end": "2024-02-23",
+        "direction": "below",
+        "duration_days": 46
+      },
+      {
+        "start": "2025-04-08",
+        "end": "2025-07-15",
+        "direction": "above",
+        "duration_days": 98
+      }
+    ]
+  }
+}

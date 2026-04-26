@@ -1,0 +1,241 @@
+{
+  "data_hash": "6ff6cc3ce9f3f7ac825b2bae8e1d0cd82295564ca909ba6698f523606fba2d92",
+  "train_window": [
+    "2022-01-01 00:00:00+00:00",
+    "2025-01-01 00:00:00+00:00"
+  ],
+  "oos_window": [
+    "2025-01-01 00:00:00+00:00",
+    "2026-04-27 00:00:00+00:00"
+  ],
+  "slippage_pips_verdict": 2.0,
+  "filters": {
+    "rollover_hour_ny_excluded": 17,
+    "decision_dates_excluded_count": 70,
+    "sunday_partial_session_excluded": true
+  },
+  "aegis": {
+    "best_params": {
+      "bb_period": 50,
+      "bb_std": 2.5,
+      "atr_period": 20,
+      "stop_atr_mult": 2.0,
+      "target_r_mult": 1.0,
+      "max_hold_bars": 16,
+      "entry_variant": "touch",
+      "entry_hours_ny": [
+        18,
+        19,
+        20,
+        21
+      ],
+      "require_close_inside": false,
+      "require_regime_calm": false
+    },
+    "train_metrics": {
+      "n_trades": 319,
+      "pf": 0.7218538318148852,
+      "mu_sigma": -0.15047099086471086,
+      "sharpe": -2.388652928144981,
+      "max_dd_r": 47.22152802296085,
+      "win_rate": 0.47962382445141066,
+      "mean_r": -0.13088745568204946,
+      "std_r": 0.8698517563410675,
+      "total_r": -41.753098362573766,
+      "params": {
+        "bb_period": 50,
+        "bb_std": 2.5,
+        "atr_period": 20,
+        "stop_atr_mult": 2.0,
+        "target_r_mult": 1.0,
+        "max_hold_bars": 16,
+        "entry_variant": "touch",
+        "entry_hours_ny": [
+          18,
+          19,
+          20,
+          21
+        ],
+        "require_close_inside": false,
+        "require_regime_calm": false
+      }
+    },
+    "oos_metrics": {
+      "n_trades": 136,
+      "pf": 0.6195752411572386,
+      "mu_sigma": -0.22039312122616886,
+      "sharpe": -3.498632336602521,
+      "max_dd_r": 29.637573462425223,
+      "win_rate": 0.4852941176470588,
+      "mean_r": -0.19137224004519943,
+      "std_r": 0.868322200713388,
+      "total_r": -26.026624646147123,
+      "params": {
+        "bb_period": 50,
+        "bb_std": 2.5,
+        "atr_period": 20,
+        "stop_atr_mult": 2.0,
+        "target_r_mult": 1.0,
+        "max_hold_bars": 16,
+        "entry_variant": "touch",
+        "entry_hours_ny": [
+          18,
+          19,
+          20,
+          21
+        ],
+        "require_close_inside": false,
+        "require_regime_calm": false
+      }
+    },
+    "verdict": {
+      "pass": false,
+      "reasons": [
+        "train PF 0.722 < 2.0",
+        "OOS PF 0.6195752411572386 < 1.8",
+        "OOS mu/sigma -0.22039312122616886 < 1.0",
+        "OOS Sharpe -3.50 < 0.7 * train Sharpe -2.39"
+      ]
+    },
+    "n_combos_evaluated": 288,
+    "n_admissible_train": 288
+  },
+  "rangefade": {
+    "best_params": {
+      "bb_period": 50,
+      "bb_std": 2.0,
+      "atr_period": 14,
+      "stop_atr_mult": 2.0,
+      "target_r_mult": 1.0,
+      "max_hold_bars": 16,
+      "entry_variant": "touch",
+      "entry_hours_ny": [
+        18,
+        19,
+        20,
+        21
+      ],
+      "require_close_inside": false,
+      "require_regime_calm": true
+    },
+    "train_metrics": {
+      "n_trades": 269,
+      "pf": 0.7694418947927308,
+      "mu_sigma": -0.12015777373747358,
+      "sharpe": -1.907445524403139,
+      "max_dd_r": 33.53092127080963,
+      "win_rate": 0.5427509293680297,
+      "mean_r": -0.1003247128570437,
+      "std_r": 0.8349415084556902,
+      "total_r": -26.98734775854475,
+      "params": {
+        "bb_period": 50,
+        "bb_std": 2.0,
+        "atr_period": 14,
+        "stop_atr_mult": 2.0,
+        "target_r_mult": 1.0,
+        "max_hold_bars": 16,
+        "entry_variant": "touch",
+        "entry_hours_ny": [
+          18,
+          19,
+          20,
+          21
+        ],
+        "require_close_inside": false,
+        "require_regime_calm": true
+      }
+    },
+    "oos_metrics": {
+      "n_trades": 114,
+      "pf": 0.6632238035547258,
+      "mu_sigma": -0.18714574927001693,
+      "sharpe": -2.9708466689478747,
+      "max_dd_r": 23.425851502344152,
+      "win_rate": 0.5263157894736842,
+      "mean_r": -0.1611243462838338,
+      "std_r": 0.8609564839827645,
+      "total_r": -18.368175476357052,
+      "params": {
+        "bb_period": 50,
+        "bb_std": 2.0,
+        "atr_period": 14,
+        "stop_atr_mult": 2.0,
+        "target_r_mult": 1.0,
+        "max_hold_bars": 16,
+        "entry_variant": "touch",
+        "entry_hours_ny": [
+          18,
+          19,
+          20,
+          21
+        ],
+        "require_close_inside": false,
+        "require_regime_calm": true
+      }
+    },
+    "verdict": {
+      "pass": false,
+      "reasons": [
+        "train PF 0.769 < 2.0",
+        "OOS PF 0.6632238035547258 < 1.8",
+        "OOS mu/sigma -0.18714574927001693 < 1.0",
+        "OOS Sharpe -2.97 < 0.7 * train Sharpe -1.91"
+      ]
+    },
+    "n_combos_evaluated": 128,
+    "n_admissible_train": 128
+  },
+  "diagnostic_no_slippage": {
+    "aegis": {
+      "best_params": {
+        "bb_period": 30,
+        "bb_std": 2.5,
+        "atr_period": 20,
+        "stop_atr_mult": 2.0,
+        "target_r_mult": 1.0,
+        "max_hold_bars": 16,
+        "entry_variant": "touch",
+        "entry_hours_ny": [
+          18,
+          19,
+          20,
+          21
+        ],
+        "require_close_inside": false,
+        "require_regime_calm": false
+      },
+      "train_pf": 1.1277936675295175,
+      "train_n": 436,
+      "train_mean_r": 0.0474877185954798,
+      "oos_pf": 0.9335467128829756,
+      "oos_n": 182,
+      "oos_mean_r": -0.028254661745132817
+    },
+    "rangefade": {
+      "best_params": {
+        "bb_period": 50,
+        "bb_std": 2.0,
+        "atr_period": 14,
+        "stop_atr_mult": 2.0,
+        "target_r_mult": 1.0,
+        "max_hold_bars": 16,
+        "entry_variant": "touch",
+        "entry_hours_ny": [
+          18,
+          19,
+          20,
+          21
+        ],
+        "require_close_inside": false,
+        "require_regime_calm": true
+      },
+      "train_pf": 1.2285548780743751,
+      "train_n": 269,
+      "train_mean_r": 0.08143360242944231,
+      "oos_pf": 1.1028794376558637,
+      "oos_n": 114,
+      "oos_mean_r": 0.039594437389421866
+    }
+  }
+}

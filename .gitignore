@@ -23,3 +23,6 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# AUDNZD discovery loop raw bar CSVs (large; SHA256 sidecars are committed)
+data/audnzd_oanda_m15_*.csv

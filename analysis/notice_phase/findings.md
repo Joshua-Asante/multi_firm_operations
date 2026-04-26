@@ -105,6 +105,37 @@ generalized — only a live-PnL gap vs MC justifies an overlay; bar-stat shifts
 do not. If Q5 shows a gap, the response is to investigate further (Q3), not
 to add an overlay.
 
+**Q3 outcome (2026-04-25, third pre-Q gate test) — NO_TRIGGER_CANDIDATE
+(Q5 is window-specific; lower tail not symmetrically elevated).**
+Per-period bootstrap bust rates at locked params (G 0.34% / S 1.00% / A 1.50%,
+dd_protection on, 50K × 3 seeds, raised from canonical 10K per brief noise-gate
+response): OANDA full panel **0.45% bust ± 0.01pp** (within-broker anchor),
+calibration-only **0.63% bust ± 0.00pp**, 2026-YTD-only **0.10% bust ± 0.02pp**
+(95% CI lower bound 0.067%). 2026-YTD is materially **safer** than calibration
+on the bust dimension (0.53pp shift in the safer direction); the
+trigger-candidate threshold (cal mean + max(0.5pp, 3·σ_seed_calib) = 1.13%)
+is mechanically unreachable at any sample size. Joint upper-tail signal does
+not generalize beyond Q5's window: Q3.2 pairwise Spearman CIs overlap on all
+three pairs in the full-panel spec (G–S Δ −0.04 / G–A Δ −0.14 / S–A Δ +0.03).
+Joint-tail probability (Q3.3) is structurally undefined at 2026-YTD scope —
+**0 days had all three legs trade simultaneously** (Aegis is rate-limiter;
+4yr panel only had 2 such days), so the symmetric joint-tail decision rule
+defers to Q3.4 as primary per brief. **The asymmetric reading of Q5 holds:
+2026-YTD regime favored synchronized smooth-trend co-movement (upper-tail
+catch), not symmetric joint-tail elevation; bust risk and p99 DD are if
+anything lower in 2026 YTD than in calibration.** No re-MC trigger; locked
+0.65% bust / 92.73% pass figure stands. Q3.6 dd_protection sensitivity
+SKIPPED per brief (no trigger candidate). Reproducible:
+`python analysis/q3_pairwise_joint_tail.py`. Gate audit Case B at
+`docs/methodology/gate_audits/2026-04-25_q3_halt_rules_design_skew.md` —
+brief's Q3.4 halt rules fired correctly per their text but were classified
+FALSE_POSITIVE (panel-split: real regime divergence with clean partition)
+and STRUCTURAL_RARE_EVENT (2026-YTD noise gate fires on rare-event mean
+smallness, not discrimination-relevant noise); both classifications
+direct-examined and logged. Resolution page:
+[✅ Q3 — pairwise correlation + symmetric joint-tail — RESOLVED 2026-04-25
+(Q5 window-specific; no re-MC trigger)](https://www.notion.so/34edc0b53c11819fa919cdf265a45490).
+
 ### B3. Intraday-vs-daily structure — **Closed (supporting)**
 
 15-min level shifts mirror daily-level shifts in direction and magnitude

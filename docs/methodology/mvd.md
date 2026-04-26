@@ -44,6 +44,7 @@ String identifiers (symbol, broker, version) verified at top of any script produ
 - `assert_symbol(actual, expected)` — strict equality. `USDJPY` and `USDJPY_X` are different feeds.
 - `assert_broker(actual, expected)` — strict equality.
 - `assert_version(actual, expected)` — strict equality.
+- `assert_tv_export(csv_path, expected_strategy, expected_version, expected_broker, expected_symbol)` — strict equality on all four fields parsed from the canonical OANDA filename pattern `<Strategy>_<Instrument>_<Version>_<Broker>_<Symbol>_<YYYY-MM-DD>_<hash>.csv`. Catches the "wrong CSV in load slot" class (e.g. a Striker CSV in Guardian's path, a v5.4 export when v5.5 is locked) at the consuming site.
 
 **Worked example.** Aegis 14mo Alch calibration loaded a CSV labeled "USDJPY" and reported $117K — actual symbol was the spread-included USDJPY, not the USDJPY_X feed used elsewhere. Reproducing on USDJPY_X gave ~$93K. One line at top of the calibration script:
 ```python

@@ -32,9 +32,13 @@ window.
 from __future__ import annotations
 
 import csv
+import sys
 from collections import defaultdict
 from datetime import datetime, timedelta
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from lib.mvd import assert_tv_export
 
 INITIAL_CAPITAL = 200_000.0
 NY_OFFSET = timedelta(hours=-5)
@@ -47,6 +51,9 @@ FILES = {
     "striker": DATA_DIR / "Striker_DJ30_v4.4_OANDA_US30USD_2026-04-25_86e9d.csv",
     "aegis": DATA_DIR / "Aegis_USDJPY_v4.3_OANDA_USDJPY_2026-04-25_7ee6b.csv",
 }
+assert_tv_export(FILES["guardian"], expected_strategy="Guardian", expected_version="v5.5", expected_broker="OANDA", expected_symbol="XAUUSD")
+assert_tv_export(FILES["striker"],  expected_strategy="Striker",  expected_version="v4.4", expected_broker="OANDA", expected_symbol="US30USD")
+assert_tv_export(FILES["aegis"],    expected_strategy="Aegis",    expected_version="v4.3", expected_broker="OANDA", expected_symbol="USDJPY")
 
 
 def parse_trades(name: str, csv_path: Path) -> list[dict]:

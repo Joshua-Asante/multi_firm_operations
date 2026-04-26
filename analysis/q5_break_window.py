@@ -56,6 +56,7 @@ import pandas as pd
 import sys
 sys.path.insert(0, str(Path(__file__).parent.parent))
 import portfolio_mc as pmc
+from lib.mvd import assert_tv_export
 
 # OANDA panels (locked version snapshot, dated 2026-04-25).
 OANDA_DIR = Path(__file__).parent.parent / "data" / "tv_exports" / "oanda"
@@ -64,6 +65,9 @@ CSVS: Dict[str, Path] = {
     "striker":  OANDA_DIR / "Striker_DJ30_v4.4_OANDA_US30USD_2026-04-25_86e9d.csv",
     "aegis":    OANDA_DIR / "Aegis_USDJPY_v4.3_OANDA_USDJPY_2026-04-25_7ee6b.csv",
 }
+assert_tv_export(CSVS["guardian"], expected_strategy="Guardian", expected_version="v5.5", expected_broker="OANDA", expected_symbol="XAUUSD")
+assert_tv_export(CSVS["striker"],  expected_strategy="Striker",  expected_version="v4.4", expected_broker="OANDA", expected_symbol="US30USD")
+assert_tv_export(CSVS["aegis"],    expected_strategy="Aegis",    expected_version="v4.3", expected_broker="OANDA", expected_symbol="USDJPY")
 
 WINDOW_START = pd.Timestamp("2025-10-30")
 WINDOW_END   = pd.Timestamp("2026-01-27")

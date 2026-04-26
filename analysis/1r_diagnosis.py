@@ -22,7 +22,11 @@ from __future__ import annotations
 
 import csv
 import statistics
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from lib.mvd import assert_tv_export
 
 INITIAL_CAPITAL = 200_000.0
 DESIGNED_RISK_PCT = 0.34  # Guardian risk locked 2026-04-23
@@ -32,6 +36,13 @@ CSV_PATH = (
     / "tv_exports"
     / "oanda"
     / "Guardian_Gold_v5.5_OANDA_XAUUSD_2026-04-25_9ae1f.csv"
+)
+assert_tv_export(
+    CSV_PATH,
+    expected_strategy="Guardian",
+    expected_version="v5.5",
+    expected_broker="OANDA",
+    expected_symbol="XAUUSD",
 )
 
 

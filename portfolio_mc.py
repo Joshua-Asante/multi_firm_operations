@@ -27,10 +27,10 @@ import pandas as pd
 
 try:
     from .dd_protection import DD_TRIGGER, DD_SCALE
-    from .lib.mvd import assert_min_rows, assert_window, assert_no_fallback
+    from .lib.mvd import assert_min_rows, assert_window, assert_no_fallback, assert_tv_export
 except ImportError:
     from dd_protection import DD_TRIGGER, DD_SCALE
-    from lib.mvd import assert_min_rows, assert_window, assert_no_fallback
+    from lib.mvd import assert_min_rows, assert_window, assert_no_fallback, assert_tv_export
 
 STARTING_EQUITY = 200_000
 PROFIT_TARGET = 210_000
@@ -48,7 +48,12 @@ ALLOCATIONS: Dict[str, float] = {
 }
 STRATS = tuple(ALLOCATIONS.keys())
 
-CSV_DIR = Path(__file__).parent / "data" / "tv_exports"
+OANDA_DIR = Path(__file__).parent / "data" / "tv_exports" / "oanda"
+OANDA_PANELS: Dict[str, Path] = {
+    "guardian": OANDA_DIR / "Guardian_Gold_v5.5_OANDA_XAUUSD_2026-04-25_9ae1f.csv",
+    "striker":  OANDA_DIR / "Striker_DJ30_v4.4_OANDA_US30USD_2026-04-25_86e9d.csv",
+    "aegis":    OANDA_DIR / "Aegis_USDJPY_v4.3_OANDA_USDJPY_2026-04-25_7ee6b.csv",
+}
 
 
 # ── Data pipeline ─────────────────────────────────────────────────────────
@@ -261,7 +266,13 @@ def report_default(seeds_results: list, dd_trigger: float, dd_scale: float,
 # ── CLI modes ─────────────────────────────────────────────────────────────
 
 def _load_all(allocs: Dict[str, float]):
-    trades_by_strat = {s: load_trades(CSV_DIR / f"{s}.csv") for s in STRATS}
+    # MVD identity gate on each canonical OANDA panel — catches the
+    # 'wrong CSV in load slot' class (e.g. v5.4 export when v5.5 is locked,
+    # or a Striker file in Guardian's path).
+    assert_tv_export(OANDA_PANELS["guardian"], expected_strategy="Guardian", expected_version="v5.5", expected_broker="OANDA", expected_symbol="XAUUSD")
+    assert_tv_export(OANDA_PANELS["striker"],  expected_strategy="Striker",  expected_version="v4.4", expected_broker="OANDA", expected_symbol="US30USD")
+    assert_tv_export(OANDA_PANELS["aegis"],    expected_strategy="Aegis",    expected_version="v4.3", expected_broker="OANDA", expected_symbol="USDJPY")
+    trades_by_strat = {s: load_trades(OANDA_PANELS[s]) for s in STRATS}
     panel, scale_info = build_daily_panel(trades_by_strat, allocs)
     blocks = build_week_blocks(panel)
     return trades_by_strat, panel, blocks, scale_info
@@ -286,7 +297,7 @@ def mode_default(dd_trigger: float, dd_scale: float, no_protection: bool,
         for s, info in scale_info.items():
             tag = "  [fallback: median]" if info["fell_back"] else ""
             print(f"  {s:<9} 1R=${info['implied_1r']:>7,.2f}  scale={info['scale']:>6.3f}  n={info['n_trades']}{tag}")
-        print(f"Historical panel: {panel.index.min().date()} → {panel.index.max().date()}  "
+        print(f"Historical panel: {panel.index.min().date()} -> {panel.index.max().date()}  "
               f"({len(panel)} bdays, {len(blocks)} week-blocks)")
         print()
 
@@ -324,7 +335,7 @@ def mode_historical(dd_trigger: float, dd_scale: float, no_protection: bool,
     print("=== Portfolio MC — Historical (deterministic) ===")
     print(f"Config: {_fmt_config(dd_trigger, dd_scale, no_protection)}")
     print(f"Allocations: {_fmt_alloc(allocs)}")
-    print(f"Panel: {panel.index.min().date()} → {panel.index.max().date()}  ({len(panel)} bdays)")
+    print(f"Panel: {panel.index.min().date()} -> {panel.index.max().date()}  ({len(panel)} bdays)")
     print()
     print(f"Outcome:         {outcome.upper()}")
     print(f"Day terminated:  {day} ({panel.index[min(day - 1, len(panel) - 1)].date()})")

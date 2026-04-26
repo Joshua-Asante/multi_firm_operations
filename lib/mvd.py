@@ -100,6 +100,76 @@ def assert_version(actual: str, expected: str) -> None:
         )
 
 
+def parse_tv_export_filename(filename: str) -> dict:
+    """Parse the canonical OANDA TV-export CSV filename into identity fields.
+
+    Pattern (7 underscore-delimited fields + .csv):
+        <Strategy>_<Instrument>_<Version>_<Broker>_<Symbol>_<YYYY-MM-DD>_<hash>.csv
+
+    Example:
+        Guardian_Gold_v5.5_OANDA_XAUUSD_2026-04-25_9ae1f.csv
+        -> strategy=Guardian, instrument=Gold, version=v5.5, broker=OANDA,
+           symbol=XAUUSD, export_date=2026-04-25, hash_suffix=9ae1f
+
+    Raises AssertionError on pattern mismatch (treated as identity failure).
+    """
+    base = filename[:-4] if filename.endswith(".csv") else filename
+    parts = base.split("_")
+    if len(parts) != 7:
+        raise AssertionError(
+            f"MVD identity fail (TV-export filename pattern): "
+            f"got '{filename}', expected 7 underscore-delimited fields "
+            f"(<Strategy>_<Instrument>_<Version>_<Broker>_<Symbol>_<YYYY-MM-DD>_<hash>.csv)"
+        )
+    strategy, instrument, version, broker, symbol, export_date, hash_suffix = parts
+    return {
+        "strategy": strategy,
+        "instrument": instrument,
+        "version": version,
+        "broker": broker,
+        "symbol": symbol,
+        "export_date": export_date,
+        "hash_suffix": hash_suffix,
+        "filename": filename,
+    }
+
+
+def assert_tv_export(
+    csv_path,
+    *,
+    expected_strategy: str,
+    expected_version: str,
+    expected_broker: str,
+    expected_symbol: str,
+) -> dict:
+    """Assert a TV-export CSV's filename declares the expected identity.
+
+    Catches the 'wrong CSV in load slot' class — e.g. a Striker CSV in
+    Guardian's path, or a v5.4 export where v5.5 is locked. Returns the
+    parsed metadata dict for further use by the caller.
+
+    Use within ~5 lines of a TV-export CSV path declaration in any script
+    that loads load-bearing OANDA panels (MC inputs, 1R diagnosis, lock
+    decision inputs).
+    """
+    filename = os.path.basename(str(csv_path))
+    meta = parse_tv_export_filename(filename)
+    fields = (
+        ("strategy", expected_strategy),
+        ("version",  expected_version),
+        ("broker",   expected_broker),
+        ("symbol",   expected_symbol),
+    )
+    for field, expected in fields:
+        actual = meta[field]
+        if actual != expected:
+            raise AssertionError(
+                f"MVD identity fail (TV-export {field}): "
+                f"got '{actual}', expected '{expected}' in {filename}"
+            )
+    return meta
+
+
 # ----------------------------------------------------------------------
 # Family 3 — Contract
 # ----------------------------------------------------------------------

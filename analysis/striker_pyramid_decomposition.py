@@ -31,7 +31,11 @@ from __future__ import annotations
 
 import csv
 import statistics
+import sys
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent))
+from lib.mvd import assert_tv_export
 
 INITIAL_CAPITAL = 200_000.0
 DESIGNED_RISK_PCT = 1.00  # Striker locked
@@ -41,6 +45,13 @@ CSV_PATH = (
     / "tv_exports"
     / "oanda"
     / "Striker_DJ30_v4.4_OANDA_US30USD_2026-04-25_86e9d.csv"
+)
+assert_tv_export(
+    CSV_PATH,
+    expected_strategy="Striker",
+    expected_version="v4.4",
+    expected_broker="OANDA",
+    expected_symbol="US30USD",
 )
 
 

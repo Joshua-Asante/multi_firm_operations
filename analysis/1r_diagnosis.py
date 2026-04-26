@@ -171,10 +171,10 @@ def main() -> None:
         f"  Canonical (201 trades, 20.40% WR): "
         f"{canonical_trades} / {canonical_wins} / {canonical_losses} / 0"
     )
-    print(f"  Δ trades:  {total - canonical_trades:+d}")
-    print(f"  Δ wins:    {len(wins) - canonical_wins:+d}")
-    print(f"  Δ losses:  {len(losses) - canonical_losses:+d}")
-    print(f"  Δ BE:      {len(breakevens) - 0:+d}")
+    print(f"  Delta trades:  {total - canonical_trades:+d}")
+    print(f"  Delta wins:    {len(wins) - canonical_wins:+d}")
+    print(f"  Delta losses:  {len(losses) - canonical_losses:+d}")
+    print(f"  Delta BE:      {len(breakevens) - 0:+d}")
     print()
 
     # Sanity — Pine sizes risk = equity * 0.34%; expected $ at risk per trade.

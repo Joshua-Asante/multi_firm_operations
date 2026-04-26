@@ -85,6 +85,21 @@ P&L. Cheapest falsification first:
 Q5 / Q3 are tracked on the parent Open Questions list. Per scope discipline,
 this brief does not run them — they belong to a separate session.
 
+**Q5 outcome (2026-04-25, second pre-Q gate test) — ESCALATE Q3 (positive-tail signal).**
+Realized window cumulative scaled P&L (allocation-normalized to G 0.34% / S 1.00%
+/ A 1.50% on $200K) over 64 trading days: G +17.76%, S +15.07%, A +14.77%,
+**portfolio +47.60%**. Bootstrap distribution (Mon-anchored 5-day blocks per
+`portfolio_mc.build_week_blocks:127`, 30K samples × 3 seeds): portfolio median
++15.72%, p95 +38.82%. Two-sided p-values: G 0.2174, S 0.1389, A 0.1729 — none
+breach 0.05; **portfolio p_two = 0.0276 — breaches.** Co-movement of all three
+legs into the upper tail is the signal, not any single-leg breakdown. dd_protection
+sensitivity (Q5.5): signal persists and amplifies (p_two 0.0276 → 0.0159) because
+protection clips bootstrap lower tail more than the realized window's intra-period
+DD. **Direction is positive-tail outperformance, not breakdown-into-loss** — the
+brief's "positive tail = also a regime signal" framing applies. Q3 escalation
+authored separately. Reproducible: `python analysis/q5_break_window.py`. Resolution
+page: [⚠️ Q5 — break-window P&L falsification — ESCALATE Q3 — 2026-04-25](https://www.notion.so/34edc0b53c118142a0c1fe26fac09179).
+
 **No overlay proposals from observation alone.** Iran/Hormuz lesson
 generalized — only a live-PnL gap vs MC justifies an overlay; bar-stat shifts
 do not. If Q5 shows a gap, the response is to investigate further (Q3), not

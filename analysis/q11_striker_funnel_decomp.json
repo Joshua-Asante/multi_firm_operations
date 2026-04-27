@@ -1,0 +1,53 @@
+{
+  "question": "Striker funnel drift \u2014 hour-of-day distribution decomposition",
+  "feed": "OANDA",
+  "panel_window": "2022-01-02_2026-04-19",
+  "canonical_status": "PROXY",
+  "instrument": "US30USD",
+  "strategy": "Striker v4.4",
+  "n_periods": 9,
+  "period_totals": {
+    "P0": 798,
+    "P1": 863,
+    "P2": 807,
+    "P3": 966,
+    "P4": 851,
+    "P5": 941,
+    "P6": 873,
+    "P7": 870,
+    "P8": 618
+  },
+  "frac_signals_in_13_17_utc_per_period": {
+    "P0": 0.2043,
+    "P1": 0.2352,
+    "P2": 0.2454,
+    "P3": 0.2484,
+    "P4": 0.2468,
+    "P5": 0.2487,
+    "P6": 0.2577,
+    "P7": 0.2736,
+    "P8": 0.2573
+  },
+  "kl_vs_p0_per_period": {
+    "P0": 0.0,
+    "P1": 0.04702719621792849,
+    "P2": 0.049284892927678806,
+    "P3": 0.05578305509374402,
+    "P4": 0.04728350064579393,
+    "P5": 0.056577985868421166,
+    "P6": 0.06216852941694098,
+    "P7": 0.07742022918701263,
+    "P8": 0.09808657999163148
+  },
+  "chi_square_last_vs_first": {
+    "stat": 130.34781468139477,
+    "df": 22,
+    "p_value": 0.0,
+    "valid_hours_n": 23
+  },
+  "interpretation_keys": {
+    "frac_session_increase_means": "more signals concentrating in 13-17 UTC NY morning window",
+    "kl_increasing_with_period": "hour-distribution shape diverging from early-panel reference",
+    "chi_square_p_low": "shape difference is statistically significant"
+  }
+}

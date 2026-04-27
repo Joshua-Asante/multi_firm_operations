@@ -1,0 +1,86 @@
+{
+  "run_at": "2026-04-26T13:15:33.206797+00:00",
+  "feed": "OANDA",
+  "panel_window": "2022-01-02_2026-04-19",
+  "canonical_status": "PROXY",
+  "amendment": "AMENDMENT_oanda_rescope.md",
+  "results": [
+    {
+      "step": "TV identity assert: guardian",
+      "status": "PASS",
+      "result": "identity OK: Guardian/Gold/v5.5/OANDA/XAUUSD"
+    },
+    {
+      "step": "TV identity assert: striker",
+      "status": "PASS",
+      "result": "identity OK: Striker/DJ30/v4.4/OANDA/US30USD"
+    },
+    {
+      "step": "TV identity assert: aegis",
+      "status": "PASS",
+      "result": "identity OK: Aegis/USDJPY/v4.3/OANDA/USDJPY"
+    },
+    {
+      "step": "Bar verify: XAUUSD",
+      "status": "PASS",
+      "result": "XAUUSD: n=101,461 rows, span=2022-01-02..2026-04-19"
+    },
+    {
+      "step": "Bar verify: US30USD",
+      "status": "PASS",
+      "result": "US30USD: n=101,245 rows, span=2022-01-02..2026-04-19"
+    },
+    {
+      "step": "Bar verify: USDJPY",
+      "status": "PASS",
+      "result": "USDJPY: n=106,820 rows, span=2022-01-02..2026-04-19"
+    },
+    {
+      "step": "TZ reconciliation: guardian",
+      "status": "PASS",
+      "result": {
+        "strategy": "guardian",
+        "best_tz_label": "EST",
+        "offset_hours_utc_minus_chart": 5,
+        "median_price_diff_by_tz": {
+          "UTC": 4.072000000000116,
+          "EST": 1.8110000000001492,
+          "EDT": 2.77800000000002
+        }
+      }
+    },
+    {
+      "step": "TZ reconciliation: striker",
+      "status": "PASS",
+      "result": {
+        "strategy": "striker",
+        "best_tz_label": "EDT",
+        "offset_hours_utc_minus_chart": 4,
+        "median_price_diff_by_tz": {
+          "UTC": 239.6999999999971,
+          "EST": 5.80000000000291,
+          "EDT": 0.20000000000436557
+        }
+      }
+    },
+    {
+      "step": "TZ reconciliation: aegis",
+      "status": "PASS",
+      "result": {
+        "strategy": "aegis",
+        "best_tz_label": "EDT",
+        "offset_hours_utc_minus_chart": 4,
+        "median_price_diff_by_tz": {
+          "UTC": 0.3120000000000118,
+          "EST": 0.11100000000001842,
+          "EDT": 0.08400000000000318
+        }
+      }
+    }
+  ],
+  "resolved_tz_utc_minus_chart": {
+    "guardian": 5,
+    "striker": 4,
+    "aegis": 4
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "question": "Aegis monthly count/PF vs USDJPY vol \u2014 coupled or decoupled?",
+  "feed": "OANDA",
+  "panel_window": "2022-01-02_2026-04-19",
+  "canonical_status": "PROXY",
+  "n_months_total": 52,
+  "n_months_with_aegis_trade": 47,
+  "n_months_with_pf_defined": 22,
+  "early_panel_2022_2023_avg": {
+    "n_trades_per_mo": 1.8333333333333333,
+    "pf": 0.1101072840203275,
+    "mean_R": 0.01902116402116402,
+    "win_rate": 0.44444444444444436,
+    "ret_std_avg": 0.000668848154567271,
+    "atr14_avg": 0.11347392961668461
+  },
+  "late_panel_2025_2026_avg": {
+    "n_trades_per_mo": 3.1875,
+    "pf": 3.8202380952380954,
+    "mean_R": 0.036829629629629636,
+    "win_rate": 0.44,
+    "ret_std_avg": 0.0005734297084843687,
+    "atr14_avg": 0.1176247026004338
+  },
+  "correlations": {
+    "n_trades_vs_ret_std": {
+      "expected": "pos",
+      "verdict": "no significant correlation",
+      "n": 52,
+      "pearson": 0.09042534691051866,
+      "p_pearson": 0.5237839282909023,
+      "spearman": 0.07582655850502401,
+      "p_spearman": 0.5931538532211035
+    },
+    "n_trades_vs_atr14_mean": {
+      "expected": "pos",
+      "verdict": "no significant correlation",
+      "n": 52,
+      "pearson": 0.19287577358828126,
+      "p_pearson": 0.17070579712648343,
+      "spearman": 0.16429087676088536,
+      "p_spearman": 0.24448569888360672
+    },
+    "pf_vs_ret_std": {
+      "expected": "pos",
+      "verdict": "no significant correlation",
+      "n": 22,
+      "pearson": 0.02592416838025541,
+      "p_pearson": 0.9088286516567471,
+      "spearman": -0.07429378219558995,
+      "p_spearman": 0.7424713704223506
+    },
+    "pf_vs_atr14_mean": {
+      "expected": "pos",
+      "verdict": "no significant correlation",
+      "n": 22,
+      "pearson": 0.004634198982451949,
+      "p_pearson": 0.9836704081047454,
+      "spearman": 0.06961385890767877,
+      "p_spearman": 0.7582101758732144
+    }
+  },
+  "summary_counts": {
+    "coupled_in_expected_direction": 0,
+    "no_significant_correlation": 4,
+    "inverse_direction": 0
+  }
+}

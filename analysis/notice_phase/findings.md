@@ -1,5 +1,9 @@
 # Notice phase — findings
 
+> **Companion memo:** [`findings_2026-04-26.md`](findings_2026-04-26.md) —
+> Notice scan of the 2026-04-26 OANDA-proxy Identify corpus (D–J series,
+> 6 Forward questions seeded for the next Inquire-phase brief).
+
 **Status (2026-04-25):** The original Notice/Inquire two-phase framework was
 compressed under The Algorithm (`docs/methodology/observation_routing.md`).
 Each finding is now routed into one of three buckets — **Closed**, **Action**,

@@ -1,0 +1,204 @@
+{
+  "scope": "O1 rejected-universe diagnostic \u2014 Notice 2026-04-27",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "thin_floor_n": 10,
+  "magnitude_floor_R": 0.5,
+  "per_strategy": {
+    "guardian": {
+      "accepted": {
+        "n": 200,
+        "mean_R": 1.653235294117647,
+        "PF": 3.654545454545455,
+        "win_rate": 0.21
+      },
+      "per_filter": [
+        {
+          "filter": "block_TueH08",
+          "n": 51,
+          "thin": false,
+          "rejected_mean_R": 0.8643839302764621,
+          "rejected_PF": 1.9583387053065127,
+          "accepted_mean_R": 1.653235294117647,
+          "accepted_PF": 3.654545454545455,
+          "delta_mean_R": -0.7888513638411848
+        },
+        {
+          "filter": "block_MonH08",
+          "n": 38,
+          "thin": false,
+          "rejected_mean_R": -0.3199233750300367,
+          "rejected_PF": 0.6623031041349616,
+          "accepted_mean_R": 1.653235294117647,
+          "accepted_PF": 3.654545454545455,
+          "delta_mean_R": -1.9731586691476837
+        },
+        {
+          "filter": "block_MonH09",
+          "n": 40,
+          "thin": false,
+          "rejected_mean_R": 1.2397349454907463,
+          "rejected_PF": 2.416839937703705,
+          "accepted_mean_R": 1.653235294117647,
+          "accepted_PF": 3.654545454545455,
+          "delta_mean_R": -0.41350034862690066
+        },
+        {
+          "filter": "block_MonH12",
+          "n": 25,
+          "thin": false,
+          "rejected_mean_R": 2.0614731989017923,
+          "rejected_PF": 3.4541347605973822,
+          "accepted_mean_R": 1.653235294117647,
+          "accepted_PF": 3.654545454545455,
+          "delta_mean_R": 0.40823790478414534
+        },
+        {
+          "filter": "block_TueH12",
+          "n": 29,
+          "thin": false,
+          "rejected_mean_R": 1.855741286677336,
+          "rejected_PF": 3.242354054735117,
+          "accepted_mean_R": 1.653235294117647,
+          "accepted_PF": 3.654545454545455,
+          "delta_mean_R": 0.20250599255968904
+        },
+        {
+          "filter": "block_ThuH12",
+          "n": 29,
+          "thin": false,
+          "rejected_mean_R": 1.9943985969458904,
+          "rejected_PF": 3.409898304642947,
+          "accepted_mean_R": 1.653235294117647,
+          "accepted_PF": 3.654545454545455,
+          "delta_mean_R": 0.3411633028282435
+        }
+      ]
+    },
+    "striker": {
+      "accepted": {
+        "n": 233,
+        "mean_R": 0.07502145922746781,
+        "PF": 2.549645390070922,
+        "win_rate": 0.6437768240343348
+      },
+      "per_filter": [
+        {
+          "filter": "block_atr",
+          "n": 5236,
+          "thin": false,
+          "rejected_mean_R": -0.08579981051551101,
+          "rejected_PF": 0.34416378414712934,
+          "accepted_mean_R": 0.07502145922746781,
+          "accepted_PF": 2.549645390070922,
+          "delta_mean_R": -0.16082126974297883
+        },
+        {
+          "filter": "block_dow",
+          "n": 4618,
+          "thin": false,
+          "rejected_mean_R": -0.08133743062541501,
+          "rejected_PF": 0.34217818804173805,
+          "accepted_mean_R": 0.07502145922746781,
+          "accepted_PF": 2.549645390070922,
+          "delta_mean_R": -0.15635888985288282
+        },
+        {
+          "filter": "block_warmup",
+          "n": 6176,
+          "thin": false,
+          "rejected_mean_R": -0.08545774603030129,
+          "rejected_PF": 0.33695095542318837,
+          "accepted_mean_R": 0.07502145922746781,
+          "accepted_PF": 2.549645390070922,
+          "delta_mean_R": -0.1604792052577691
+        },
+        {
+          "filter": "block_body",
+          "n": 450,
+          "thin": false,
+          "rejected_mean_R": -0.08017777777777389,
+          "rejected_PF": 0.30615384615387714,
+          "accepted_mean_R": 0.07502145922746781,
+          "accepted_PF": 2.549645390070922,
+          "delta_mean_R": -0.15519923700524169
+        },
+        {
+          "filter": "block_prev_bullish",
+          "n": 1554,
+          "thin": false,
+          "rejected_mean_R": -0.07584411064683427,
+          "rejected_PF": 0.3697232730204224,
+          "accepted_mean_R": 0.07502145922746781,
+          "accepted_PF": 2.549645390070922,
+          "delta_mean_R": -0.15086556987430208
+        }
+      ]
+    },
+    "aegis": {
+      "accepted": {
+        "n": 123,
+        "mean_R": 0.032032520325203255,
+        "PF": 3.8970588235294112,
+        "win_rate": 0.4065040650406504
+      },
+      "per_filter": [
+        {
+          "filter": "block_TueH10",
+          "n": 105,
+          "thin": false,
+          "rejected_mean_R": -0.020724346076459763,
+          "rejected_PF": 0.8186619718309813,
+          "accepted_mean_R": 0.032032520325203255,
+          "accepted_PF": 3.8970588235294112,
+          "delta_mean_R": -0.05275686640166302
+        },
+        {
+          "filter": "block_EOM",
+          "n": 663,
+          "thin": false,
+          "rejected_mean_R": -0.08068847914816683,
+          "rejected_PF": 0.5265799851749097,
+          "accepted_mean_R": 0.032032520325203255,
+          "accepted_PF": 3.8970588235294112,
+          "delta_mean_R": -0.11272099947337008
+        },
+        {
+          "filter": "block_vol",
+          "n": 1118,
+          "thin": false,
+          "rejected_mean_R": -0.055729480554557176,
+          "rejected_PF": 0.6313280517160115,
+          "accepted_mean_R": 0.032032520325203255,
+          "accepted_PF": 3.8970588235294112,
+          "delta_mean_R": -0.08776200087976044
+        }
+      ]
+    }
+  },
+  "flagged_top3": [
+    {
+      "strategy": "guardian",
+      "filter": "block_MonH08",
+      "n": 38,
+      "rejected_mean_R": -0.3199233750300367,
+      "rejected_PF": 0.6623031041349616,
+      "accepted_mean_R": 1.653235294117647,
+      "accepted_PF": 3.654545454545455,
+      "delta_mean_R": -1.9731586691476837,
+      "abs_delta": 1.9731586691476837
+    },
+    {
+      "strategy": "guardian",
+      "filter": "block_TueH08",
+      "n": 51,
+      "rejected_mean_R": 0.8643839302764621,
+      "rejected_PF": 1.9583387053065127,
+      "accepted_mean_R": 1.653235294117647,
+      "accepted_PF": 3.654545454545455,
+      "delta_mean_R": -0.7888513638411848,
+      "abs_delta": 0.7888513638411848
+    }
+  ],
+  "total_above_floor": 2
+}

@@ -1,0 +1,57 @@
+{
+  "run_at": "2026-04-27T22:45:54.990477+00:00",
+  "scope": "Notice 2026-04-27 over OANDA-proxy corpus",
+  "amendment_binding": "docs/methodology/identify_corpus/2026-04-26/AMENDMENT_oanda_rescope.md",
+  "brief_preamble_correction": "Brief preamble says 'Pepperstone-canonical bar-corpus'; AMENDMENT rescopes to OANDA-proxy. Phase 0 verifies against OANDA manifest per AMENDMENT, with canonical_status=PROXY end-to-end.",
+  "files": [
+    {
+      "symbol": "XAUUSD",
+      "path": "C:\\Users\\joshu\\prop_firm_pipeline\\data\\bar_data\\XAUUSD.csv",
+      "sha256": "0d8aaa4077892805d0ecaf00f172dfb122284e104db2c0203cd2117c420facca",
+      "n_rows": 101461,
+      "first_ts": "2022-01-02",
+      "last_ts": "2026-04-19",
+      "broker_via_tv_export": "OANDA",
+      "checks": {
+        "row_count_matches_manifest": true,
+        "first_ts_matches_manifest": true,
+        "last_ts_matches_manifest": true,
+        "tv_export_oanda_present": true
+      },
+      "PASS": true
+    },
+    {
+      "symbol": "US30USD",
+      "path": "C:\\Users\\joshu\\prop_firm_pipeline\\data\\bar_data\\US30USD.csv",
+      "sha256": "723a354b1b874e000b025c9537a55f57d810da684e29fce808e1148f0ee677b5",
+      "n_rows": 101245,
+      "first_ts": "2022-01-02",
+      "last_ts": "2026-04-19",
+      "broker_via_tv_export": "OANDA",
+      "checks": {
+        "row_count_matches_manifest": true,
+        "first_ts_matches_manifest": true,
+        "last_ts_matches_manifest": true,
+        "tv_export_oanda_present": true
+      },
+      "PASS": true
+    },
+    {
+      "symbol": "USDJPY",
+      "path": "C:\\Users\\joshu\\prop_firm_pipeline\\data\\bar_data\\USDJPY.csv",
+      "sha256": "678c846c483139e537b43a5ad9950c5fbff4d99733dc735bd564a7fd83db185e",
+      "n_rows": 106820,
+      "first_ts": "2022-01-02",
+      "last_ts": "2026-04-19",
+      "broker_via_tv_export": "OANDA",
+      "checks": {
+        "row_count_matches_manifest": true,
+        "first_ts_matches_manifest": true,
+        "last_ts_matches_manifest": true,
+        "tv_export_oanda_present": true
+      },
+      "PASS": true
+    }
+  ],
+  "all_pass": true
+}

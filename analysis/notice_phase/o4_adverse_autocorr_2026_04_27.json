@@ -1,0 +1,74 @@
+{
+  "scope": "O4 simultaneous-adverse autocorrelation \u2014 Notice 2026-04-27",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "n_universe_bars": 101118,
+  "n_adverse_events": 213,
+  "p_adverse": 0.0021064498902272594,
+  "thin_floor_n": 50,
+  "thin_floor_passed": true,
+  "autocorrelation": {
+    "lag_1": {
+      "rho": 0.03552705067617746,
+      "z_vs_iid_se": 11.297266949197315,
+      "iid_se": 0.0031447473832334023,
+      "significant_2sigma": "True"
+    },
+    "lag_2": {
+      "rho": 0.04493652178546346,
+      "z_vs_iid_se": 14.289389992038124,
+      "iid_se": 0.0031447473832334023,
+      "significant_2sigma": "True"
+    },
+    "lag_3": {
+      "rho": 0.01670802495530566,
+      "z_vs_iid_se": 5.31299431057213,
+      "iid_se": 0.0031447473832334023,
+      "significant_2sigma": "True"
+    },
+    "lag_4": {
+      "rho": 0.030822242057022144,
+      "z_vs_iid_se": 9.801182193951293,
+      "iid_se": 0.0031447473832334023,
+      "significant_2sigma": "True"
+    }
+  },
+  "run_lengths": {
+    "max_run": 3,
+    "n_runs_ge2": 7,
+    "n_runs_ge3": 1,
+    "n_runs_ge4": 0,
+    "n_total_runs": 205
+  },
+  "expected_under_iid": {
+    "expected_runs_ge2": 0.44772871768557804,
+    "expected_runs_ge3": 0.0009431181082203775,
+    "expected_runs_ge4": 1.9866310355321546e-06
+  },
+  "macro_event_tag": {
+    "pct_in_nfp_window_first_fri_1230_to_1330_utc": 0.004694835680751174,
+    "pct_in_fomc_window_wed_1800_to_1959_utc": 0.023474178403755867,
+    "note": "tag-and-preserve per brief; no deletion applied"
+  },
+  "flagged_top3": [
+    {
+      "type": "autocorr_significant",
+      "lag_15min_bars": 1,
+      "rho": 0.03552705067617746,
+      "z_vs_iid_se": 11.297266949197315
+    },
+    {
+      "type": "autocorr_significant",
+      "lag_15min_bars": 2,
+      "rho": 0.04493652178546346,
+      "z_vs_iid_se": 14.289389992038124
+    },
+    {
+      "type": "autocorr_significant",
+      "lag_15min_bars": 3,
+      "rho": 0.01670802495530566,
+      "z_vs_iid_se": 5.31299431057213
+    }
+  ],
+  "total_flagged": 6
+}

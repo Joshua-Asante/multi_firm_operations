@@ -1,0 +1,1646 @@
+{
+  "scope": "O3 conversion-funnel rolling drift \u2014 Notice 2026-04-27",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "period_months": 6,
+  "thin_floor_universe": 30,
+  "drift_threshold_relative": 0.3,
+  "discontinuity_threshold_z": 2.0,
+  "per_strategy": {
+    "guardian": {
+      "s1_signal_raw": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.03298700719181777,
+            "mean_universe": 4624.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.024193339705896783,
+            "mean_universe": 5869.782051282052,
+            "n_obs": 156,
+            "min_universe": 5752,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.036497355980557554,
+            "mean_universe": 5755.8441558441555,
+            "n_obs": 154,
+            "min_universe": 5665,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.029140196824797064,
+            "mean_universe": 5876.670967741936,
+            "n_obs": 155,
+            "min_universe": 5766,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.03451644859994521,
+            "mean_universe": 5750.858064516129,
+            "n_obs": 155,
+            "min_universe": 5661,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.03742501628143407,
+            "mean_universe": 5876.0,
+            "n_obs": 158,
+            "min_universe": 5756,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.03902131750181788,
+            "mean_universe": 5755.058441558442,
+            "n_obs": 154,
+            "min_universe": 5652,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.03671720098199021,
+            "mean_universe": 5869.5,
+            "n_obs": 158,
+            "min_universe": 5760,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.043046321064690314,
+            "mean_universe": 5714.141304347826,
+            "n_obs": 92,
+            "min_universe": 5661,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.03298700719181777,
+        "last_period_rate": 0.043046321064690314,
+        "relative_drift": 0.304947757593714,
+        "first_third_mean": 0.03122590095942403,
+        "last_third_mean": 0.03959494651616613,
+        "thirds_rel_change": 0.26801614363720405,
+        "sustained": true,
+        "discontinuities_2sigma": [
+          {
+            "period": 1,
+            "mean_rate": 0.024193339705896783,
+            "z": -2.0313097023913844
+          }
+        ],
+        "drift_anomaly": true,
+        "discontinuity_anomaly": true
+      },
+      "s2_day_pass": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.019211371916207046,
+            "mean_universe": 4624.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.013720166789398105,
+            "mean_universe": 5869.782051282052,
+            "n_obs": 156,
+            "min_universe": 5752,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.02162462847290995,
+            "mean_universe": 5755.8441558441555,
+            "n_obs": 154,
+            "min_universe": 5665,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.018177981309199117,
+            "mean_universe": 5876.670967741936,
+            "n_obs": 155,
+            "min_universe": 5766,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.020808395339113907,
+            "mean_universe": 5750.858064516129,
+            "n_obs": 155,
+            "min_universe": 5661,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.02196682217227663,
+            "mean_universe": 5876.0,
+            "n_obs": 158,
+            "min_universe": 5756,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.023291016537882795,
+            "mean_universe": 5755.058441558442,
+            "n_obs": 154,
+            "min_universe": 5652,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.021567264339850078,
+            "mean_universe": 5869.5,
+            "n_obs": 158,
+            "min_universe": 5760,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.024829128910798248,
+            "mean_universe": 5714.141304347826,
+            "n_obs": 92,
+            "min_universe": 5661,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.019211371916207046,
+        "last_period_rate": 0.024829128910798248,
+        "relative_drift": 0.2924183144802879,
+        "first_third_mean": 0.018185389059505036,
+        "last_third_mean": 0.02322913659617704,
+        "thirds_rel_change": 0.2773516431332969,
+        "sustained": true,
+        "discontinuities_2sigma": [
+          {
+            "period": 1,
+            "mean_rate": 0.013720166789398105,
+            "z": -2.2426124114793606
+          }
+        ],
+        "drift_anomaly": false,
+        "discontinuity_anomaly": true
+      },
+      "s3_session_pass": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.0068825266827191684,
+            "mean_universe": 4624.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.004566114027703838,
+            "mean_universe": 5869.782051282052,
+            "n_obs": 156,
+            "min_universe": 5752,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.006879448423455765,
+            "mean_universe": 5755.8441558441555,
+            "n_obs": 154,
+            "min_universe": 5665,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.006201009983886612,
+            "mean_universe": 5876.670967741936,
+            "n_obs": 155,
+            "min_universe": 5766,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.008120596664917731,
+            "mean_universe": 5750.858064516129,
+            "n_obs": 155,
+            "min_universe": 5661,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.00813252991253678,
+            "mean_universe": 5876.0,
+            "n_obs": 158,
+            "min_universe": 5756,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.008862775092231412,
+            "mean_universe": 5755.058441558442,
+            "n_obs": 154,
+            "min_universe": 5652,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.006931400797650741,
+            "mean_universe": 5869.5,
+            "n_obs": 158,
+            "min_universe": 5760,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.010034290126615582,
+            "mean_universe": 5714.141304347826,
+            "n_obs": 92,
+            "min_universe": 5661,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.0068825266827191684,
+        "last_period_rate": 0.010034290126615582,
+        "relative_drift": 0.4579369741943675,
+        "first_third_mean": 0.006109363044626257,
+        "last_third_mean": 0.008609488672165912,
+        "thirds_rel_change": 0.40922852501599877,
+        "sustained": true,
+        "discontinuities_2sigma": [],
+        "drift_anomaly": true,
+        "discontinuity_anomaly": false
+      },
+      "s4_hour_pass": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.003674072330318172,
+            "mean_universe": 4624.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.003535383608818302,
+            "mean_universe": 5869.782051282052,
+            "n_obs": 156,
+            "min_universe": 5752,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.005150853859902052,
+            "mean_universe": 5755.8441558441555,
+            "n_obs": 154,
+            "min_universe": 5665,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.004544224293491193,
+            "mean_universe": 5876.670967741936,
+            "n_obs": 155,
+            "min_universe": 5766,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.005825730602716624,
+            "mean_universe": 5750.858064516129,
+            "n_obs": 155,
+            "min_universe": 5661,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.005495320948484704,
+            "mean_universe": 5876.0,
+            "n_obs": 158,
+            "min_universe": 5756,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.00641570308174402,
+            "mean_universe": 5755.058441558442,
+            "n_obs": 154,
+            "min_universe": 5652,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.005077040644231039,
+            "mean_universe": 5869.5,
+            "n_obs": 158,
+            "min_universe": 5760,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.007411500993605885,
+            "mean_universe": 5714.141304347826,
+            "n_obs": 92,
+            "min_universe": 5661,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.003674072330318172,
+        "last_period_rate": 0.007411500993605885,
+        "relative_drift": 1.0172441713917084,
+        "first_third_mean": 0.004120103266346175,
+        "last_third_mean": 0.006301414906526981,
+        "thirds_rel_change": 0.5294313028506334,
+        "sustained": true,
+        "discontinuities_2sigma": [],
+        "drift_anomaly": true,
+        "discontinuity_anomaly": false
+      }
+    },
+    "striker": {
+      "s1_signal_raw": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.06934955938533763,
+            "mean_universe": 4610.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.07287798973118281,
+            "mean_universe": 5854.647435897436,
+            "n_obs": 156,
+            "min_universe": 5716,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.07236631144849069,
+            "mean_universe": 5775.567741935484,
+            "n_obs": 155,
+            "min_universe": 5645,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.07450095401060869,
+            "mean_universe": 5858.7806451612905,
+            "n_obs": 155,
+            "min_universe": 5761,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.07946375054704265,
+            "mean_universe": 5741.141935483871,
+            "n_obs": 155,
+            "min_universe": 5641,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.07883577695292908,
+            "mean_universe": 5856.2594936708865,
+            "n_obs": 158,
+            "min_universe": 5742,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.076937386494507,
+            "mean_universe": 5727.850649350649,
+            "n_obs": 154,
+            "min_universe": 5596,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.07512388531970407,
+            "mean_universe": 5843.183544303797,
+            "n_obs": 158,
+            "min_universe": 5700,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.07456442334061171,
+            "mean_universe": 5682.8387096774195,
+            "n_obs": 93,
+            "min_universe": 5584,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.06934955938533763,
+        "last_period_rate": 0.07456442334061171,
+        "relative_drift": 0.0751967856969059,
+        "first_third_mean": 0.0715312868550037,
+        "last_third_mean": 0.07554189838494092,
+        "thirds_rel_change": 0.05606793483342274,
+        "sustained": false,
+        "discontinuities_2sigma": [],
+        "drift_anomaly": false,
+        "discontinuity_anomaly": false
+      },
+      "s2_atr_expanding": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.018318909173588624,
+            "mean_universe": 4610.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.02242441157095653,
+            "mean_universe": 5854.647435897436,
+            "n_obs": 156,
+            "min_universe": 5716,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.02360221231364621,
+            "mean_universe": 5775.567741935484,
+            "n_obs": 155,
+            "min_universe": 5645,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.025198098409988982,
+            "mean_universe": 5858.7806451612905,
+            "n_obs": 155,
+            "min_universe": 5761,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.027993514168171134,
+            "mean_universe": 5741.141935483871,
+            "n_obs": 155,
+            "min_universe": 5641,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.026161723026122175,
+            "mean_universe": 5856.2594936708865,
+            "n_obs": 158,
+            "min_universe": 5742,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.02239155539307266,
+            "mean_universe": 5727.850649350649,
+            "n_obs": 154,
+            "min_universe": 5596,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.020539462803905912,
+            "mean_universe": 5843.183544303797,
+            "n_obs": 158,
+            "min_universe": 5700,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.02211990274030599,
+            "mean_universe": 5682.8387096774195,
+            "n_obs": 93,
+            "min_universe": 5584,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.018318909173588624,
+        "last_period_rate": 0.02211990274030599,
+        "relative_drift": 0.20749016934902803,
+        "first_third_mean": 0.021448511019397123,
+        "last_third_mean": 0.021683640312428188,
+        "thirds_rel_change": 0.010962499579501081,
+        "sustained": false,
+        "discontinuities_2sigma": [],
+        "drift_anomaly": false,
+        "discontinuity_anomaly": false
+      },
+      "s3_session_pass": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.005791889411640089,
+            "mean_universe": 4610.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.010711131949710115,
+            "mean_universe": 5854.647435897436,
+            "n_obs": 156,
+            "min_universe": 5716,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.009597284710648633,
+            "mean_universe": 5775.567741935484,
+            "n_obs": 155,
+            "min_universe": 5645,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.014602965451183201,
+            "mean_universe": 5858.7806451612905,
+            "n_obs": 155,
+            "min_universe": 5761,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.011068182214269131,
+            "mean_universe": 5741.141935483871,
+            "n_obs": 155,
+            "min_universe": 5641,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.014482033301689805,
+            "mean_universe": 5856.2594936708865,
+            "n_obs": 158,
+            "min_universe": 5742,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.01058681673646591,
+            "mean_universe": 5727.850649350649,
+            "n_obs": 154,
+            "min_universe": 5596,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.010838946411405748,
+            "mean_universe": 5843.183544303797,
+            "n_obs": 158,
+            "min_universe": 5700,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.01230779227360706,
+            "mean_universe": 5682.8387096774195,
+            "n_obs": 93,
+            "min_universe": 5584,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.005791889411640089,
+        "last_period_rate": 0.01230779227360706,
+        "relative_drift": 1.125004708976628,
+        "first_third_mean": 0.00870010202399961,
+        "last_third_mean": 0.011244518473826239,
+        "thirds_rel_change": 0.29245823127220166,
+        "sustained": true,
+        "discontinuities_2sigma": [
+          {
+            "period": 0,
+            "mean_rate": 0.005791889411640089,
+            "z": -2.1302439055988023
+          }
+        ],
+        "drift_anomaly": true,
+        "discontinuity_anomaly": true
+      },
+      "s4_warmup_pass": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.005352922878040958,
+            "mean_universe": 4610.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.009724647168594872,
+            "mean_universe": 5854.647435897436,
+            "n_obs": 156,
+            "min_universe": 5716,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.008734392591801109,
+            "mean_universe": 5775.567741935484,
+            "n_obs": 155,
+            "min_universe": 5645,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.013027983394702482,
+            "mean_universe": 5858.7806451612905,
+            "n_obs": 155,
+            "min_universe": 5761,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.010375205654770287,
+            "mean_universe": 5741.141935483871,
+            "n_obs": 155,
+            "min_universe": 5641,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.01280281654346758,
+            "mean_universe": 5856.2594936708865,
+            "n_obs": 158,
+            "min_universe": 5742,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.010208178014038873,
+            "mean_universe": 5727.850649350649,
+            "n_obs": 154,
+            "min_universe": 5596,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.009667118370698585,
+            "mean_universe": 5843.183544303797,
+            "n_obs": 158,
+            "min_universe": 5700,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.012172636525372945,
+            "mean_universe": 5682.8387096774195,
+            "n_obs": 93,
+            "min_universe": 5584,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.005352922878040958,
+        "last_period_rate": 0.012172636525372945,
+        "relative_drift": 1.2740167946951328,
+        "first_third_mean": 0.007937320879478979,
+        "last_third_mean": 0.010682644303370134,
+        "thirds_rel_change": 0.3458753231192745,
+        "sustained": true,
+        "discontinuities_2sigma": [
+          {
+            "period": 0,
+            "mean_rate": 0.005352922878040958,
+            "z": -2.1848172390889546
+          }
+        ],
+        "drift_anomaly": true,
+        "discontinuity_anomaly": true
+      },
+      "s5_dow_pass": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.0029759273632960883,
+            "mean_universe": 4610.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.004364881931820021,
+            "mean_universe": 5854.647435897436,
+            "n_obs": 156,
+            "min_universe": 5716,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.004027396266301116,
+            "mean_universe": 5775.567741935484,
+            "n_obs": 155,
+            "min_universe": 5645,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.005913698263392211,
+            "mean_universe": 5858.7806451612905,
+            "n_obs": 155,
+            "min_universe": 5761,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.00474812516500495,
+            "mean_universe": 5741.141935483871,
+            "n_obs": 155,
+            "min_universe": 5641,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.005383569283217531,
+            "mean_universe": 5856.2594936708865,
+            "n_obs": 158,
+            "min_universe": 5742,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.004164917236143665,
+            "mean_universe": 5727.850649350649,
+            "n_obs": 154,
+            "min_universe": 5596,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.005114230596148285,
+            "mean_universe": 5843.183544303797,
+            "n_obs": 158,
+            "min_universe": 5700,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.0045597597447775366,
+            "mean_universe": 5682.8387096774195,
+            "n_obs": 93,
+            "min_universe": 5584,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.0029759273632960883,
+        "last_period_rate": 0.0045597597447775366,
+        "relative_drift": 0.5322147311173689,
+        "first_third_mean": 0.0037894018538057414,
+        "last_third_mean": 0.004612969192356496,
+        "thirds_rel_change": 0.21733438952209203,
+        "sustained": true,
+        "discontinuities_2sigma": [],
+        "drift_anomaly": true,
+        "discontinuity_anomaly": false
+      },
+      "s6_body_pass": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.002784517175197789,
+            "mean_universe": 4610.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.004075014711088992,
+            "mean_universe": 5854.647435897436,
+            "n_obs": 156,
+            "min_universe": 5716,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.003883158811830789,
+            "mean_universe": 5775.567741935484,
+            "n_obs": 155,
+            "min_universe": 5645,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.00527540670335338,
+            "mean_universe": 5858.7806451612905,
+            "n_obs": 155,
+            "min_universe": 5761,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.004209325592616901,
+            "mean_universe": 5741.141935483871,
+            "n_obs": 155,
+            "min_universe": 5641,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.004874136193563684,
+            "mean_universe": 5856.2594936708865,
+            "n_obs": 158,
+            "min_universe": 5742,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.0039900381571924964,
+            "mean_universe": 5727.850649350649,
+            "n_obs": 154,
+            "min_universe": 5596,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.0048488453969254075,
+            "mean_universe": 5843.183544303797,
+            "n_obs": 158,
+            "min_universe": 5700,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.0041991981407326715,
+            "mean_universe": 5682.8387096774195,
+            "n_obs": 93,
+            "min_universe": 5584,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.002784517175197789,
+        "last_period_rate": 0.0041991981407326715,
+        "relative_drift": 0.5080525191712619,
+        "first_third_mean": 0.003580896899372523,
+        "last_third_mean": 0.004346027231616858,
+        "thirds_rel_change": 0.21367002562358275,
+        "sustained": true,
+        "discontinuities_2sigma": [
+          {
+            "period": 0,
+            "mean_rate": 0.002784517175197789,
+            "z": -2.1316372768609733
+          }
+        ],
+        "drift_anomaly": true,
+        "discontinuity_anomaly": true
+      },
+      "s7_prev_bullish": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.002369444607697154,
+            "mean_universe": 4610.889655172414,
+            "n_obs": 145,
+            "min_universe": 740,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.0034717331937613735,
+            "mean_universe": 5854.647435897436,
+            "n_obs": 156,
+            "min_universe": 5716,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.003354628219468324,
+            "mean_universe": 5775.567741935484,
+            "n_obs": 155,
+            "min_universe": 5645,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.004411663763580991,
+            "mean_universe": 5858.7806451612905,
+            "n_obs": 155,
+            "min_universe": 5761,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.0033771048808233887,
+            "mean_universe": 5741.141935483871,
+            "n_obs": 155,
+            "min_universe": 5641,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.004281771224971609,
+            "mean_universe": 5856.2594936708865,
+            "n_obs": 158,
+            "min_universe": 5742,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.00339823789553149,
+            "mean_universe": 5727.850649350649,
+            "n_obs": 154,
+            "min_universe": 5596,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.0038950892070532964,
+            "mean_universe": 5843.183544303797,
+            "n_obs": 158,
+            "min_universe": 5700,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.0032322946182884514,
+            "mean_universe": 5682.8387096774195,
+            "n_obs": 93,
+            "min_universe": 5584,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.002369444607697154,
+        "last_period_rate": 0.0032322946182884514,
+        "relative_drift": 0.3641570719941392,
+        "first_third_mean": 0.0030652686736422838,
+        "last_third_mean": 0.003508540573624413,
+        "thirds_rel_change": 0.14461110825088436,
+        "sustained": false,
+        "discontinuities_2sigma": [
+          {
+            "period": 0,
+            "mean_rate": 0.002369444607697154,
+            "z": -2.0190402352793644
+          }
+        ],
+        "drift_anomaly": false,
+        "discontinuity_anomaly": true
+      }
+    },
+    "aegis": {
+      "s1_signal_raw": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.06775390561744019,
+            "mean_universe": 4895.575342465753,
+            "n_obs": 146,
+            "min_universe": 776,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.0739415790132989,
+            "mean_universe": 6149.378205128205,
+            "n_obs": 156,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.08077948439294556,
+            "mean_universe": 6116.25641025641,
+            "n_obs": 156,
+            "min_universe": 6040,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.07608274728435488,
+            "mean_universe": 6158.012903225806,
+            "n_obs": 155,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.07346864993129947,
+            "mean_universe": 6068.974358974359,
+            "n_obs": 156,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.07583161321274569,
+            "mean_universe": 6154.0822784810125,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.08298485284851705,
+            "mean_universe": 6071.2,
+            "n_obs": 155,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.07581030771760774,
+            "mean_universe": 6156.911392405063,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.06988749120671071,
+            "mean_universe": 6009.935483870968,
+            "n_obs": 93,
+            "min_universe": 5948,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.06775390561744019,
+        "last_period_rate": 0.06988749120671071,
+        "relative_drift": 0.03149022288570968,
+        "first_third_mean": 0.07415832300789488,
+        "last_third_mean": 0.07622755059094517,
+        "thirds_rel_change": 0.02790283678380923,
+        "sustained": false,
+        "discontinuities_2sigma": [],
+        "drift_anomaly": false,
+        "discontinuity_anomaly": false
+      },
+      "s2_in_session": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.0070660840727297235,
+            "mean_universe": 4895.575342465753,
+            "n_obs": 146,
+            "min_universe": 776,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.0066430143757029774,
+            "mean_universe": 6149.378205128205,
+            "n_obs": 156,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.008124861446884136,
+            "mean_universe": 6116.25641025641,
+            "n_obs": 156,
+            "min_universe": 6040,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.008873998974231686,
+            "mean_universe": 6158.012903225806,
+            "n_obs": 155,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.008255040296930414,
+            "mean_universe": 6068.974358974359,
+            "n_obs": 156,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.00770559521263731,
+            "mean_universe": 6154.0822784810125,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.010462863163314937,
+            "mean_universe": 6071.2,
+            "n_obs": 155,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.00981200975926387,
+            "mean_universe": 6156.911392405063,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.009427688122190197,
+            "mean_universe": 6009.935483870968,
+            "n_obs": 93,
+            "min_universe": 5948,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.0070660840727297235,
+        "last_period_rate": 0.009427688122190197,
+        "relative_drift": 0.33421680596395087,
+        "first_third_mean": 0.007277986631772278,
+        "last_third_mean": 0.009900853681589668,
+        "thirds_rel_change": 0.3603836036696168,
+        "sustained": true,
+        "discontinuities_2sigma": [],
+        "drift_anomaly": true,
+        "discontinuity_anomaly": false
+      },
+      "s3_hour_pass": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.004360032445374588,
+            "mean_universe": 4895.575342465753,
+            "n_obs": 146,
+            "min_universe": 776,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.004104605670607032,
+            "mean_universe": 6149.378205128205,
+            "n_obs": 156,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.006008751532703057,
+            "mean_universe": 6116.25641025641,
+            "n_obs": 156,
+            "min_universe": 6040,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.0058818271343306,
+            "mean_universe": 6158.012903225806,
+            "n_obs": 155,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.00530959698951923,
+            "mean_universe": 6068.974358974359,
+            "n_obs": 156,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.005220707504185346,
+            "mean_universe": 6154.0822784810125,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.006135654310681148,
+            "mean_universe": 6071.2,
+            "n_obs": 155,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.006488193962501427,
+            "mean_universe": 6156.911392405063,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.00543040768174843,
+            "mean_universe": 6009.935483870968,
+            "n_obs": 93,
+            "min_universe": 5948,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.004360032445374588,
+        "last_period_rate": 0.00543040768174843,
+        "relative_drift": 0.24549708053419825,
+        "first_third_mean": 0.004824463216228226,
+        "last_third_mean": 0.006018085318310336,
+        "thirds_rel_change": 0.2474103436144107,
+        "sustained": true,
+        "discontinuities_2sigma": [],
+        "drift_anomaly": false,
+        "discontinuity_anomaly": false
+      },
+      "s4_day_pass": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.002421992147510727,
+            "mean_universe": 4895.575342465753,
+            "n_obs": 146,
+            "min_universe": 776,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.002060242823065817,
+            "mean_universe": 6149.378205128205,
+            "n_obs": 156,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.003176589029009676,
+            "mean_universe": 6116.25641025641,
+            "n_obs": 156,
+            "min_universe": 6040,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.003093007417651059,
+            "mean_universe": 6158.012903225806,
+            "n_obs": 155,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.003456692278246726,
+            "mean_universe": 6068.974358974359,
+            "n_obs": 156,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.0035727149824361175,
+            "mean_universe": 6154.0822784810125,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.003775642263794297,
+            "mean_universe": 6071.2,
+            "n_obs": 155,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.003927085886443273,
+            "mean_universe": 6156.911392405063,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.0021447505806168323,
+            "mean_universe": 6009.935483870968,
+            "n_obs": 93,
+            "min_universe": 5948,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.002421992147510727,
+        "last_period_rate": 0.0021447505806168323,
+        "relative_drift": -0.11446840039462468,
+        "first_third_mean": 0.0025529413331954066,
+        "last_third_mean": 0.0032824929102848004,
+        "thirds_rel_change": 0.28576903339029947,
+        "sustained": "False",
+        "discontinuities_2sigma": [],
+        "drift_anomaly": false,
+        "discontinuity_anomaly": false
+      },
+      "s5_vol_pass": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.0021326022707951016,
+            "mean_universe": 4895.575342465753,
+            "n_obs": 146,
+            "min_universe": 776,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.002060242823065817,
+            "mean_universe": 6149.378205128205,
+            "n_obs": 156,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.003176589029009676,
+            "mean_universe": 6116.25641025641,
+            "n_obs": 156,
+            "min_universe": 6040,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.0025899201780055624,
+            "mean_universe": 6158.012903225806,
+            "n_obs": 155,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.002894019997968637,
+            "mean_universe": 6068.974358974359,
+            "n_obs": 156,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.0035222914764042384,
+            "mean_universe": 6154.0822784810125,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.003775642263794297,
+            "mean_universe": 6071.2,
+            "n_obs": 155,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.003874562929423386,
+            "mean_universe": 6156.911392405063,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.002087450115899557,
+            "mean_universe": 6009.935483870968,
+            "n_obs": 93,
+            "min_universe": 5948,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.0021326022707951016,
+        "last_period_rate": 0.002087450115899557,
+        "relative_drift": -0.021172328058485224,
+        "first_third_mean": 0.002456478040956865,
+        "last_third_mean": 0.00324588510303908,
+        "thirds_rel_change": 0.32135726390402397,
+        "sustained": "False",
+        "discontinuities_2sigma": [],
+        "drift_anomaly": false,
+        "discontinuity_anomaly": false
+      },
+      "s6_not_block_TueH10": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.001747689861590354,
+            "mean_universe": 4895.575342465753,
+            "n_obs": 146,
+            "min_universe": 776,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.0013939676974156871,
+            "mean_universe": 6149.378205128205,
+            "n_obs": 156,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.0020335231256127418,
+            "mean_universe": 6116.25641025641,
+            "n_obs": 156,
+            "min_universe": 6040,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.0019913893715569056,
+            "mean_universe": 6158.012903225806,
+            "n_obs": 155,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.0022067340754656937,
+            "mean_universe": 6068.974358974359,
+            "n_obs": 156,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.0027968075062990826,
+            "mean_universe": 6154.0822784810125,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.0030343129163984722,
+            "mean_universe": 6071.2,
+            "n_obs": 155,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.002832430631712813,
+            "mean_universe": 6156.911392405063,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.0017303815849193322,
+            "mean_universe": 6009.935483870968,
+            "n_obs": 93,
+            "min_universe": 5948,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.001747689861590354,
+        "last_period_rate": 0.0017303815849193322,
+        "relative_drift": -0.009903517238047983,
+        "first_third_mean": 0.001725060228206261,
+        "last_third_mean": 0.002532375044343539,
+        "thirds_rel_change": 0.4679922491614882,
+        "sustained": "False",
+        "discontinuities_2sigma": [],
+        "drift_anomaly": false,
+        "discontinuity_anomaly": false
+      },
+      "s7_not_block_EOM": {
+        "thin_all": false,
+        "per_period": [
+          {
+            "period": 0,
+            "mean_rate": 0.0014999293848600376,
+            "mean_universe": 4895.575342465753,
+            "n_obs": 146,
+            "min_universe": 776,
+            "thin": false
+          },
+          {
+            "period": 1,
+            "mean_rate": 0.0012323680905885301,
+            "mean_universe": 6149.378205128205,
+            "n_obs": 156,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 2,
+            "mean_rate": 0.0019271531251774166,
+            "mean_universe": 6116.25641025641,
+            "n_obs": 156,
+            "min_universe": 6040,
+            "thin": false
+          },
+          {
+            "period": 3,
+            "mean_rate": 0.0017753840730376457,
+            "mean_universe": 6158.012903225806,
+            "n_obs": 155,
+            "min_universe": 6044,
+            "thin": false
+          },
+          {
+            "period": 4,
+            "mean_rate": 0.0016933243441980717,
+            "mean_universe": 6068.974358974359,
+            "n_obs": 156,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 5,
+            "mean_rate": 0.002507936891992333,
+            "mean_universe": 6154.0822784810125,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 6,
+            "mean_rate": 0.0026254981204674433,
+            "mean_universe": 6071.2,
+            "n_obs": 155,
+            "min_universe": 5948,
+            "thin": false
+          },
+          {
+            "period": 7,
+            "mean_rate": 0.002832430631712813,
+            "mean_universe": 6156.911392405063,
+            "n_obs": 158,
+            "min_universe": 6036,
+            "thin": false
+          },
+          {
+            "period": 8,
+            "mean_rate": 0.0017007078173378882,
+            "mean_universe": 6009.935483870968,
+            "n_obs": 93,
+            "min_universe": 5948,
+            "thin": false
+          }
+        ],
+        "first_period_rate": 0.0014999293848600376,
+        "last_period_rate": 0.0017007078173378882,
+        "relative_drift": 0.1338585899472766,
+        "first_third_mean": 0.0015531502002086612,
+        "last_third_mean": 0.0023862121898393816,
+        "thirds_rel_change": 0.536369238157907,
+        "sustained": true,
+        "discontinuities_2sigma": [],
+        "drift_anomaly": false,
+        "discontinuity_anomaly": false
+      }
+    }
+  },
+  "flagged_top3": [
+    {
+      "strategy": "guardian",
+      "stage": "s2_day_pass",
+      "type": "discontinuity_2sigma",
+      "period": 1,
+      "rate": 0.013720166789398105,
+      "z": -2.2426124114793606
+    },
+    {
+      "strategy": "striker",
+      "stage": "s4_warmup_pass",
+      "type": "discontinuity_2sigma",
+      "period": 0,
+      "rate": 0.005352922878040958,
+      "z": -2.1848172390889546
+    },
+    {
+      "strategy": "striker",
+      "stage": "s6_body_pass",
+      "type": "discontinuity_2sigma",
+      "period": 0,
+      "rate": 0.002784517175197789,
+      "z": -2.1316372768609733
+    }
+  ],
+  "total_flagged": 14
+}

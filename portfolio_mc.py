@@ -244,6 +244,46 @@ def _fmt_alloc(allocs: Dict[str, float]) -> str:
             f"A {allocs['aegis']:.2%}")
 
 
+def _serial_grid_with_progress(blocks: np.ndarray, all_trigs: list,
+                                dd_scale: float) -> dict:
+    """Run the sensitivity-grid serial path with a Rich progress bar when
+    Rich is installed; fall back to plain iteration otherwise.
+
+    The bar advances per (trig, seed) cell — granular feedback during a
+    multi-minute run. Numerically inert: same loop, same SEEDS, same numbers.
+    """
+    try:
+        from rich.progress import (
+            BarColumn,
+            MofNCompleteColumn,
+            Progress,
+            TextColumn,
+            TimeElapsedColumn,
+        )
+    except ImportError:
+        return {
+            trig: [run_seed(seed, SIMS_PER_SEED, blocks, trig, dd_scale) for seed in SEEDS]
+            for trig in all_trigs
+        }
+
+    out: dict = {trig: [] for trig in all_trigs}
+    total_cells = len(all_trigs) * len(SEEDS)
+    columns = [
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TextColumn("•"),
+        TimeElapsedColumn(),
+    ]
+    with Progress(*columns, transient=True) as progress:
+        task = progress.add_task("Sensitivity grid", total=total_cells)
+        for trig in all_trigs:
+            for seed in SEEDS:
+                out[trig].append(run_seed(seed, SIMS_PER_SEED, blocks, trig, dd_scale))
+                progress.update(task, advance=1)
+    return out
+
+
 def _run_seeds(blocks: np.ndarray, effective_trigger: float, dd_scale: float,
                seeds=SEEDS, parallel: bool = False) -> list:
     """Run all seeds. Sequential by default; joblib-parallel when requested.
@@ -463,10 +503,7 @@ def mode_sensitivity(dd_scale: float, allocs: Dict[str, float],
         for (trig, _seed), result in zip(pairs, flat):
             by_trig[trig].append(result)
     else:
-        by_trig = {
-            trig: [run_seed(seed, SIMS_PER_SEED, blocks, trig, dd_scale) for seed in SEEDS]
-            for trig in all_trigs
-        }
+        by_trig = _serial_grid_with_progress(blocks, all_trigs, dd_scale)
 
     def _row(label: str, results: list) -> str:
         pass_r = np.mean([r["outcomes"]["pass"] / SIMS_PER_SEED for r in results])

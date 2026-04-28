@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "OANDA_CREDS_PATH": "~/.keys/oanda.txt"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(python -m portfolio_mc:*)",
+      "Bash(python portfolio_mc.py:*)",
+      "Bash(python cli.py status:*)",
+      "Bash(python cli.py lots:*)",
+      "Bash(python cli.py add:*)",
+      "Bash(python cli.py update:*)",
+      "Bash(python dd_protection.py:*)",
+      "Bash(python scripts/verify_lock_anchors.py:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(git status:*)",
+      "Bash(git show:*)",
+      "Bash(git blame:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python scripts/lock_event_hook.py"
+          }
+        ]
+      }
+    ]
+  }
+}

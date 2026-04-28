@@ -1,0 +1,330 @@
+//@version=6
+strategy("Guardian Gold v5.5", overlay=true,
+     initial_capital=200000,
+     default_qty_type=strategy.percent_of_equity,
+     default_qty_value=100,
+     commission_type=strategy.commission.cash_per_order,
+     commission_value=0,
+     slippage=3,
+     process_orders_on_close=false,
+     calc_on_every_tick=true,
+     margin_long=0,
+     margin_short=0,
+     max_labels_count=500)
+
+// ==========================================
+// GUARDIAN GOLD v5.5 — FXIFY Trend-Follower (XAUUSD)
+// LOCKED CONFIG:
+//   EMA 385/25 | SL 1.55×ATR | TP 29×ATR | grace 1b/2.0×ATR
+//   maxHold 850 | max 2/day | risk 0.34%
+//   Mon/Tue/Thu | 0800–1600 UTC (NY Extended)
+//   Blocks: Tue H08, Mon H08, Mon H09, H12 entry + H12 day-gate
+//
+// TEST VARIANT — 2026-04-23:
+//   blockH12 split into per-day inputs so Thu H12 can be unblocked
+//   in isolation while Mon/Tue H12 remain blocked. Matches locked
+//   v5.5 behavior when all three defaults are true.
+// ==========================================
+
+// BACKTEST
+group_backtest = "═══ BACKTEST ═══"
+backtestMode = input.bool(true, "Backtest Mode (disable DD kill)", group=group_backtest,
+     tooltip="Disables DD-based trade blocking for backtests. TURN OFF for live FXIFY deployment.")
+startDate = input.time(timestamp("2022-01-01"), "Start Date", group=group_backtest)
+endDate   = input.time(timestamp("2026-12-31"), "End Date",   group=group_backtest)
+inDateRange = time >= startDate and time <= endDate
+
+// RISK
+group_risk = "═══ RISK (FXIFY) ═══"
+riskPerTrade   = input.float(0.34, "Risk Per Trade (%)", minval=0.1, maxval=2.0, step=0.01, group=group_risk)
+maxDailyDD     = input.float(1.6,  "Max Daily DD (%)",   minval=1.0, maxval=5.0, step=0.25, group=group_risk)
+maxTotalDD     = input.float(5.0,  "Max Static DD (%)",  minval=1.0, maxval=5.0, step=0.25, group=group_risk)
+maxHoldBars    = input.int(850, "Max Hold (bars)", minval=10, maxval=2000, step=10, group=group_risk)
+maxDailyTrades = input.int(2,   "Max Trades Per Day", minval=1, maxval=5, step=1, group=group_risk)
+
+// TREND / ENTRY / EXITS
+group_core = "═══ TREND / ENTRY / EXITS ═══"
+emaSlowLen        = input.int(385,  "EMA Slow",       minval=100, maxval=600, group=group_core)
+entryEmaLen       = input.int(25,   "Entry EMA",      minval=5,   maxval=100, group=group_core)
+atrLength         = input.int(14,   "ATR Length",     minval=10,  maxval=30,  group=group_core)
+stopAtr           = input.float(1.55,"Stop Loss (ATR)", minval=0.5, maxval=5.0, step=0.05, group=group_core)
+tpAtr             = input.float(29.0,"Take Profit (ATR)", minval=2.0, maxval=50.0, step=0.5, group=group_core)
+minBarsBeforeStop = input.int(1,   "Min Bars Before Stop", minval=0, maxval=10, step=1, group=group_core,
+     tooltip="Bars 1-2 have 89% loss rate (noise stopouts). During grace, stop widens to graceStopMult × normal distance.")
+graceStopMult     = input.float(2.0,"Grace Stop Multiplier", minval=1.5, maxval=5.0, step=0.5, group=group_core)
+
+// SESSION
+group_session = "═══ SESSION ═══"
+useSession    = input.bool(true, "Use Session Filter?", group=group_session)
+sessionChoice = input.string("NY Extended", "Session",
+     options=["London-NY Overlap", "London", "New York", "NY Extended", "Asian", "24H"],
+     group=group_session)
+blockH14    = input.bool(false, "Block Hour 14 (UTC)",     group=group_session)
+blockTueH08 = input.bool(true,  "Block Tuesday H08",       group=group_session)
+blockMonH08 = input.bool(true,  "Block Monday H08",        group=group_session)
+blockThuH08 = input.bool(false, "Block Thursday H08",      group=group_session)
+blockMonH09 = input.bool(true,  "Block Monday H09",        group=group_session)
+blockMonH12 = input.bool(true,  "Block Monday H12",        group=group_session,
+     tooltip="v5.5 locked: true. 4yr data: 7 trades, 0% WR, -$7,775.")
+blockTueH12 = input.bool(true,  "Block Tuesday H12",       group=group_session,
+     tooltip="v5.5 locked: true. 4yr data: 8 trades, 0% WR, -$9,624.")
+blockThuH12 = input.bool(true,  "Block Thursday H12",      group=group_session,
+     tooltip="v5.5 locked: true (v5.4 legacy). 4yr data: 4 trades, 25% WR, +$23,131. Set FALSE to run isolated Thu H12 test.")
+blockH12Day = input.bool(true,  "Block H12 Signal Day",    group=group_session,
+     tooltip="When a valid trend-recovery signal would fire at H12 UTC on a day where that day's H12 is blocked, block ALL subsequent entries that day. Only latches for days whose H12 is blocked.")
+
+// DAY FILTER (Mon / Tue / Thu; Wed & Fri disabled)
+group_days = "═══ DAY FILTER ═══"
+tradeMon = input.bool(true,  "Monday",    group=group_days)
+tradeTue = input.bool(true,  "Tuesday",   group=group_days)
+tradeWed = input.bool(false, "Wednesday", group=group_days)
+tradeThu = input.bool(true,  "Thursday",  group=group_days)
+tradeFri = input.bool(false, "Friday",    group=group_days)
+
+dayAllowed = switch dayofweek
+    dayofweek.monday    => tradeMon
+    dayofweek.tuesday   => tradeTue
+    dayofweek.wednesday => tradeWed
+    dayofweek.thursday  => tradeThu
+    dayofweek.friday    => tradeFri
+    => false
+
+// VISUALS
+group_visual  = "═══ VISUALS ═══"
+showEmas      = input.bool(true, "Show EMAs",      group=group_visual)
+showDashboard = input.bool(true, "Show Dashboard", group=group_visual)
+
+// ==========================================
+// SESSION FUNCTIONS
+// ==========================================
+getLondonNY() => not na(time(timeframe.period, "1300-1700:23456"))
+getLondon()   => not na(time(timeframe.period, "0800-1600:23456"))
+getNewYork()  => not na(time(timeframe.period, "1300-2100:23456"))
+getNYExt()    => not na(time(timeframe.period, "0800-1600:23456"))
+getAsian()    => not na(time(timeframe.period, "0000-0800:23456"))
+
+sessionActive = switch sessionChoice
+    "London-NY Overlap" => getLondonNY()
+    "London"            => getLondon()
+    "New York"          => getNewYork()
+    "NY Extended"       => getNYExt()
+    "Asian"             => getAsian()
+    => true
+
+sessionOK = useSession ? sessionActive : true
+
+hourH14Blocked    = blockH14    and hour == 14
+hourTueH08Blocked = blockTueH08 and hour ==  8 and dayofweek == dayofweek.tuesday
+hourMonH08Blocked = blockMonH08 and hour ==  8 and dayofweek == dayofweek.monday
+hourThuH08Blocked = blockThuH08 and hour ==  8 and dayofweek == dayofweek.thursday
+hourMonH09Blocked = blockMonH09 and hour ==  9 and dayofweek == dayofweek.monday
+hourMonH12Blocked = blockMonH12 and hour == 12 and dayofweek == dayofweek.monday
+hourTueH12Blocked = blockTueH12 and hour == 12 and dayofweek == dayofweek.tuesday
+hourThuH12Blocked = blockThuH12 and hour == 12 and dayofweek == dayofweek.thursday
+hourH12Blocked    = hourMonH12Blocked or hourTueH12Blocked or hourThuH12Blocked
+
+hourAllowed = not hourH14Blocked and not hourTueH08Blocked and
+     not hourMonH08Blocked and not hourThuH08Blocked and
+     not hourMonH09Blocked and not hourH12Blocked
+
+// ==========================================
+// INDICATORS & SIGNAL
+// ==========================================
+atrVal   = ta.atr(atrLength)
+emaSlow  = ta.ema(close, emaSlowLen)
+entryEma = ta.ema(close, entryEmaLen)
+
+bullTrendOK  = close > emaSlow
+recoveryLong = close > entryEma and close[1] <= entryEma[1]
+longSignal   = bullTrendOK and recoveryLong and sessionOK and hourAllowed and dayAllowed and inDateRange
+
+// ==========================================
+// H12 SIGNAL-DAY GATE
+// Latches if a valid H12 signal fires on a day where H12 is blocked.
+// If Thursday H12 is unblocked via blockThuH12=false, a Thu H12 entry
+// fires normally (taking the position) and does NOT latch the day-gate,
+// because the day-gate only cares about "blocked H12 signal days" as a
+// regime marker.
+// ==========================================
+var bool h12SignalToday = false
+isNewDay = ta.change(time("D")) != 0
+if isNewDay
+    h12SignalToday := false
+
+// Only evaluate day-gate on days where H12 is actually blocked
+dayH12Blocked = (dayofweek == dayofweek.monday and blockMonH12) or
+     (dayofweek == dayofweek.tuesday and blockTueH12) or
+     (dayofweek == dayofweek.thursday and blockThuH12)
+
+h12SignalRaw = hour == 12 and bullTrendOK and recoveryLong and sessionOK and dayAllowed and inDateRange and dayH12Blocked
+if h12SignalRaw and blockH12Day
+    h12SignalToday := true
+
+// ==========================================
+// DRAWDOWN MONITORING
+// ==========================================
+var float dayStartEquity = strategy.initial_capital
+if isNewDay
+    dayStartEquity := strategy.equity
+
+dailyDD  = dayStartEquity > 0          ? (dayStartEquity - strategy.equity) / dayStartEquity * 100 : 0.0
+staticDD = strategy.initial_capital > 0 ? (strategy.initial_capital - strategy.equity) / strategy.initial_capital * 100 : 0.0
+ddHit    = staticDD >= maxTotalDD or dailyDD >= maxDailyDD
+
+if ddHit and not backtestMode and strategy.position_size != 0
+    strategy.close_all("DD Limit")
+
+// ==========================================
+// TRADE GATING
+// ==========================================
+var int dailyTradeCount = 0
+if isNewDay
+    dailyTradeCount := 0
+
+canTrade = (backtestMode or not ddHit) and
+     dailyTradeCount < maxDailyTrades and
+     strategy.position_size == 0 and
+     not h12SignalToday
+
+// ==========================================
+// POSITION SIZING
+// ==========================================
+calcSize(stopDist) =>
+    risk = strategy.equity * (riskPerTrade / 100)
+    stopDist > 0 ? risk / stopDist : 0
+
+// ==========================================
+// TRADE STATE
+// ==========================================
+var float entryPrice    = na
+var float stopPrice     = na
+var float tpPrice       = na
+var bool  stopActivated = false
+var int   barsInTrade   = 0
+
+// ==========================================
+// ENTRY
+// ==========================================
+if longSignal and canTrade
+    stopDist = atrVal * stopAtr
+    size     = calcSize(stopDist)
+    stop     = close - stopDist
+    tp       = close + atrVal * tpAtr
+
+    strategy.entry("Long", strategy.long, qty=size)
+
+    if minBarsBeforeStop > 0
+        graceStopLvl = close - stopDist * graceStopMult
+        strategy.exit("Exit", "Long", stop=graceStopLvl, limit=tp)
+    else
+        strategy.exit("Exit", "Long", stop=stop, limit=tp)
+
+    entryPrice      := close
+    stopPrice       := stop
+    tpPrice         := tp
+    stopActivated   := minBarsBeforeStop <= 0
+    barsInTrade     := 0
+    dailyTradeCount += 1
+
+// ==========================================
+// POSITION MANAGEMENT
+// ==========================================
+if strategy.position_size > 0 and not na(entryPrice)
+    barsInTrade += 1
+
+    // Tighten grace stop to real stop once grace window ends
+    if not stopActivated and barsInTrade >= minBarsBeforeStop
+        strategy.exit("Exit", "Long", stop=stopPrice, limit=tpPrice)
+        stopActivated := true
+
+    // Max hold time-stop
+    if barsInTrade >= maxHoldBars
+        strategy.close("Long", comment="Stale")
+
+// ==========================================
+// POSITION RESET
+// ==========================================
+if strategy.position_size == 0 and strategy.position_size[1] != 0
+    entryPrice    := na
+    stopPrice     := na
+    tpPrice       := na
+    stopActivated := false
+    barsInTrade   := 0
+
+// ==========================================
+// VISUALS
+// ==========================================
+plot(showEmas ? emaSlow  : na, "EMA Slow",  color.red,    2)
+plot(showEmas ? entryEma : na, "Entry EMA", color.yellow, 1)
+
+plotshape(longSignal and canTrade, "Long Signal",
+     shape.triangleup, location.belowbar, color.green, size=size.normal)
+
+graceActive = strategy.position_size > 0 and not stopActivated
+bgcolor(graceActive              ? color.new(color.orange,  93) : na, title="Stop Grace Period")
+bgcolor(not dayAllowed           ? color.new(color.gray,    95) : na, title="Day Blocked")
+bgcolor(hourH14Blocked           ? color.new(color.purple,  95) : na, title="H14 Blocked")
+bgcolor(hourTueH08Blocked        ? color.new(color.fuchsia, 95) : na, title="Tue H08 Blocked")
+bgcolor(hourMonH08Blocked        ? color.new(color.olive,   95) : na, title="Mon H08 Blocked")
+bgcolor(hourThuH08Blocked        ? color.new(color.teal,    95) : na, title="Thu H08 Blocked")
+bgcolor(hourMonH09Blocked        ? color.new(color.red,     95) : na, title="Mon H09 Blocked")
+bgcolor(hourMonH12Blocked        ? color.new(color.maroon,  95) : na, title="Mon H12 Blocked")
+bgcolor(hourTueH12Blocked        ? color.new(color.maroon,  95) : na, title="Tue H12 Blocked")
+bgcolor(hourThuH12Blocked        ? color.new(color.maroon,  95) : na, title="Thu H12 Blocked")
+bgcolor(h12SignalToday           ? color.new(color.navy,    96) : na, title="H12 Signal Day")
+bgcolor(backtestMode and ddHit   ? color.new(color.red,     93) : na, title="DD Breach (backtest)")
+
+// ==========================================
+// DASHBOARD
+// ==========================================
+if showDashboard and barstate.islast
+    var table dash = table.new(position.top_right, 2, 10, bgcolor=color.new(color.black, 85), border_width=1)
+
+    table.cell(dash, 0, 0, "Guardian Gold v5.5", text_color=#FFD700, text_size=size.small)
+    modeText  = backtestMode ? "BACKTEST" : "FXIFY"
+    modeColor = backtestMode ? color.orange : color.white
+    table.cell(dash, 1, 0, modeText, text_color=modeColor, text_size=size.small)
+
+    table.cell(dash, 0, 1, "Trend", text_color=color.white, text_size=size.tiny)
+    table.cell(dash, 1, 1, bullTrendOK ? "BULL ✓" : "BEAR ✗",
+         text_color=bullTrendOK ? color.green : color.red, text_size=size.tiny)
+
+    table.cell(dash, 0, 2, "Session", text_color=color.white, text_size=size.tiny)
+    table.cell(dash, 1, 2, sessionOK ? "ACTIVE" : "CLOSED",
+         text_color=sessionOK ? color.green : color.gray, text_size=size.tiny)
+
+    table.cell(dash, 0, 3, "Day", text_color=color.white, text_size=size.tiny)
+    table.cell(dash, 1, 3, dayAllowed ? "ALLOWED" : "BLOCKED",
+         text_color=dayAllowed ? color.green : color.red, text_size=size.tiny)
+
+    hourText = hourTueH08Blocked ? "TUE H08 ✗" :
+     hourMonH08Blocked ? "MON H08 ✗" :
+     hourThuH08Blocked ? "THU H08 ✗" :
+     hourMonH09Blocked ? "MON H09 ✗" :
+     hourMonH12Blocked ? "MON H12 ✗" :
+     hourTueH12Blocked ? "TUE H12 ✗" :
+     hourThuH12Blocked ? "THU H12 ✗" :
+     hourH14Blocked    ? "H14 ✗"     :
+     "OK ✓"
+    table.cell(dash, 0, 4, "Hour", text_color=color.white, text_size=size.tiny)
+    table.cell(dash, 1, 4, hourText, text_color=hourAllowed ? color.green : color.red, text_size=size.tiny)
+
+    table.cell(dash, 0, 5, "H12 Day", text_color=color.white, text_size=size.tiny)
+    table.cell(dash, 1, 5, h12SignalToday ? "LOCKED ✗" : "CLEAR ✓",
+         text_color=h12SignalToday ? color.red : color.green, text_size=size.tiny)
+
+    table.cell(dash, 0, 6, "Daily DD", text_color=color.white, text_size=size.tiny)
+    table.cell(dash, 1, 6, str.tostring(dailyDD, "#.##") + "%",
+         text_color=dailyDD > 1.0 ? color.orange : color.green, text_size=size.tiny)
+
+    table.cell(dash, 0, 7, "Static DD", text_color=color.white, text_size=size.tiny)
+    table.cell(dash, 1, 7, str.tostring(staticDD, "#.##") + "%",
+         text_color=staticDD > 3.0 ? color.orange : color.green, text_size=size.tiny)
+
+    table.cell(dash, 0, 8, "Trades Today", text_color=color.white, text_size=size.tiny)
+    table.cell(dash, 1, 8, str.tostring(dailyTradeCount) + "/" + str.tostring(maxDailyTrades),
+         text_color=color.white, text_size=size.tiny)
+
+    table.cell(dash, 0, 9, "Position", text_color=color.white, text_size=size.tiny)
+    table.cell(dash, 1, 9, strategy.position_size > 0 ? "LONG" : "FLAT",
+         text_color=strategy.position_size > 0 ? color.green : color.gray, text_size=size.tiny)

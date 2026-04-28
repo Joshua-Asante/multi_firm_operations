@@ -1,0 +1,365 @@
+//@version=6
+strategy("Aegis USDJPY v4.3", overlay=true,
+     initial_capital=200000,
+     default_qty_type=strategy.fixed,
+     default_qty_value=10000,
+     currency=currency.USD,
+     commission_type=strategy.commission.percent,
+     commission_value=0.003,
+     slippage=2,
+     margin_long=0,
+     margin_short=0)
+
+// ============================================================================
+// AEGIS-REVERSION USDJPY v4.3 — CANDIDATE LOCK 2026-04-22
+// ============================================================================
+// BB mean-reversion, long-only | OANDA/PEPPERSTONE:USDJPY 15min | FXIFY Compliant
+//
+// STATUS: v4.3 candidate pending backtest validation on both OANDA and
+// Pepperstone feeds + post-v4.3 portfolio Monte Carlo re-run. v4.2 remains
+// production-locked for the active FXIFY $200K challenge.
+//
+// ──────────────────────────────────────────────────────────────────────────
+// CHANGE LOG v4.2 → v4.3:
+// ──────────────────────────────────────────────────────────────────────────
+//   [1] Block calendar day 29, 30, 31 of every month.
+//       The sole parameter change from v4.2.
+//
+// DISCOVERY: 2026-04-22 INQHIORI loop on Pepperstone:USDJPY 4yr backtest.
+// Initial finding: January as negative-expectancy month (PF 0.35, n=11,
+// net -$9,575). Drill-down revealed the January weakness is 80% concentrated
+// in days 29-31. Broader analysis showed days 29-31 of EVERY month carry
+// the same structural trend-impulse signature — January is just the most
+// extreme instance of an all-months EOM pattern.
+//
+// MECHANISM: Month-end JPY flow impulse overrides mean-reversion dynamics
+// on days 29-31. Loss-character comparison (days 1-28 baseline vs 29-31):
+//
+//   Metric                     Days 1-28   Days 29-31   Delta
+//   Full-stop share of losses     14.3%       71.4%     5x increase
+//   Avg loss size                -$1,122     -$2,746    2.4x
+//   Mean hold on losses          2.1 bars    0.9 bars   losses fire fast
+//   Loss MFE mean                $1,571      $834       halved
+//   % losses with MFE < $500      14%         43%       3x straight-down
+//
+// The BE mechanic fails to engage on EOM days because price doesn't
+// oscillate first — it goes adverse immediately. This is the textbook
+// signature of directional impulse overwhelming a mean-reversion setup.
+//
+// Likely real-world driver: USDJPY month-end flow (Japanese exporter
+// repatriation, WMR fix-window positioning, fund rebalancing, options
+// expiry adjustments) produces directional impulses that override the
+// typical lower-BB reversion character.
+//
+// ──────────────────────────────────────────────────────────────────────────
+// OOS VALIDATION (train 2022-2024 / test 2025-2026, Pepperstone):
+// ──────────────────────────────────────────────────────────────────────────
+//   Train split (n=83):  Δnet +$5,113   ΔPF +0.68
+//   Test split  (n=53):  Δnet +$3,462   ΔPF +1.08
+//
+// Both splits improve on both metrics — filter transfers cleanly across
+// the regime change. This is the key evidence that distinguishes the EOM
+// filter from curve-fitting.
+//
+// ──────────────────────────────────────────────────────────────────────────
+// REJECTED DURING SAME INQHIORI LOOP (documented so they are not
+// revisited without new mechanism-level evidence):
+// ──────────────────────────────────────────────────────────────────────────
+//   [A] Post-holiday Wed 10:15 filter: FAILED OOS.
+//       In-sample 5/5 losses (train split 3/3, all losses).
+//       Test split: Dec 24 2025 trade was +$9,096 winner. OOS filter
+//       removed a net +$6,362 (wrong sign). Rejected.
+//
+//   [B] FOMC-day filter: Different mechanism (chop, not impulse).
+//       FOMC losses are BE-shaves (avg -$75, hold 5 bars, 0% full stops)
+//       not the trend-impulse pattern. Near-flat aggregate, not worth
+//       filtering complexity. May revisit in later iteration.
+//
+//   [C] BOJ-day filter: No session overlap in 4yr panel (BOJ announces
+//       pre-10:00 EST). Irrelevant to Aegis.
+//
+//   [D] Wed 10:15 blanket block: Effectively redundant after EOM filter.
+//       Residual weakness is noise on top of EOM and FOMC correlation.
+//
+// ──────────────────────────────────────────────────────────────────────────
+// v4.3 FULL-PANEL IMPACT (Pepperstone:USDJPY 15min, 4.25 yrs):
+// ──────────────────────────────────────────────────────────────────────────
+//   Metric                v4.2 Pepperstone   v4.3 Pepperstone   Delta
+//   Trades                  136                123              -13
+//   Net P&L                +$165,289          +$173,863         +$8,574
+//   Profit Factor           3.23               4.16             +0.93
+//   Win Rate                58.8%              60.2%            +1.3 pp
+//   MaxDD (trade-close)    -$11,667 (5.83%)   -$7,526 (3.76%)   +$4,141
+//   RoMaD                   14.2               23.1             +63%
+//
+// Simultaneous improvement in trade count, MaxDD, and net — only
+// achievable when removed trades are genuinely negative-expectancy,
+// not curve-fit noise.
+//
+// OANDA numbers PENDING re-run. Expected direction: net positive delta
+// similar to Pepperstone, since the EOM full-stop cohort is broker-feed
+// independent (price moves on EOM days are large enough that fill quality
+// divergence does not change trade outcome).
+//
+// ──────────────────────────────────────────────────────────────────────────
+// ARCHITECTURAL RULES (PRESERVED FROM v4.2 — DO NOT MODIFY):
+// ──────────────────────────────────────────────────────────────────────────
+//   [A] BE mechanic preserved. Removing BE destroys the edge (v5 test:
+//       PF 1.17, DD 28%). BE is not a supplement — it IS most of the edge.
+//
+//   [B] Risk % preserved at 1.5% (fractional-Kelly standalone).
+//       dd_protection.py scaling overrides remain in effect.
+//
+//   [C] Tuesday H10 block preserved (US data release continuation zone).
+//
+//   [D] All session/hour/day/vol/daily-cap/max-hold parameters identical
+//       to v4.2. EOM is an additive filter, not a retune.
+//
+// ──────────────────────────────────────────────────────────────────────────
+// PORTFOLIO ROLE:
+// ──────────────────────────────────────────────────────────────────────────
+//   Guardian v5.5 / Striker v4.4 diversifier. Post-v4.3 MC re-run required
+//   to re-estimate:
+//     - Aegis bust contribution (expected to drop; 5 full-stop losses
+//       at EOM removed)
+//     - Pass/bust rate at portfolio level
+//     - Optimal allocation given reduced Aegis tail and higher RoMaD
+//
+//   Pre-MC expectation: Aegis bust share drops from ~25% toward ~15-20%.
+// ============================================================================
+
+
+// ============================================================================
+// INPUTS — RISK (portfolio-level, only adjustable parameter)
+// ============================================================================
+risk_pct = input.float(1.5, "Risk Per Trade %",
+     minval=0.1, maxval=3.0, step=0.05,
+     group="Risk",
+     tooltip="Portfolio risk allocation. 0.75% as Guardian companion. 1.5% = fractional-Kelly optimum standalone. dd_protection.py overrides (e.g. 0.60% in DD mode at 0.40x scaling).") / 100
+
+
+// ============================================================================
+// LOCKED PARAMETERS (unchanged from v4.2)
+// ============================================================================
+
+// Core
+bb_length   = 19
+bb_mult     = 1.9
+atr_period  = 19
+
+// Stop / TP
+atr_sl_mult = 1.42
+tp_offset   = 0.8      // TP = basis + 0.8 x ATR
+
+// Breakeven
+be_trigger  = 0.3      // ATR mult
+be_pad      = 0.15     // ATR mult
+
+// Entry quality
+min_atr_val = 0.07
+
+// Session: 10:00 - 13:45 chart TZ
+sess_start  = 10
+sess_end_h  = 13
+sess_end_m  = 45
+
+// Hold
+max_hold    = 40
+max_daily   = 1
+
+
+// ============================================================================
+// CALCULATIONS
+// ============================================================================
+atr = ta.atr(atr_period)
+[basis, upper, lower] = ta.bb(close, bb_length, bb_mult)
+
+// --- Session filter (minute-level end) ---
+int bar_minutes = hour * 60 + minute
+int end_minutes = sess_end_h * 60 + sess_end_m
+in_session = bar_minutes >= (sess_start * 60) and bar_minutes < end_minutes
+
+// --- Hour filter (execution-aware) ---
+// H11 disabled. Block signals on H11 bars AND on 10:45 bars
+// (whose signal would execute at 11:00).
+int next_hour = minute == 45 ? hour + 1 : hour
+bool hour_ok = hour != 11 and next_hour != 11
+
+// --- Day filter: Mon/Tue/Wed only ---
+dow = dayofweek
+bool day_ok = dow == dayofweek.monday or dow == dayofweek.tuesday or dow == dayofweek.wednesday
+
+// --- Entry quality ---
+bool vol_ok = atr >= min_atr_val
+
+// --- v4.2: Tuesday H10 block (US data release continuation zone) ---
+bool tue_h10_block = dow == dayofweek.tuesday and hour == 10
+
+// --- v4.3: End-of-month block (day 29, 30, 31 of any month) ---
+// Month-end JPY flow impulse overrides mean-reversion. See header for
+// full mechanism evidence and OOS validation.
+bool eom_block = dayofmonth >= 29
+
+filters_pass = in_session and hour_ok and day_ok and vol_ok and not tue_h10_block and not eom_block
+
+// --- Position sizing ---
+float stop_dist = atr * atr_sl_mult
+float risk_amt  = strategy.equity * risk_pct
+float pos_size  = stop_dist > 0 ? math.round(risk_amt * close / stop_dist) : 0
+
+// --- TP target ---
+float tp_target = basis + (tp_offset * atr)
+
+
+// ============================================================================
+// PERSISTENT STATE
+// ============================================================================
+var int   entry_bar       = 0
+var float entry_price     = na
+var float entry_atr       = na
+var float initial_stop    = na
+var bool  be_active       = false
+var int   daily_count     = 0
+var int   last_trade_date = 0
+
+
+// ============================================================================
+// DAILY TRADE COUNTER RESET
+// ============================================================================
+int today = year * 10000 + month * 100 + dayofmonth
+if today != last_trade_date
+    daily_count     := 0
+    last_trade_date := today
+
+
+// ============================================================================
+// ENTRY — LONG ONLY (max 1 per calendar day)
+// ============================================================================
+bool daily_ok = daily_count < max_daily
+
+if close < lower and strategy.position_size == 0 and filters_pass and daily_ok
+    entry_price  := close
+    entry_atr    := atr
+    initial_stop := close - stop_dist
+    be_active    := false
+    entry_bar    := bar_index
+    daily_count  += 1
+    strategy.entry("Long", strategy.long, qty=pos_size)
+    strategy.exit("X-Long", "Long",
+         stop=close - stop_dist,
+         limit=tp_target)
+
+
+// ============================================================================
+// BREAKEVEN STOP MANAGEMENT
+// ============================================================================
+if strategy.position_size > 0 and not be_active
+    float trigger_price = entry_price + (be_trigger * entry_atr)
+    if high >= trigger_price
+        be_active := true
+        float be_stop = entry_price + (be_pad * entry_atr)
+        strategy.exit("X-Long", "Long",
+             stop=be_stop,
+             limit=tp_target)
+
+
+// ============================================================================
+// STALE TRADE EXIT
+// ============================================================================
+if strategy.position_size != 0 and (bar_index - entry_bar) >= max_hold
+    strategy.close_all(comment="Stale")
+
+
+// ============================================================================
+// RESET STATE ON FLAT
+// ============================================================================
+if strategy.position_size == 0 and strategy.position_size[1] > 0
+    be_active    := false
+    entry_price  := na
+    entry_atr    := na
+    initial_stop := na
+
+
+// ============================================================================
+// PLOTS
+// ============================================================================
+plot(upper, "Upper BB", color.new(color.red, 60))
+plot(tp_target, "TP Target", color.gray)
+plot(lower, "Lower BB (entry zone)", color.green)
+
+// Active session (filters_pass = all green)
+bgcolor(filters_pass ? color.new(color.yellow, 95) : na, title="Active Session")
+
+// Show Tue H10 blocks (orange) — when session would otherwise be active
+bool tue_h10_blocked_and_active = tue_h10_block and in_session and day_ok and hour_ok and not eom_block
+bgcolor(tue_h10_blocked_and_active ? color.new(color.orange, 90) : na, title="Tue H10 Blocked")
+
+// v4.3: Show EOM blocks (purple) — when session would otherwise be active
+bool eom_blocked_and_active = eom_block and in_session and day_ok and hour_ok and not tue_h10_block
+bgcolor(eom_blocked_and_active ? color.new(color.purple, 90) : na, title="EOM Blocked (day 29-31)")
+
+float be_trigger_lvl = strategy.position_size > 0 ? entry_price + (be_trigger * entry_atr) : na
+float be_stop_lvl    = be_active ? entry_price + (be_pad * entry_atr) : na
+
+plot(be_trigger_lvl, "BE Trigger", color.new(color.orange, 40), style=plot.style_circles)
+plot(be_stop_lvl, "BE Stop", color.new(color.blue, 0), style=plot.style_stepline_diamond, linewidth=2)
+
+
+// ============================================================================
+// ALERTS
+// ============================================================================
+bool entered     = strategy.position_size > 0 and strategy.position_size[1] == 0
+bool exited      = strategy.position_size == 0 and strategy.position_size[1] > 0
+bool be_just_hit = be_active and not be_active[1]
+
+alertcondition(entered,     "Aegis v4.3: Long Entry",      "Aegis USDJPY v4.3 — LONG entry at {{close}}")
+alertcondition(be_just_hit, "Aegis v4.3: BE Active",       "Aegis USDJPY v4.3 — Breakeven stop activated")
+alertcondition(exited,      "Aegis v4.3: Position Closed", "Aegis USDJPY v4.3 — Position closed")
+
+
+// ============================================================================
+// INFO TABLE (v4.3 adds EOM block row)
+// ============================================================================
+var table info = table.new(position.top_right, 2, 10, bgcolor=color.new(color.black, 85), border_width=0)
+if barstate.islast
+    table.cell(info, 0, 0, "Aegis v4.3", text_color=#00BFFF, text_size=size.small)
+    table.cell(info, 1, 0, "USDJPY", text_color=color.white, text_size=size.small)
+
+    // Pre-compute session status string (nested ternary on one line per Pine v6 rules)
+    string sess_str = filters_pass ? "ACTIVE" : eom_blocked_and_active ? "EOM BLK" : tue_h10_blocked_and_active ? "TUE H10 BLK" : "CLOSED"
+    color  sess_col = filters_pass ? color.lime : eom_blocked_and_active ? color.purple : tue_h10_blocked_and_active ? color.orange : color.gray
+
+    table.cell(info, 0, 1, "Session", text_color=color.gray, text_size=size.small)
+    table.cell(info, 1, 1, sess_str, text_color=sess_col, text_size=size.small)
+
+    table.cell(info, 0, 2, "Day", text_color=color.gray, text_size=size.small)
+    string day_str = day_ok ? "ALLOWED" : "BLOCKED"
+    color  day_col = day_ok ? color.lime : color.red
+    table.cell(info, 1, 2, day_str, text_color=day_col, text_size=size.small)
+
+    table.cell(info, 0, 3, "EOM", text_color=color.gray, text_size=size.small)
+    string eom_str = eom_block ? str.tostring(dayofmonth) + " BLK" : "ok"
+    color  eom_col = eom_block ? color.purple : color.gray
+    table.cell(info, 1, 3, eom_str, text_color=eom_col, text_size=size.small)
+
+    table.cell(info, 0, 4, "Vol ATR", text_color=color.gray, text_size=size.small)
+    string vol_str = str.tostring(atr, "#.###") + (vol_ok ? " OK" : " LOW")
+    color  vol_col = vol_ok ? color.white : color.red
+    table.cell(info, 1, 4, vol_str, text_color=vol_col, text_size=size.small)
+
+    table.cell(info, 0, 5, "Stop", text_color=color.gray, text_size=size.small)
+    table.cell(info, 1, 5, str.tostring(stop_dist, "#.###"), text_color=color.white, text_size=size.small)
+
+    table.cell(info, 0, 6, "Risk $", text_color=color.gray, text_size=size.small)
+    table.cell(info, 1, 6, str.tostring(risk_amt, "#.00"), text_color=color.white, text_size=size.small)
+
+    table.cell(info, 0, 7, "Daily", text_color=color.gray, text_size=size.small)
+    table.cell(info, 1, 7, str.tostring(daily_count) + "/1", text_color=color.white, text_size=size.small)
+
+    table.cell(info, 0, 8, "BE", text_color=color.gray, text_size=size.small)
+    color be_col = be_active ? color.lime : color.gray
+    table.cell(info, 1, 8, be_active ? "YES" : "no", text_color=be_col, text_size=size.small)
+
+    table.cell(info, 0, 9, "Bars", text_color=color.gray, text_size=size.small)
+    string bars_str = strategy.position_size > 0 ? str.tostring(bar_index - entry_bar) : "—"
+    table.cell(info, 1, 9, bars_str, text_color=color.white, text_size=size.small)

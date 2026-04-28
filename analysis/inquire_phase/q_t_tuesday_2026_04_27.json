@@ -1,0 +1,179 @@
+{
+  "scope": "Q-T Tuesday-cohort bar-level concurrent-loss \u2014 Inquire 2026-04-27",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "amendment_binding": "docs/methodology/identify_corpus/2026-04-26/AMENDMENT_oanda_rescope.md",
+  "panel_window": "2022-01-02_2026-04-19",
+  "phase_0": {
+    "scope": "Q-T Inquire 2026-04-27 over OANDA-proxy corpus",
+    "amendment_binding": "docs/methodology/identify_corpus/2026-04-26/AMENDMENT_oanda_rescope.md",
+    "canonical_status": "PROXY",
+    "files": [
+      {
+        "symbol": "XAUUSD",
+        "path": "C:\\Users\\joshu\\prop_firm_pipeline\\data\\bar_data\\XAUUSD.csv",
+        "sha256": "0d8aaa4077892805d0ecaf00f172dfb122284e104db2c0203cd2117c420facca",
+        "n_rows": 101461,
+        "first_ts": "2022-01-02",
+        "last_ts": "2026-04-19",
+        "broker_via_tv_export": "OANDA",
+        "checks": {
+          "row_count_matches_manifest": true,
+          "first_ts_matches_manifest": true,
+          "last_ts_matches_manifest": true,
+          "tv_export_oanda_present": true
+        },
+        "PASS": true
+      },
+      {
+        "symbol": "US30USD",
+        "path": "C:\\Users\\joshu\\prop_firm_pipeline\\data\\bar_data\\US30USD.csv",
+        "sha256": "723a354b1b874e000b025c9537a55f57d810da684e29fce808e1148f0ee677b5",
+        "n_rows": 101245,
+        "first_ts": "2022-01-02",
+        "last_ts": "2026-04-19",
+        "broker_via_tv_export": "OANDA",
+        "checks": {
+          "row_count_matches_manifest": true,
+          "first_ts_matches_manifest": true,
+          "last_ts_matches_manifest": true,
+          "tv_export_oanda_present": true
+        },
+        "PASS": true
+      },
+      {
+        "symbol": "USDJPY",
+        "path": "C:\\Users\\joshu\\prop_firm_pipeline\\data\\bar_data\\USDJPY.csv",
+        "sha256": "678c846c483139e537b43a5ad9950c5fbff4d99733dc735bd564a7fd83db185e",
+        "n_rows": 106820,
+        "first_ts": "2022-01-02",
+        "last_ts": "2026-04-19",
+        "broker_via_tv_export": "OANDA",
+        "checks": {
+          "row_count_matches_manifest": true,
+          "first_ts_matches_manifest": true,
+          "last_ts_matches_manifest": true,
+          "tv_export_oanda_present": true
+        },
+        "PASS": true
+      }
+    ],
+    "all_pass": true
+  },
+  "adversity_definition": {
+    "rolling_window_bars": 5760,
+    "rolling_min_periods": 500,
+    "sigma_threshold": 1.0,
+    "direction": "down (long-only universe)",
+    "source": "scripts/identify/2026-04-26/o4_bar_correlation.py simultaneous_adverse() \u2014 Q14-equivalent, not re-derived"
+  },
+  "schedules_used": {
+    "guardian": "Mon/Tue/Thu \u00d7 08:00-16:00 NY",
+    "striker": "Tue/Fri \u00d7 13:00-17:00 UTC",
+    "aegis": "Mon/Tue/Wed \u00d7 10:00-13:45 NY",
+    "source": "findings_2026-04-26.md \u00a7G2 + filters.py operational metadata; Rule 0 does not bind on Q-T"
+  },
+  "cohort_sizes": {
+    "n_panel_bars_with_valid_rolling_std": 101117,
+    "n_overlap_windows": 7809,
+    "n_tuesday_overlap": 4579,
+    "n_non_tuesday_overlap": 3230,
+    "thin_floor_n": 100,
+    "thin_floor_passed": true
+  },
+  "concurrent_loss_rates": {
+    "rate_tuesday": 0.061367110722865256,
+    "rate_non_tuesday": 0.007430340557275541,
+    "delta_pp": 5.393677016558971,
+    "mw_u": 7793952.0,
+    "mw_p": 8.733409275263211e-34,
+    "bootstrap_95ci_pp": {
+      "n_resamples": 1000,
+      "ci_lower_pp": 4.603583494983492,
+      "ci_upper_pp": 6.178246598923474,
+      "median_pp": 5.415515845997714
+    }
+  },
+  "dow_breakdown_overlap_windows": {
+    "Mon": {
+      "n_overlap_windows": 3230,
+      "n_concurrent_loss": 24,
+      "concurrent_loss_rate": 0.007430340557275541
+    },
+    "Tue": {
+      "n_overlap_windows": 4579,
+      "n_concurrent_loss": 281,
+      "concurrent_loss_rate": 0.061367110722865256
+    },
+    "Wed": {
+      "n_overlap_windows": 0,
+      "n_concurrent_loss": 0,
+      "concurrent_loss_rate": null
+    },
+    "Thu": {
+      "n_overlap_windows": 0,
+      "n_concurrent_loss": 0,
+      "concurrent_loss_rate": null
+    },
+    "Fri": {
+      "n_overlap_windows": 0,
+      "n_concurrent_loss": 0,
+      "concurrent_loss_rate": null
+    },
+    "Sat": {
+      "n_overlap_windows": 0,
+      "n_concurrent_loss": 0,
+      "concurrent_loss_rate": null
+    },
+    "Sun": {
+      "n_overlap_windows": 0,
+      "n_concurrent_loss": 0,
+      "concurrent_loss_rate": null
+    }
+  },
+  "macro_event_composition_tuesday": {
+    "n": 4579,
+    "pct_in_nfp_first_fri_1230_1330_utc": 0.0,
+    "pct_in_fomc_wed_1800_1959_utc": 0.0,
+    "note": "tag-and-preserve per brief; no deletion applied"
+  },
+  "k_level_decomposition": {
+    "tuesday_K2_n": 2219,
+    "tuesday_K2_concurrent_loss_rate": 0.03470031545741325,
+    "tuesday_K3_n": 2360,
+    "tuesday_K3_concurrent_loss_rate": 0.08644067796610169,
+    "monday_K2_n": 3230,
+    "monday_K2_concurrent_loss_rate": 0.007430340557275541,
+    "matched_K2_test": {
+      "n_a": 2219,
+      "n_b": 3230,
+      "rate_a": 0.03470031545741325,
+      "rate_b": 0.007430340557275541,
+      "diff_pp": 2.726997490013771,
+      "mw_u": 3681412.0,
+      "mw_p": 2.266820916069818e-13
+    },
+    "matched_K2_bootstrap_ci_pp": {
+      "n_resamples": 1000,
+      "ci_lower_pp": 1.9295055229463527,
+      "ci_upper_pp": 3.49317706494851,
+      "median_pp": 2.722693261265987
+    },
+    "note": "Mon overlap is always K=2 (G+A); Tue overlap can be K=2 or K=3. \u22652-adverse-of-3 is mechanically higher-probability than \u22652-adverse-of-2 even under iid \u2014 descriptive only, no deletion."
+  },
+  "hypothesis_branching": {
+    "thresholds": {
+      "H_null": "abs(delta) <= 1pp AND p > 0.05",
+      "H_alt_1": "delta > 4pp AND p < 0.05",
+      "else": "H_inconclusive"
+    },
+    "verdict": "H_alt_1 supported",
+    "routing_recommendation": "Forward (Pepperstone re-verification gated): OANDA-proxy Tuesday cohort shows concurrent-loss elevation; Pepperstone canonical re-verification required before any operational implication. NO overlay or sizing modulation admissible."
+  },
+  "non_actions_mandatory": [
+    "no overlay proposal",
+    "no allocation modulation",
+    "no dd_protection touch",
+    "no parameter change"
+  ]
+}

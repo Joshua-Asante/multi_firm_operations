@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prop-firm-pipeline"
+version = "0.1.0"
+description = "Multi-firm prop trading operational pipeline (multipliers, DD protection, Monte Carlo validation)."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "statsmodels",
+    "arch",
+    "matplotlib",
+    "ruptures",
+]
+
+[project.optional-dependencies]
+cli = ["rich"]
+mc = ["joblib"]
+analysis = ["nolds<0.6", "setuptools<81"]   # nolds 0.6.x has a Python 3.11/3.12 import bug (importlib.resources.files() on a module). 0.5.x works but imports pkg_resources at module load — and setuptools 81+ removed pkg_resources. Pin both: nolds<0.6 for the import bug, setuptools<81 for the pkg_resources removal. Local 0.5.x deprecation warning ("pin to Setuptools<81") was the breadcrumb.
+report = ["quantstats"]
+broker = ["oandapyV20"]
+dev = ["pytest", "pytest-xdist"]
+
+[tool.setuptools]
+py-modules = ["accounts", "cli", "csv_parser", "dd_protection", "firm_rules", "portfolio_mc"]
+packages = ["lib"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+# pytest 9 changed default --import-mode from prepend to importlib; importlib
+# does NOT add cwd to sys.path, so test imports of top-level modules
+# (`from accounts import ...`, `from portfolio_mc import ...`) need an
+# explicit pythonpath. Setuptools handles `lib` via the packages declaration
+# above; this covers the py-modules.
+pythonpath = ["."]

@@ -1,0 +1,17 @@
+"""MVD self-check confirmation.
+
+dd_protection._validate_protection_rule() runs at module import. If the
+boundary check fails or the spec pin literal drifts past DD_TRIGGER=0.010 /
+DD_SCALE=0.40, the import raises AssertionError. This test makes the
+import-time guard visible at the test layer so it cannot be silently disabled.
+"""
+
+
+def test_dd_protection_self_check_passes_at_import():
+    import dd_protection
+
+    assert callable(dd_protection._validate_protection_rule)
+    # Spec-pinned constants — duplicated here so a constant drift fails this
+    # test even if the spec pin in dd_protection.py is also drifted.
+    assert dd_protection.DD_TRIGGER == 0.010
+    assert dd_protection.DD_SCALE == 0.40

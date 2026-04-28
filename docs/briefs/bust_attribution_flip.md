@@ -65,10 +65,21 @@ This question matters because:
 | Guardian-led (~37% Guardian, <30% Aegis) | **Version-relock effect** confirmed. The flip is real and will appear live. | Investigate whether Guardian's bumped exposure drives bust on dd-protection-already-engaged days; consider whether the 1.0% / 0.40× single-tier still drains the right culprit. |
 | Mixed / Striker-led / unstable | Both drivers contribute, or third factor present. | Escalate; design a second falsification. |
 
+## Panel-revision noise floor (post-experiment beat, 2026-04-28)
+
+The 04-23 ADR cites Pepperstone × current-locks attribution as A 27.6 / S 39.3 / G 33.2. The committed 04-26 Pepperstone panel reproduces **A 25.1 / S 43.4 / G 31.4** (`python portfolio_mc.py --panel pepperstone`, 223 week-blocks, panel 2022-01-04 → 2026-04-20). The Δ (S +4.1pp, G −1.8pp, A −2.5pp) is **panel-revision-only**: same broker, same versions (v5.5/v4.4/v4.3, jointly locked 2026-04-23, no movement through 04-26), same allocations (G 0.34 / S 1.00 / A 1.50), same dd_protection (DD_TRIGGER=0.010 / DD_SCALE=0.40). The only thing that moved is the Pepperstone export CSV regenerated 3 days later.
+
+**Verified by `git log --since=2026-04-23 --until=2026-04-27 -- dd_protection.py accounts.py portfolio_mc.py`:** in-window commits are `2147b75` (dd_protection MVD self-check retrofit), `b7211e4` (portfolio_mc implied_1r return-shape), and `59dddb3` (portfolio_mc canonical-OANDA dispatch). Per-commit diff inspection: none moved `ALLOCATIONS`, `BASE_RISK`, `DD_TRIGGER`, `DD_SCALE`, `SEEDS`, `HORIZON_DAYS`, `SIMS_PER_SEED`, `STARTING_EQUITY`, or `PROFIT_TARGET`. `accounts.py` had zero in-window commits. The "all constants held" claim is therefore evidenced, not asserted.
+
+**This bounds the panel-revision noise floor at ~4pp on Striker share.** The 04-23 → 04-26 window is therefore not a broker-feed test. The decision tree above must not be read against this delta.
+
+A clean broker-feed test (Pepperstone-vs-OANDA at current locks) requires same-date panels from both feeds. The committed pair is OANDA 04-25 / Pepperstone 04-26 — 1 day apart in regeneration, both backtests through 2026-04-20. Strict same-date reconstruction requires a TradingView re-export from both feeds in a single session: the trade-export CSVs in `data/tv_exports/` are produced by TV's strategy tester, and the bar-data CSVs in `data/bar_data/` are auxiliary (don't drive the MC). The 1-day regeneration drift on the existing OANDA/Pepperstone pair is within the panel-revision noise floor measured here, so the existing-panel broker-feed read is close-but-not-strictly-clean.
+
 ## Partial-D's (declared)
 
 - **Pepperstone × pre-relock attribution** (Aegis 43.2 / Striker 33.8 / Guardian 23.0): cited from 4f9c497 commit message, 2026-04-18. Configuration: Guardian 0.30%, Aegis v4.1 era, Striker pre-pyramid-v4.4. **Not** a current-locks comparand.
 - **OANDA × current-locks attribution** (Guardian 37.1 / Striker 34.3 / Aegis 28.7): from [portfolio_mc.py](../../portfolio_mc.py) run 2026-04-26 on `data/tv_exports/oanda/<dated>.csv`, 223 week-blocks, panel 2022-01-04 → 2026-04-20.
+- **Pepperstone × current-locks attribution** (Aegis 25.1 / Striker 43.4 / Guardian 31.4): from `python portfolio_mc.py --panel pepperstone` on the committed 04-26 Pepperstone CSVs, same panel/blocks. Versions, allocations, and dd_protection constants held constant from the 04-23 ADR's run (see § Panel-revision noise floor for verification). Differs from the ADR's reported A 27.6 / S 39.3 / G 33.2 by panel-revision noise only.
 - **CLAUDE.md headline metrics** (92.73% pass / 0.65% bust / p99 DD 4.94%): Pepperstone × current-locks, authoritative for lock decisions. Did not publish attribution.
 - **Two-tier canonical model:** Pepperstone authoritative, OANDA pattern-spotting proxy. Documented in user feedback memory `feedback_two_tier_canonical_pepperstone_oanda.md`.
 
@@ -92,4 +103,6 @@ This brief is in **prep status**. Promote to active Inquire when:
 - MVD identity gate: [lib/mvd.py](../../lib/mvd.py) `assert_tv_export`
 - Pre-relock comparand: commit 4f9c497 (2026-04-18)
 - Post-retrofit verification: commit b7211e4 (2026-04-25)
+- dd_protection MVD retrofit (in-window, no constants moved): commit 2147b75 (2026-04-25)
+- Pepperstone-current-locks reproduction + `--panel` flag: commit 135e93c (2026-04-28)
 - Two-tier canonical memory: `feedback_two_tier_canonical_pepperstone_oanda.md`

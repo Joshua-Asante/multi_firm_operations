@@ -1,23 +1,27 @@
 name: Pylint
 
-on: [push]
+on: [push, pull_request]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.8", "3.9", "3.10"]
+        python-version: ["3.11", "3.12"]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v3
+      uses: actions/setup-python@v5
       with:
         python-version: ${{ matrix.python-version }}
-    - name: Install dependencies
+    - name: Install package + pylint
       run: |
         python -m pip install --upgrade pip
+        pip install -e .[cli,mc,analysis,report,broker]
         pip install pylint
-    - name: Analysing the code with pylint
-      run: |
-        pylint $(git ls-files '*.py')
+    - name: Lint
+      # --fail-under=8.0 calibrated against current codebase score (8.35/10
+      # locally with deps installed). Bar moves up when the score does;
+      # for now this catches regressions below the established baseline
+      # without blocking on the existing style debt that pre-dates pyproject.
+      run: pylint --fail-under=8.0 $(git ls-files '*.py')

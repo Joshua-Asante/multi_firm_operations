@@ -1,0 +1,207 @@
+{
+  "question": "Q-MSEE-6c \u2014 stress-conditional correlations (P2, H6c)",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "stress_proxy": "max(|XAUUSD daily ret|, |US30USD daily ret|, |USDJPY daily ret|)",
+  "stress_pctile": 0.95,
+  "stress_threshold": 0.023815394106832866,
+  "n_bootstrap": 2000,
+  "auto_forward_threshold": 0.3,
+  "auto_forward_triggers": [
+    {
+      "slice": "stress",
+      "pair": "guardian_aegis",
+      "view": "all_days_zerofill",
+      "r": 0.602956059807978
+    },
+    {
+      "slice": "full",
+      "pair": "guardian_aegis",
+      "view": "both_traded",
+      "r": 0.31561553013399246
+    }
+  ],
+  "slices": {
+    "full": {
+      "label": "all_trade_dates",
+      "n_days": 420,
+      "pairs": {
+        "guardian_striker": {
+          "all_days_zerofill": {
+            "n": 420,
+            "r": -0.04716843405983036,
+            "ci95": [
+              -0.07296372622178417,
+              -0.024008975133767978
+            ]
+          },
+          "both_traded": {
+            "n": 23,
+            "r": -0.16281061880015346,
+            "ci95": [
+              -0.394890170055188,
+              0.12271044739835442
+            ]
+          }
+        },
+        "guardian_aegis": {
+          "all_days_zerofill": {
+            "n": 420,
+            "r": 0.013603178494456547,
+            "ci95": [
+              -0.055639985381670684,
+              0.13023878679492315
+            ]
+          },
+          "both_traded": {
+            "n": 21,
+            "r": 0.31561553013399246,
+            "ci95": [
+              -0.26288134320885115,
+              0.7101135757294692
+            ]
+          }
+        },
+        "striker_aegis": {
+          "all_days_zerofill": {
+            "n": 420,
+            "r": -0.031335731832219056,
+            "ci95": [
+              -0.048263967290837026,
+              -0.015372241646758593
+            ]
+          },
+          "both_traded": {
+            "n": 11,
+            "r": -0.12594056875010348,
+            "ci95": [
+              -0.3897752314465587,
+              0.47140012855666635
+            ]
+          }
+        }
+      }
+    },
+    "stress": {
+      "label": "stress_dates",
+      "n_days": 28,
+      "pairs": {
+        "guardian_striker": {
+          "all_days_zerofill": {
+            "n": 28,
+            "r": -0.06332839340127941,
+            "ci95": [
+              -0.2157647787082786,
+              0.06408890324199826
+            ]
+          },
+          "both_traded": {
+            "n": 2,
+            "r": NaN,
+            "ci95": [
+              NaN,
+              NaN
+            ]
+          }
+        },
+        "guardian_aegis": {
+          "all_days_zerofill": {
+            "n": 28,
+            "r": 0.602956059807978,
+            "ci95": [
+              -0.1944184898520263,
+              0.9461370492032066
+            ]
+          },
+          "both_traded": {
+            "n": 3,
+            "r": NaN,
+            "ci95": [
+              NaN,
+              NaN
+            ]
+          }
+        },
+        "striker_aegis": {
+          "all_days_zerofill": {
+            "n": 28,
+            "r": -0.006608058033979663,
+            "ci95": [
+              -0.10469645287623762,
+              0.13717977774445392
+            ]
+          },
+          "both_traded": {
+            "n": 0,
+            "r": NaN,
+            "ci95": [
+              NaN,
+              NaN
+            ]
+          }
+        }
+      }
+    },
+    "calm": {
+      "label": "calm_dates",
+      "n_days": 392,
+      "pairs": {
+        "guardian_striker": {
+          "all_days_zerofill": {
+            "n": 392,
+            "r": -0.04805144716309019,
+            "ci95": [
+              -0.07665644760877087,
+              -0.02225781858232009
+            ]
+          },
+          "both_traded": {
+            "n": 21,
+            "r": -0.13976374577182923,
+            "ci95": [
+              -0.36083836381868206,
+              0.1938573614543679
+            ]
+          }
+        },
+        "guardian_aegis": {
+          "all_days_zerofill": {
+            "n": 392,
+            "r": -0.04642357816388583,
+            "ci95": [
+              -0.06833713346818246,
+              -0.02455161733906758
+            ]
+          },
+          "both_traded": {
+            "n": 18,
+            "r": -0.1679576598696091,
+            "ci95": [
+              -0.38484370055311606,
+              0.057635870969742646
+            ]
+          }
+        },
+        "striker_aegis": {
+          "all_days_zerofill": {
+            "n": 392,
+            "r": -0.03251799969058903,
+            "ci95": [
+              -0.05042020886968332,
+              -0.015513322354032862
+            ]
+          },
+          "both_traded": {
+            "n": 11,
+            "r": -0.12594056875010348,
+            "ci95": [
+              -0.3897752314465587,
+              0.47140012855666635
+            ]
+          }
+        }
+      }
+    }
+  },
+  "verdict": "AUTO-FORWARD TRIGGERED: 2 pair-views exceed r>0.3 in some slice \u2014 Khandani-Lo crowded-unwind Forward question opened (Pepperstone re-fit required before Action)"
+}

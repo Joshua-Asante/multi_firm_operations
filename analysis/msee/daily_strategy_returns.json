@@ -1,0 +1,35 @@
+{
+  "primitive": "per-strategy daily R, USD, trade-count on common date axis",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "panel_window": [
+    "2022-01-04",
+    "2026-04-20"
+  ],
+  "n_trade_dates": 420,
+  "q14_reconcile": {
+    "rows_joined": 420,
+    "worst_abs_diff_R": 3.552713678800501e-15,
+    "tolerance_R": 1e-06
+  },
+  "per_strategy": {
+    "guardian": {
+      "n_trade_dates": 182,
+      "n_trades_total": 200,
+      "sum_R": 330.6470588235294,
+      "sum_pnl_usd": 665358.8
+    },
+    "striker": {
+      "n_trade_dates": 168,
+      "n_trades_total": 233,
+      "sum_R": 17.48,
+      "sum_pnl_usd": 427730.97
+    },
+    "aegis": {
+      "n_trade_dates": 123,
+      "n_trades_total": 123,
+      "sum_R": 3.94,
+      "sum_pnl_usd": 212677.68999999997
+    }
+  }
+}

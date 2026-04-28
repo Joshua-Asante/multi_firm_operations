@@ -1,0 +1,472 @@
+{
+  "question": "Q-MSEE-5 \u2014 punctuated-equilibrium changepoint analysis (H5, P5)",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "rolling_window_sweep_business_days": [
+    30,
+    90,
+    180
+  ],
+  "primary_window_business_days": 90,
+  "annualize_factor": 15.874507866387544,
+  "allocations": {
+    "guardian": 0.0034000000000000002,
+    "striker": 0.01,
+    "aegis": 0.015
+  },
+  "per_strategy": {
+    "guardian": {
+      "sweep": {
+        "30": {
+          "n_rolling_obs": 1088,
+          "rolling_sharpe_var": 16.96866839171019,
+          "pelt_penalty": 237.29313127936342,
+          "n_changepoints": 17,
+          "changepoint_dates": [
+            "2022-04-19",
+            "2022-08-10",
+            "2022-11-23",
+            "2023-01-04",
+            "2023-03-08",
+            "2023-03-29",
+            "2023-06-14",
+            "2023-07-21",
+            "2024-02-13",
+            "2024-03-18",
+            "2024-04-29",
+            "2024-07-11",
+            "2024-12-04",
+            "2025-01-17",
+            "2025-06-02",
+            "2025-09-01",
+            "2026-03-11"
+          ],
+          "verdict": "CONTINUOUS-DRIFT: 17 changepoints \u2014 P5 falsified at this window"
+        },
+        "90": {
+          "n_rolling_obs": 1031,
+          "rolling_sharpe_var": 2.8367105246457593,
+          "pelt_penalty": 39.363809237594566,
+          "n_changepoints": 13,
+          "changepoint_dates": [
+            "2022-07-12",
+            "2022-08-10",
+            "2022-12-14",
+            "2023-01-04",
+            "2023-10-10",
+            "2024-02-23",
+            "2024-05-07",
+            "2024-07-11",
+            "2024-10-02",
+            "2025-06-26",
+            "2025-08-25",
+            "2025-09-08",
+            "2026-02-16"
+          ],
+          "verdict": "CONTINUOUS-DRIFT: 13 changepoints \u2014 P5 falsified at this window"
+        },
+        "180": {
+          "n_rolling_obs": 941,
+          "rolling_sharpe_var": 0.7106157055910017,
+          "pelt_penalty": 9.731090660555866,
+          "n_changepoints": 8,
+          "changepoint_dates": [
+            "2022-11-15",
+            "2023-01-25",
+            "2023-07-21",
+            "2023-10-20",
+            "2024-04-18",
+            "2024-06-21",
+            "2024-10-23",
+            "2025-01-17"
+          ],
+          "verdict": "TRANSITIONAL: 8 changepoints"
+        }
+      },
+      "primary_segments": [
+        {
+          "start_date": "2022-05-09",
+          "end_date": "2022-07-11",
+          "n_obs": 46,
+          "mean_sharpe": 1.3011148809626751
+        },
+        {
+          "start_date": "2022-07-12",
+          "end_date": "2022-08-09",
+          "n_obs": 21,
+          "mean_sharpe": -4.537188439930195
+        },
+        {
+          "start_date": "2022-08-10",
+          "end_date": "2022-12-13",
+          "n_obs": 90,
+          "mean_sharpe": 0.3048292294792819
+        },
+        {
+          "start_date": "2022-12-14",
+          "end_date": "2023-01-03",
+          "n_obs": 15,
+          "mean_sharpe": -1.9882210764818147
+        },
+        {
+          "start_date": "2023-01-04",
+          "end_date": "2023-10-09",
+          "n_obs": 199,
+          "mean_sharpe": 1.2401217254738413
+        },
+        {
+          "start_date": "2023-10-10",
+          "end_date": "2024-02-22",
+          "n_obs": 98,
+          "mean_sharpe": 2.8982640494791214
+        },
+        {
+          "start_date": "2024-02-23",
+          "end_date": "2024-05-06",
+          "n_obs": 52,
+          "mean_sharpe": 0.7808365122982194
+        },
+        {
+          "start_date": "2024-05-07",
+          "end_date": "2024-07-10",
+          "n_obs": 47,
+          "mean_sharpe": -2.4750759922395074
+        },
+        {
+          "start_date": "2024-07-11",
+          "end_date": "2024-10-01",
+          "n_obs": 59,
+          "mean_sharpe": 0.48398049721191017
+        },
+        {
+          "start_date": "2024-10-02",
+          "end_date": "2025-06-25",
+          "n_obs": 191,
+          "mean_sharpe": 2.381243306321996
+        },
+        {
+          "start_date": "2025-06-26",
+          "end_date": "2025-08-22",
+          "n_obs": 42,
+          "mean_sharpe": 1.221757565686119
+        },
+        {
+          "start_date": "2025-08-25",
+          "end_date": "2025-09-05",
+          "n_obs": 10,
+          "mean_sharpe": -3.4367475591247354
+        },
+        {
+          "start_date": "2025-09-08",
+          "end_date": "2026-02-13",
+          "n_obs": 115,
+          "mean_sharpe": 2.6445078209074557
+        },
+        {
+          "start_date": "2026-02-16",
+          "end_date": "2026-04-20",
+          "n_obs": 46,
+          "mean_sharpe": 1.4602056117413742
+        }
+      ],
+      "primary_event_alignment": [
+        {
+          "changepoint": "2023-10-10",
+          "event": "Israel/Hamas",
+          "event_date": "2023-10-07",
+          "delta_days": 3
+        }
+      ]
+    },
+    "striker": {
+      "sweep": {
+        "30": {
+          "n_rolling_obs": 1091,
+          "rolling_sharpe_var": 8.947431731830314,
+          "pelt_penalty": 125.17188544527127,
+          "n_changepoints": 22,
+          "changepoint_dates": [
+            "2022-04-08",
+            "2022-04-29",
+            "2022-10-25",
+            "2023-01-27",
+            "2023-03-31",
+            "2023-05-26",
+            "2023-07-07",
+            "2023-08-18",
+            "2023-09-12",
+            "2024-02-16",
+            "2024-03-19",
+            "2024-04-30",
+            "2024-07-05",
+            "2024-08-23",
+            "2024-10-04",
+            "2025-02-07",
+            "2025-03-21",
+            "2025-04-29",
+            "2025-06-10",
+            "2025-08-19",
+            "2025-10-03",
+            "2026-03-24"
+          ],
+          "verdict": "CONTINUOUS-DRIFT: 22 changepoints \u2014 P5 falsified at this window"
+        },
+        "90": {
+          "n_rolling_obs": 1031,
+          "rolling_sharpe_var": 2.375877564055473,
+          "pelt_penalty": 32.9690288772202,
+          "n_changepoints": 7,
+          "changepoint_dates": [
+            "2022-07-01",
+            "2022-07-19",
+            "2022-12-20",
+            "2023-09-12",
+            "2024-04-26",
+            "2025-04-25",
+            "2025-06-13"
+          ],
+          "verdict": "TRANSITIONAL: 7 changepoints"
+        },
+        "180": {
+          "n_rolling_obs": 941,
+          "rolling_sharpe_var": 1.2015016062509445,
+          "pelt_penalty": 16.453226360241437,
+          "n_changepoints": 6,
+          "changepoint_dates": [
+            "2023-04-25",
+            "2023-09-12",
+            "2024-01-16",
+            "2024-05-21",
+            "2025-06-27",
+            "2025-10-17"
+          ],
+          "verdict": "TRANSITIONAL: 6 changepoints"
+        }
+      },
+      "primary_segments": [
+        {
+          "start_date": "2022-05-09",
+          "end_date": "2022-06-30",
+          "n_obs": 39,
+          "mean_sharpe": 0.10412232889987369
+        },
+        {
+          "start_date": "2022-07-01",
+          "end_date": "2022-07-18",
+          "n_obs": 12,
+          "mean_sharpe": -1.873431898095286
+        },
+        {
+          "start_date": "2022-07-19",
+          "end_date": "2022-12-19",
+          "n_obs": 110,
+          "mean_sharpe": 1.3160698399420203
+        },
+        {
+          "start_date": "2022-12-20",
+          "end_date": "2023-09-11",
+          "n_obs": 190,
+          "mean_sharpe": -1.4002770028754568
+        },
+        {
+          "start_date": "2023-09-12",
+          "end_date": "2024-04-25",
+          "n_obs": 163,
+          "mean_sharpe": 1.71968313064903
+        },
+        {
+          "start_date": "2024-04-26",
+          "end_date": "2025-04-24",
+          "n_obs": 260,
+          "mean_sharpe": 0.9166637171768691
+        },
+        {
+          "start_date": "2025-04-25",
+          "end_date": "2025-06-12",
+          "n_obs": 35,
+          "mean_sharpe": -0.8751225797426029
+        },
+        {
+          "start_date": "2025-06-13",
+          "end_date": "2026-04-20",
+          "n_obs": 222,
+          "mean_sharpe": 2.6395796935226263
+        }
+      ],
+      "primary_event_alignment": []
+    },
+    "aegis": {
+      "sweep": {
+        "30": {
+          "n_rolling_obs": 954,
+          "rolling_sharpe_var": 8.053338662744032,
+          "pelt_penalty": 110.50249599471582,
+          "n_changepoints": 18,
+          "changepoint_dates": [
+            "2022-04-18",
+            "2022-05-11",
+            "2022-09-07",
+            "2022-10-03",
+            "2023-01-04",
+            "2023-04-19",
+            "2023-05-22",
+            "2023-08-23",
+            "2023-09-11",
+            "2023-12-27",
+            "2024-02-07",
+            "2024-04-17",
+            "2024-06-04",
+            "2024-09-18",
+            "2024-12-17",
+            "2025-07-28",
+            "2025-08-26",
+            "2025-10-22"
+          ],
+          "verdict": "CONTINUOUS-DRIFT: 18 changepoints \u2014 P5 falsified at this window"
+        },
+        "90": {
+          "n_rolling_obs": 1031,
+          "rolling_sharpe_var": 1.8181361155943387,
+          "pelt_penalty": 25.229491201318133,
+          "n_changepoints": 9,
+          "changepoint_dates": [
+            "2022-09-14",
+            "2022-10-03",
+            "2023-02-06",
+            "2023-03-08",
+            "2023-07-12",
+            "2024-07-03",
+            "2024-11-06",
+            "2025-01-27",
+            "2025-11-12"
+          ],
+          "verdict": "TRANSITIONAL: 9 changepoints"
+        },
+        "180": {
+          "n_rolling_obs": 941,
+          "rolling_sharpe_var": 0.8943693030442176,
+          "pelt_penalty": 12.247391527468725,
+          "n_changepoints": 5,
+          "changepoint_dates": [
+            "2023-02-07",
+            "2023-06-12",
+            "2023-11-15",
+            "2024-07-03",
+            "2026-03-10"
+          ],
+          "verdict": "TRANSITIONAL: 5 changepoints"
+        }
+      },
+      "primary_segments": [
+        {
+          "start_date": "2022-05-09",
+          "end_date": "2022-09-13",
+          "n_obs": 92,
+          "mean_sharpe": -0.7555067542393367
+        },
+        {
+          "start_date": "2022-09-14",
+          "end_date": "2022-09-30",
+          "n_obs": 13,
+          "mean_sharpe": 1.8363630177721986
+        },
+        {
+          "start_date": "2022-10-03",
+          "end_date": "2023-02-03",
+          "n_obs": 90,
+          "mean_sharpe": -0.9865683442906116
+        },
+        {
+          "start_date": "2023-02-06",
+          "end_date": "2023-03-07",
+          "n_obs": 22,
+          "mean_sharpe": 1.4131300014121697
+        },
+        {
+          "start_date": "2023-03-08",
+          "end_date": "2023-07-11",
+          "n_obs": 90,
+          "mean_sharpe": 2.6881585777863406
+        },
+        {
+          "start_date": "2023-07-12",
+          "end_date": "2024-07-02",
+          "n_obs": 255,
+          "mean_sharpe": 1.493464020096858
+        },
+        {
+          "start_date": "2024-07-03",
+          "end_date": "2024-11-05",
+          "n_obs": 90,
+          "mean_sharpe": 2.3716780987278834
+        },
+        {
+          "start_date": "2024-11-06",
+          "end_date": "2025-01-24",
+          "n_obs": 58,
+          "mean_sharpe": 0.77026304198329
+        },
+        {
+          "start_date": "2025-01-27",
+          "end_date": "2025-11-11",
+          "n_obs": 207,
+          "mean_sharpe": 2.02481197983979
+        },
+        {
+          "start_date": "2025-11-12",
+          "end_date": "2026-04-20",
+          "n_obs": 114,
+          "mean_sharpe": 3.212236396407362
+        }
+      ],
+      "primary_event_alignment": [
+        {
+          "changepoint": "2023-03-08",
+          "event": "SVB collapse",
+          "event_date": "2023-03-10",
+          "delta_days": -2
+        },
+        {
+          "changepoint": "2024-11-06",
+          "event": "US election",
+          "event_date": "2024-11-05",
+          "delta_days": 1
+        }
+      ]
+    }
+  },
+  "known_events": [
+    [
+      "2022-02-24",
+      "Russia/Ukraine"
+    ],
+    [
+      "2022-06-15",
+      "Fed 75bp hike (inflation regime)"
+    ],
+    [
+      "2023-03-10",
+      "SVB collapse"
+    ],
+    [
+      "2023-10-07",
+      "Israel/Hamas"
+    ],
+    [
+      "2024-08-05",
+      "Yen-carry unwind / global vol spike"
+    ],
+    [
+      "2024-11-05",
+      "US election"
+    ],
+    [
+      "2025-04-02",
+      "Tariff announcement"
+    ],
+    [
+      "2026-04-16",
+      "Iran/Hormuz overlay window onset (per CLAUDE.md)"
+    ]
+  ]
+}

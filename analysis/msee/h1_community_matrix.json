@@ -1,0 +1,164 @@
+{
+  "question": "Q-MSEE-1 \u2014 community matrix via MC perturbation (H1, P1)",
+  "feed": "OANDA",
+  "canonical_status": "EXPLORATORY",
+  "banner": "*** EXPLORATORY \u2014 not for lock decisions ***",
+  "structural_note": "On this MC the cross-strategy elements A_ij (i!=j) are 0 by construction \u2014 strategy paths are independently bootstrapped. The portfolio-outcome sensitivity matrix below is the operationally meaningful substitute.",
+  "perturb_fraction": 0.1,
+  "sims_per_seed": 2000,
+  "seeds": [
+    42,
+    123,
+    2026
+  ],
+  "baseline_alloc": {
+    "guardian": 0.0034,
+    "striker": 0.01,
+    "aegis": 0.015
+  },
+  "runs": [
+    {
+      "label": "baseline",
+      "perturb": {
+        "guardian": 1.0,
+        "striker": 1.0,
+        "aegis": 1.0
+      },
+      "perturbed_alloc": {
+        "guardian": 0.0034,
+        "striker": 0.01,
+        "aegis": 0.015
+      },
+      "pass_rate": 0.961,
+      "bust_rate": 0.005,
+      "timeout_rate": 0.033999999999999996,
+      "p99_dd": 0.04864799359078337,
+      "median_days_to_pass": 26
+    },
+    {
+      "label": "guardian_+10pct",
+      "perturb": {
+        "guardian": 1.1,
+        "striker": 1.0,
+        "aegis": 1.0
+      },
+      "perturbed_alloc": {
+        "guardian": 0.0037400000000000003,
+        "striker": 0.01,
+        "aegis": 0.015
+      },
+      "pass_rate": 0.9620000000000001,
+      "bust_rate": 0.005666666666666667,
+      "timeout_rate": 0.03233333333333333,
+      "p99_dd": 0.04910930911920048,
+      "median_days_to_pass": 26
+    },
+    {
+      "label": "guardian_-10pct",
+      "perturb": {
+        "guardian": 0.9,
+        "striker": 1.0,
+        "aegis": 1.0
+      },
+      "perturbed_alloc": {
+        "guardian": 0.00306,
+        "striker": 0.01,
+        "aegis": 0.015
+      },
+      "pass_rate": 0.9606666666666667,
+      "bust_rate": 0.003833333333333333,
+      "timeout_rate": 0.0355,
+      "p99_dd": 0.048294367211894694,
+      "median_days_to_pass": 27
+    },
+    {
+      "label": "striker_+10pct",
+      "perturb": {
+        "guardian": 1.0,
+        "striker": 1.1,
+        "aegis": 1.0
+      },
+      "perturbed_alloc": {
+        "guardian": 0.0034,
+        "striker": 0.011000000000000001,
+        "aegis": 0.015
+      },
+      "pass_rate": 0.961,
+      "bust_rate": 0.0065,
+      "timeout_rate": 0.0325,
+      "p99_dd": 0.04941432812207132,
+      "median_days_to_pass": 26
+    },
+    {
+      "label": "striker_-10pct",
+      "perturb": {
+        "guardian": 1.0,
+        "striker": 0.9,
+        "aegis": 1.0
+      },
+      "perturbed_alloc": {
+        "guardian": 0.0034,
+        "striker": 0.009000000000000001,
+        "aegis": 0.015
+      },
+      "pass_rate": 0.9611666666666666,
+      "bust_rate": 0.0033333333333333335,
+      "timeout_rate": 0.0355,
+      "p99_dd": 0.0480869565996265,
+      "median_days_to_pass": 27
+    },
+    {
+      "label": "aegis_+10pct",
+      "perturb": {
+        "guardian": 1.0,
+        "striker": 1.0,
+        "aegis": 1.1
+      },
+      "perturbed_alloc": {
+        "guardian": 0.0034,
+        "striker": 0.01,
+        "aegis": 0.0165
+      },
+      "pass_rate": 0.9621666666666666,
+      "bust_rate": 0.0055000000000000005,
+      "timeout_rate": 0.03233333333333333,
+      "p99_dd": 0.04912422101296393,
+      "median_days_to_pass": 26
+    },
+    {
+      "label": "aegis_-10pct",
+      "perturb": {
+        "guardian": 1.0,
+        "striker": 1.0,
+        "aegis": 0.9
+      },
+      "perturbed_alloc": {
+        "guardian": 0.0034,
+        "striker": 0.01,
+        "aegis": 0.0135
+      },
+      "pass_rate": 0.9591666666666666,
+      "bust_rate": 0.003833333333333333,
+      "timeout_rate": 0.037,
+      "p99_dd": 0.04746871442285497,
+      "median_days_to_pass": 27
+    }
+  ],
+  "portfolio_outcome_sensitivity_d_metric_d_w": {
+    "pass_rate": {
+      "guardian": 1.9607843137255994,
+      "striker": -0.08333333333332416,
+      "aegis": 1.0000000000000007
+    },
+    "bust_rate": {
+      "guardian": 2.696078431372548,
+      "striker": 1.583333333333333,
+      "aegis": 0.5555555555555557
+    },
+    "p99_dd": {
+      "guardian": 1.198443981332037,
+      "striker": 0.6636857612224086,
+      "aegis": 0.5518355300363207
+    }
+  }
+}

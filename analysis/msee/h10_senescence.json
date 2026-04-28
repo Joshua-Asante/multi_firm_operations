@@ -1,0 +1,87 @@
+{
+  "question": "Q-MSEE-10 \u2014 senescence decomposition (H10)",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "window_trades": 50,
+  "n_bootstrap": 2000,
+  "per_strategy": {
+    "guardian": {
+      "n_trades": 200,
+      "trade_window": [
+        "2022-01-24T19:15:00",
+        "2026-04-20T18:00:00"
+      ],
+      "R_of_winners": {
+        "first_window_mean": NaN,
+        "last_window_mean": 13.359041574021052,
+        "trend_slope_per_trade": 0.06921564707435106,
+        "trend_slope_ci95": [
+          0.06604063375924824,
+          0.07258331501134117
+        ]
+      },
+      "win_rate": {
+        "first_window_mean": 0.17052611960832412,
+        "last_window_mean": 0.22400000000000003,
+        "trend_slope_per_trade": 0.0003849632389882967,
+        "trend_slope_ci95": [
+          0.00028560477975831224,
+          0.00047625060448904915
+        ]
+      },
+      "mode": "REJUVENATION: at least one component improving"
+    },
+    "striker": {
+      "n_trades": 233,
+      "trade_window": [
+        "2022-01-04T10:45:00",
+        "2026-04-17T13:00:00"
+      ],
+      "R_of_winners": {
+        "first_window_mean": 0.1794620542249948,
+        "last_window_mean": 0.2269805761635055,
+        "trend_slope_per_trade": 6.815769985076369e-05,
+        "trend_slope_ci95": [
+          -5.162487767459407e-05,
+          0.0001662284107576499
+        ]
+      },
+      "win_rate": {
+        "first_window_mean": 0.6597570933095562,
+        "last_window_mean": 0.6592000000000001,
+        "trend_slope_per_trade": -0.0001829916296407816,
+        "trend_slope_ci95": [
+          -0.0003576546577186487,
+          -1.772969966957527e-05
+        ]
+      },
+      "mode": "DENSITY-RISE: WR declining, R-of-winners stable"
+    },
+    "aegis": {
+      "n_trades": 123,
+      "trade_window": [
+        "2022-01-12T10:15:00",
+        "2026-04-15T13:45:00"
+      ],
+      "R_of_winners": {
+        "first_window_mean": 0.08830932812645208,
+        "last_window_mean": 0.11737117672374639,
+        "trend_slope_per_trade": 0.00036974971257084456,
+        "trend_slope_ci95": [
+          0.00030035457957326077,
+          0.00044266293206696893
+        ]
+      },
+      "win_rate": {
+        "first_window_mean": 0.4243522047332011,
+        "last_window_mean": 0.3632,
+        "trend_slope_per_trade": -0.0007485979320392297,
+        "trend_slope_ci95": [
+          -0.001103865034972878,
+          -0.00041382997803869994
+        ]
+      },
+      "mode": "DENSITY-RISE: WR declining, R-of-winners stable"
+    }
+  }
+}

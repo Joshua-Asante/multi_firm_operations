@@ -48,7 +48,7 @@ Strategy versions most recently re-locked 2026-04-23 (Guardian v5.4 → v5.5, St
 2026-04-23 lock MC anchors:
 * Alchemy reference (2026-04-20, Striker v4.4 + Aegis v4.2 era): **99.21% pass / 0.03% bust**.
 * Pepperstone directional (2026-04-23, all three at candidate versions, 10K × 3 seeds): **88.45% pass / 4.68% bust** raw; **84.37% pass / 1.03% bust** after correcting Aegis 1R for the n=1 full-stop thin-cohort artifact (median fallback inflates Aegis scale 4.4×). Bust gate passes under corrected 1R; pass-rate gap vs Alchemy attributed to feed-level drag + v5.5 added filters (blockMonH08, blockMonH09, blockH12 all-days, blockH12Day latch). Locked under brief-authorized directional read, not anchor-grade MC. Re-MC with v5.4 Pepperstone pending (would isolate feed effect from version effect).
-* Post-Guardian-risk-relock MC (G 0.34% / S 1.00% / A 1.50%, same panel): **92.73% pass / 0.65% bust / 6.62% timeout**, p99 DD 4.94%. See Protection section below.
+* Post-Guardian-risk-relock MC (G 0.34% / S 1.00% / A 1.50%, same panel): **92.73% pass / 0.65% bust / 6.62% timeout**, p99 DD 4.94%. Lock criteria: bust <1%, p99 DD <5%. Current 04-26 Pepperstone panel (the one committed to the repo) reproduces **93.78% pass / 0.58% bust / 4.92% p99 DD** under `python portfolio_mc.py --panel pepperstone` — drift within lock criteria, no re-MC triggered. `tests/test_mc_anchors.py` pins 93.78/0.58/4.92 as the code-reproducible anchor; 92.73/0.65/4.94 retained here as the 04-23 lock-decision artifact. See Protection section below.
 
 No active overlays. Guardian runs at its locked base risk. The Iran-Israel /
 Hormuz conflict overlay was deactivated 2026-04-23 after revert triggers met;

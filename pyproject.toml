@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "prop-firm-pipeline"
+version = "0.1.0"
+description = "Multi-firm prop trading operational pipeline (multipliers, DD protection, Monte Carlo validation)."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy",
+    "pandas",
+    "scipy",
+    "statsmodels",
+    "arch",
+    "matplotlib",
+    "ruptures",
+]
+
+[project.optional-dependencies]
+cli = ["rich"]
+mc = ["joblib"]
+analysis = ["nolds"]
+report = ["quantstats"]
+broker = ["oandapyV20"]
+dev = ["pytest", "pytest-xdist"]
+
+[tool.setuptools]
+py-modules = ["accounts", "cli", "csv_parser", "dd_protection", "firm_rules", "portfolio_mc"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

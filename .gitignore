@@ -12,6 +12,12 @@ __pycache__/
 venv/
 env/
 
+# Test artifacts (pytest-html-report and similar auto-generate here)
+reports/
+.pytest_cache/
+.coverage
+htmlcov/
+
 # Env / secrets
 .env
 .env.*

@@ -55,6 +55,28 @@ OANDA_PANELS: Dict[str, Path] = {
     "aegis":    OANDA_DIR / "Aegis_USDJPY_v4.3_OANDA_USDJPY_2026-04-25_7ee6b.csv",
 }
 
+PEPPERSTONE_DIR = Path(__file__).parent / "data" / "tv_exports" / "pepperstone"
+PEPPERSTONE_PANELS: Dict[str, Path] = {
+    "guardian": PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-04-26_87e73.csv",
+    "striker":  PEPPERSTONE_DIR / "Striker_DJ30_v4.4_PEPPERSTONE_US30_2026-04-26_3eea0.csv",
+    "aegis":    PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv",
+}
+
+# Pepperstone is the CLAUDE.md canonical lock anchor; OANDA is the pattern-spotting proxy
+# (per 2026-04-26 commit 59dddb3 + two-tier canonical rule).
+PANELS_BY_BROKER: Dict[str, Dict[str, Path]] = {
+    "pepperstone": PEPPERSTONE_PANELS,
+    "oanda":       OANDA_PANELS,
+}
+
+# Symbol field varies per broker (Pepperstone uses US30, OANDA uses US30USD for DJ30).
+EXPECTED_SYMBOLS_BY_BROKER: Dict[str, Dict[str, str]] = {
+    "pepperstone": {"guardian": "XAUUSD", "striker": "US30",    "aegis": "USDJPY"},
+    "oanda":       {"guardian": "XAUUSD", "striker": "US30USD", "aegis": "USDJPY"},
+}
+
+DEFAULT_PANEL = "pepperstone"
+
 
 # ── Data pipeline ─────────────────────────────────────────────────────────
 
@@ -222,10 +244,27 @@ def _fmt_alloc(allocs: Dict[str, float]) -> str:
             f"A {allocs['aegis']:.2%}")
 
 
-def report_default(seeds_results: list, dd_trigger: float, dd_scale: float,
-                   allocs: Dict[str, float], no_protection: bool):
-    """Print the default MC output block."""
-    per_seed = len(seeds_results[0]["max_dds"])
+def compute_default_config(dd_trigger: float, dd_scale: float, no_protection: bool,
+                           allocs: Dict[str, float],
+                           panel_name: str = DEFAULT_PANEL) -> dict:
+    """Pure compute path for default MC mode. Returns aggregated metrics dict.
+
+    Consumed by mode_default (printout layered on top) and by tests/test_mc_anchors.py
+    (anchor pinning). Numerically deterministic given fixed SEEDS = (42, 123, 2026).
+    """
+    trades_by_strat, panel, blocks, scale_info = _load_all(allocs, panel_name=panel_name)
+
+    fallback_count = sum(1 for info in scale_info.values() if info["fell_back"])
+    assert_no_fallback(
+        fallback_count,
+        label="portfolio_mc implied_1r (Striker/Aegis full-stop cohort)",
+    )
+
+    effective_trigger = 10.0 if no_protection else dd_trigger
+    seeds_results = [run_seed(seed, SIMS_PER_SEED, blocks, effective_trigger, dd_scale)
+                     for seed in SEEDS]
+
+    per_seed = SIMS_PER_SEED
     pass_r = [r["outcomes"]["pass"] / per_seed for r in seeds_results]
     bd_r   = [r["outcomes"]["bust_daily"] / per_seed for r in seeds_results]
     bs_r   = [r["outcomes"]["bust_static"] / per_seed for r in seeds_results]
@@ -236,28 +275,57 @@ def report_default(seeds_results: list, dd_trigger: float, dd_scale: float,
     all_dds  = [d for r in seeds_results for d in r["max_dds"]]
 
     attrib = {s: sum(r["bust_attribution"][s] for r in seeds_results) for s in STRATS}
-    total_busts = sum(attrib.values())
+
+    return {
+        "panel_name": panel_name,
+        "panel_start": panel.index.min(),
+        "panel_end": panel.index.max(),
+        "n_bdays": len(panel),
+        "n_blocks": len(blocks),
+        "scale_info": scale_info,
+        "seeds_results": seeds_results,
+        "pass_rate": float(np.mean(pass_r)),
+        "pass_sigma": float(np.std(pass_r)),
+        "bust_rate": float(np.mean(bust_r)),
+        "bust_sigma": float(np.std(bust_r)),
+        "bust_daily_rate": float(np.mean(bd_r)),
+        "bust_static_rate": float(np.mean(bs_r)),
+        "timeout_rate": float(np.mean(to_r)),
+        "median_days_to_pass": int(np.median(all_days)) if all_days else None,
+        "p50_dd": float(np.percentile(all_dds, 50)),
+        "p95_dd": float(np.percentile(all_dds, 95)),
+        "p99_dd": float(np.percentile(all_dds, 99)),
+        "bust_attribution": attrib,
+    }
+
+
+def report_default(result: dict, dd_trigger: float, dd_scale: float,
+                   allocs: Dict[str, float], no_protection: bool):
+    """Print the default MC output block from a compute_default_config() result."""
+    n_seeds = len(result["seeds_results"])
+    per_seed = SIMS_PER_SEED
 
     print("=== Portfolio MC ===")
     print(f"Config: {_fmt_config(dd_trigger, dd_scale, no_protection)}")
     print(f"Allocations: {_fmt_alloc(allocs)}")
-    print(f"Sims: {per_seed:,} × {len(seeds_results)} seeds, horizon {HORIZON_DAYS} days")
+    print(f"Sims: {per_seed:,} × {n_seeds} seeds, horizon {HORIZON_DAYS} days")
     print()
-    print(f"Pass:         {np.mean(pass_r):>6.2%} (sigma {np.std(pass_r):.2%})")
-    print(f"Bust:         {np.mean(bust_r):>6.2%} (sigma {np.std(bust_r):.2%})")
-    print(f"  Daily:      {np.mean(bd_r):>6.2%}")
-    print(f"  Static:     {np.mean(bs_r):>6.2%}")
-    print(f"Timeout:      {np.mean(to_r):>6.2%}")
-    if all_days:
-        print(f"Median days to pass: {int(np.median(all_days))}")
-    print(f"p50 DD:       {np.percentile(all_dds, 50):.2%}")
-    print(f"p95 DD:       {np.percentile(all_dds, 95):.2%}")
-    print(f"p99 DD:       {np.percentile(all_dds, 99):.2%}")
+    print(f"Pass:         {result['pass_rate']:>6.2%} (sigma {result['pass_sigma']:.2%})")
+    print(f"Bust:         {result['bust_rate']:>6.2%} (sigma {result['bust_sigma']:.2%})")
+    print(f"  Daily:      {result['bust_daily_rate']:>6.2%}")
+    print(f"  Static:     {result['bust_static_rate']:>6.2%}")
+    print(f"Timeout:      {result['timeout_rate']:>6.2%}")
+    if result["median_days_to_pass"] is not None:
+        print(f"Median days to pass: {result['median_days_to_pass']}")
+    print(f"p50 DD:       {result['p50_dd']:.2%}")
+    print(f"p95 DD:       {result['p95_dd']:.2%}")
+    print(f"p99 DD:       {result['p99_dd']:.2%}")
     print()
     print("Bust attribution:")
+    total_busts = sum(result["bust_attribution"].values())
     if total_busts > 0:
         for s in ("aegis", "striker", "guardian"):
-            pct = attrib[s] / total_busts
+            pct = result["bust_attribution"][s] / total_busts
             print(f"  {s.capitalize():<10} {pct:>5.1%}")
     else:
         print("  (no busts)")
@@ -265,51 +333,43 @@ def report_default(seeds_results: list, dd_trigger: float, dd_scale: float,
 
 # ── CLI modes ─────────────────────────────────────────────────────────────
 
-def _load_all(allocs: Dict[str, float]):
-    # MVD identity gate on each canonical OANDA panel — catches the
+def _load_all(allocs: Dict[str, float], panel_name: str = DEFAULT_PANEL):
+    # MVD identity gate on each canonical broker panel — catches the
     # 'wrong CSV in load slot' class (e.g. v5.4 export when v5.5 is locked,
     # or a Striker file in Guardian's path).
-    assert_tv_export(OANDA_PANELS["guardian"], expected_strategy="Guardian", expected_version="v5.5", expected_broker="OANDA", expected_symbol="XAUUSD")
-    assert_tv_export(OANDA_PANELS["striker"],  expected_strategy="Striker",  expected_version="v4.4", expected_broker="OANDA", expected_symbol="US30USD")
-    assert_tv_export(OANDA_PANELS["aegis"],    expected_strategy="Aegis",    expected_version="v4.3", expected_broker="OANDA", expected_symbol="USDJPY")
-    trades_by_strat = {s: load_trades(OANDA_PANELS[s]) for s in STRATS}
+    panels = PANELS_BY_BROKER[panel_name]
+    expected_broker = panel_name.upper()
+    expected_symbols = EXPECTED_SYMBOLS_BY_BROKER[panel_name]
+    assert_tv_export(panels["guardian"], expected_strategy="Guardian", expected_version="v5.5", expected_broker=expected_broker, expected_symbol=expected_symbols["guardian"])
+    assert_tv_export(panels["striker"],  expected_strategy="Striker",  expected_version="v4.4", expected_broker=expected_broker, expected_symbol=expected_symbols["striker"])
+    assert_tv_export(panels["aegis"],    expected_strategy="Aegis",    expected_version="v4.3", expected_broker=expected_broker, expected_symbol=expected_symbols["aegis"])
+    trades_by_strat = {s: load_trades(panels[s]) for s in STRATS}
     panel, scale_info = build_daily_panel(trades_by_strat, allocs)
     blocks = build_week_blocks(panel)
     return trades_by_strat, panel, blocks, scale_info
 
 
 def mode_default(dd_trigger: float, dd_scale: float, no_protection: bool,
-                 allocs: Dict[str, float], verbose: bool = True):
-    trades_by_strat, panel, blocks, scale_info = _load_all(allocs)
-
-    # MVD contract — catches the implied_1r silent-fallback case
-    # (audit instance #1). Guardian's median path is by design and reports
-    # fell_back=False. Striker/Aegis fall back to median when full-stop
-    # cohort is under-populated (n<5); for any canonical run this must be 0.
-    fallback_count = sum(1 for info in scale_info.values() if info["fell_back"])
-    assert_no_fallback(
-        fallback_count,
-        label="portfolio_mc implied_1r (Striker/Aegis full-stop cohort)",
-    )
+                 allocs: Dict[str, float], panel_name: str = DEFAULT_PANEL,
+                 verbose: bool = True):
+    result = compute_default_config(dd_trigger, dd_scale, no_protection, allocs,
+                                    panel_name=panel_name)
 
     if verbose:
         print("Scale factors:")
-        for s, info in scale_info.items():
+        for s, info in result["scale_info"].items():
             tag = "  [fallback: median]" if info["fell_back"] else ""
             print(f"  {s:<9} 1R=${info['implied_1r']:>7,.2f}  scale={info['scale']:>6.3f}  n={info['n_trades']}{tag}")
-        print(f"Historical panel: {panel.index.min().date()} -> {panel.index.max().date()}  "
-              f"({len(panel)} bdays, {len(blocks)} week-blocks)")
+        print(f"Panel ({result['panel_name']}): {result['panel_start'].date()} -> {result['panel_end'].date()}  "
+              f"({result['n_bdays']} bdays, {result['n_blocks']} week-blocks)")
         print()
 
-    effective_trigger = 10.0 if no_protection else dd_trigger
-    seeds_results = [run_seed(seed, SIMS_PER_SEED, blocks, effective_trigger, dd_scale)
-                     for seed in SEEDS]
-    report_default(seeds_results, dd_trigger, dd_scale, allocs, no_protection)
+    report_default(result, dd_trigger, dd_scale, allocs, no_protection)
 
 
 def mode_historical(dd_trigger: float, dd_scale: float, no_protection: bool,
-                    allocs: Dict[str, float]):
-    _, panel, _, scale_info = _load_all(allocs)
+                    allocs: Dict[str, float], panel_name: str = DEFAULT_PANEL):
+    _, panel, _, scale_info = _load_all(allocs, panel_name=panel_name)
     path = panel.values
 
     effective_trigger = 10.0 if no_protection else dd_trigger
@@ -335,7 +395,7 @@ def mode_historical(dd_trigger: float, dd_scale: float, no_protection: bool,
     print("=== Portfolio MC — Historical (deterministic) ===")
     print(f"Config: {_fmt_config(dd_trigger, dd_scale, no_protection)}")
     print(f"Allocations: {_fmt_alloc(allocs)}")
-    print(f"Panel: {panel.index.min().date()} -> {panel.index.max().date()}  ({len(panel)} bdays)")
+    print(f"Panel ({panel_name}): {panel.index.min().date()} -> {panel.index.max().date()}  ({len(panel)} bdays)")
     print()
     print(f"Outcome:         {outcome.upper()}")
     print(f"Day terminated:  {day} ({panel.index[min(day - 1, len(panel) - 1)].date()})")
@@ -345,10 +405,12 @@ def mode_historical(dd_trigger: float, dd_scale: float, no_protection: bool,
         print(f"Bust culprit:    {STRATS[culprit]}")
 
 
-def mode_sensitivity(dd_scale: float, allocs: Dict[str, float]):
-    _, _, blocks, _ = _load_all(allocs)
+def mode_sensitivity(dd_scale: float, allocs: Dict[str, float],
+                     panel_name: str = DEFAULT_PANEL):
+    _, _, blocks, _ = _load_all(allocs, panel_name=panel_name)
     grid = [0.005, 0.010, 0.015, 0.020, 0.025]
     print("=== Portfolio MC — Sensitivity grid ===")
+    print(f"Panel: {panel_name}")
     print(f"Allocations: {_fmt_alloc(allocs)}")
     print(f"Sims: {SIMS_PER_SEED:,} × {len(SEEDS)} seeds (DD_SCALE fixed at {dd_scale}×)")
     print()
@@ -390,6 +452,8 @@ def main():
                    help="DD-trigger sensitivity grid")
     p.add_argument("--guardian-risk", type=float, default=None,
                    help="Override Guardian allocation for what-if MC (e.g. 0.0025 to simulate a reduced-risk overlay)")
+    p.add_argument("--panel", choices=list(PANELS_BY_BROKER.keys()), default=DEFAULT_PANEL,
+                   help=f"Broker panel to load (default: {DEFAULT_PANEL}, the CLAUDE.md canonical lock anchor)")
     args = p.parse_args()
 
     allocs = dict(ALLOCATIONS)
@@ -397,11 +461,11 @@ def main():
         allocs["guardian"] = args.guardian_risk
 
     if args.sensitivity:
-        mode_sensitivity(args.dd_scale, allocs)
+        mode_sensitivity(args.dd_scale, allocs, panel_name=args.panel)
     elif args.historical:
-        mode_historical(args.dd_trigger, args.dd_scale, args.no_protection, allocs)
+        mode_historical(args.dd_trigger, args.dd_scale, args.no_protection, allocs, panel_name=args.panel)
     else:
-        mode_default(args.dd_trigger, args.dd_scale, args.no_protection, allocs)
+        mode_default(args.dd_trigger, args.dd_scale, args.no_protection, allocs, panel_name=args.panel)
 
 
 if __name__ == "__main__":

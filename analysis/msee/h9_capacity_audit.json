@@ -1,0 +1,144 @@
+{
+  "question": "Q-MSEE-9 \u2014 capacity audit (H9; strict test deferred)",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "strict_test_status": "DEFERRED",
+  "deferred_reason": "The strict capacity test (progressively scale lots until slippage-adjusted PF falls 20%) requires a calibrated lot-dependent slippage model. The o7 slippage scaffold characterizes execution-gap types but does not quantify slippage(lots). Audit inputs produced; strict test gated on model availability.",
+  "required_inputs_for_strict_test": [
+    "Lot-dependent slippage function slippage(lots, instrument, regime) calibrated to live DXTrade fills (not in scope of current OANDA-proxy corpus).",
+    "Per-instrument depth-of-book or market-impact estimates for XAUUSD, US30USD, USDJPY at the user's broker (Pepperstone or FXIFY/Alchemy DXTrade).",
+    "Threshold definition for 'PF falls 20%' as a hard bar vs a soft monotone decline."
+  ],
+  "predicted_capacity_ordering": "Aegis > Guardian > Striker (per source report Part V)",
+  "per_strategy": {
+    "guardian": {
+      "n_trades": 200,
+      "lot_qty_distribution": {
+        "min": 38.71,
+        "p25": 155.5725,
+        "median": 200.745,
+        "p75": 236.6725,
+        "max": 532.42
+      },
+      "mae_pct_distribution_abs": {
+        "median": 0.22,
+        "p75": 0.28,
+        "p95": 0.4704999999999998,
+        "max": 1.34
+      },
+      "scaling_grid_lot_qty_at_account": {
+        "200000": {
+          "multiplier": 1.0,
+          "median_lot_qty": 200.745,
+          "max_lot_qty": 532.42
+        },
+        "500000": {
+          "multiplier": 2.5,
+          "median_lot_qty": 501.8625,
+          "max_lot_qty": 1331.05
+        },
+        "1000000": {
+          "multiplier": 5.0,
+          "median_lot_qty": 1003.725,
+          "max_lot_qty": 2662.1
+        },
+        "2000000": {
+          "multiplier": 10.0,
+          "median_lot_qty": 2007.45,
+          "max_lot_qty": 5324.2
+        },
+        "5000000": {
+          "multiplier": 25.0,
+          "median_lot_qty": 5018.625,
+          "max_lot_qty": 13310.5
+        }
+      }
+    },
+    "striker": {
+      "n_trades": 233,
+      "lot_qty_distribution": {
+        "min": 10.3,
+        "p25": 33.62,
+        "median": 49.74,
+        "p75": 65.18,
+        "max": 295.37
+      },
+      "mae_pct_distribution_abs": {
+        "median": 0.09,
+        "p75": 0.16,
+        "p95": 0.28,
+        "max": 0.52
+      },
+      "scaling_grid_lot_qty_at_account": {
+        "200000": {
+          "multiplier": 1.0,
+          "median_lot_qty": 49.74,
+          "max_lot_qty": 295.37
+        },
+        "500000": {
+          "multiplier": 2.5,
+          "median_lot_qty": 124.35,
+          "max_lot_qty": 738.425
+        },
+        "1000000": {
+          "multiplier": 5.0,
+          "median_lot_qty": 248.7,
+          "max_lot_qty": 1476.85
+        },
+        "2000000": {
+          "multiplier": 10.0,
+          "median_lot_qty": 497.4,
+          "max_lot_qty": 2953.7
+        },
+        "5000000": {
+          "multiplier": 25.0,
+          "median_lot_qty": 1243.5,
+          "max_lot_qty": 7384.25
+        }
+      }
+    },
+    "aegis": {
+      "n_trades": 123,
+      "lot_qty_distribution": {
+        "min": 1308457.0,
+        "p25": 2309111.0,
+        "median": 3070243.0,
+        "p75": 4250514.5,
+        "max": 9259603.0
+      },
+      "mae_pct_distribution_abs": {
+        "median": 0.04,
+        "p75": 0.08,
+        "p95": 0.13899999999999993,
+        "max": 0.2
+      },
+      "scaling_grid_lot_qty_at_account": {
+        "200000": {
+          "multiplier": 1.0,
+          "median_lot_qty": 3070243.0,
+          "max_lot_qty": 9259603.0
+        },
+        "500000": {
+          "multiplier": 2.5,
+          "median_lot_qty": 7675607.5,
+          "max_lot_qty": 23149007.5
+        },
+        "1000000": {
+          "multiplier": 5.0,
+          "median_lot_qty": 15351215.0,
+          "max_lot_qty": 46298015.0
+        },
+        "2000000": {
+          "multiplier": 10.0,
+          "median_lot_qty": 30702430.0,
+          "max_lot_qty": 92596030.0
+        },
+        "5000000": {
+          "multiplier": 25.0,
+          "median_lot_qty": 76756075.0,
+          "max_lot_qty": 231490075.0
+        }
+      }
+    }
+  }
+}

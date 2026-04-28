@@ -1,0 +1,215 @@
+{
+  "question": "Q-MSEE-2 \u2014 regime cluster decomposition (H2, P3)",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "k_primary": 4,
+  "k_sweep": [
+    3,
+    4,
+    5,
+    6
+  ],
+  "seed": 2026,
+  "n_business_days_clustered": 1335,
+  "n_trade_dates_assigned": 419,
+  "cluster_descriptions": {
+    "0": {
+      "n_days": 792,
+      "guardian_ret": 0.0018085446735098562,
+      "guardian_rv": 0.0008366343066546273,
+      "guardian_range_pct": 0.009494932584391762,
+      "striker_ret": 0.0010469072496177689,
+      "striker_rv": 0.0007215173059266643,
+      "striker_range_pct": 0.008030610013625037,
+      "aegis_ret": 0.00013317598278017736,
+      "aegis_rv": 0.00047744889680213874,
+      "aegis_range_pct": 0.005497277673198948
+    },
+    "1": {
+      "n_days": 198,
+      "guardian_ret": 0.010528151389351944,
+      "guardian_rv": 0.0012073942866200034,
+      "guardian_range_pct": 0.019880474180516347,
+      "striker_ret": 0.0006717865328615038,
+      "striker_rv": 0.0011411968346727364,
+      "striker_range_pct": 0.018026269515412,
+      "aegis_ret": -0.008098430464454118,
+      "aegis_rv": 0.0008813029359075748,
+      "aegis_range_pct": 0.014792970408951998
+    },
+    "2": {
+      "n_days": 25,
+      "guardian_ret": -0.011467152994068903,
+      "guardian_rv": 0.005545194039944472,
+      "guardian_range_pct": 0.042297416642957206,
+      "striker_ret": 0.00180343206972454,
+      "striker_rv": 0.0037687887315806558,
+      "striker_range_pct": 0.020520073204450467,
+      "aegis_ret": 0.0020287849727316943,
+      "aegis_rv": 0.0013936069071610188,
+      "aegis_range_pct": 0.009362945492261986
+    },
+    "3": {
+      "n_days": 320,
+      "guardian_ret": -0.006874080804383212,
+      "guardian_rv": 0.0011380157770778064,
+      "guardian_range_pct": 0.017885667280109752,
+      "striker_ret": -0.0020627299678752267,
+      "striker_rv": 0.001108937443889678,
+      "striker_range_pct": 0.016815894656566292,
+      "aegis_ret": 0.005597117798136686,
+      "aegis_rv": 0.00063761645096318,
+      "aegis_range_pct": 0.010596451887294033
+    }
+  },
+  "permutation_test": {
+    "observed_var_of_cell_means": 3.780626223257194,
+    "permutation_p_value": 0.074,
+    "n_permutations": 500
+  },
+  "primary_cells": [
+    {
+      "strategy": "guardian",
+      "cluster": 0,
+      "n_trade_days": 97,
+      "mean_R": 1.1791995148574896,
+      "gross_R": 114.38235294117649,
+      "win_rate": 0.1958762886597938,
+      "pf": 2.961169944528492
+    },
+    {
+      "strategy": "guardian",
+      "cluster": 1,
+      "n_trade_days": 27,
+      "mean_R": 4.198257080610022,
+      "gross_R": 113.35294117647058,
+      "win_rate": 0.3333333333333333,
+      "pf": 7.599315068493151
+    },
+    {
+      "strategy": "guardian",
+      "cluster": 2,
+      "n_trade_days": 6,
+      "mean_R": 6.411764705882352,
+      "gross_R": 38.470588235294116,
+      "win_rate": 0.5,
+      "pf": 5.605633802816902
+    },
+    {
+      "strategy": "guardian",
+      "cluster": 3,
+      "n_trade_days": 51,
+      "mean_R": 1.0507497116493658,
+      "gross_R": 53.58823529411766,
+      "win_rate": 0.19607843137254902,
+      "pf": 2.4369085173501577
+    },
+    {
+      "strategy": "striker",
+      "cluster": 0,
+      "n_trade_days": 93,
+      "mean_R": 0.08655913978494623,
+      "gross_R": 8.049999999999999,
+      "win_rate": 0.5483870967741935,
+      "pf": 2.694736842105263
+    },
+    {
+      "strategy": "striker",
+      "cluster": 1,
+      "n_trade_days": 36,
+      "mean_R": 0.1513888888888889,
+      "gross_R": 5.45,
+      "win_rate": 0.7777777777777778,
+      "pf": 4.657718120805368
+    },
+    {
+      "strategy": "striker",
+      "cluster": 2,
+      "n_trade_days": 2,
+      "mean_R": 1.2650000000000001,
+      "gross_R": 2.5300000000000002,
+      "win_rate": 1.0,
+      "pf": Infinity
+    },
+    {
+      "strategy": "striker",
+      "cluster": 3,
+      "n_trade_days": 37,
+      "mean_R": 0.039189189189189184,
+      "gross_R": 1.4499999999999997,
+      "win_rate": 0.7297297297297297,
+      "pf": 1.525362318840579
+    },
+    {
+      "strategy": "aegis",
+      "cluster": 0,
+      "n_trade_days": 73,
+      "mean_R": 0.034611872146118716,
+      "gross_R": 2.5266666666666664,
+      "win_rate": 0.3698630136986301,
+      "pf": 4.509259259259262
+    },
+    {
+      "strategy": "aegis",
+      "cluster": 1,
+      "n_trade_days": 36,
+      "mean_R": 0.019259259259259243,
+      "gross_R": 0.6933333333333328,
+      "win_rate": 0.4444444444444444,
+      "pf": 2.5294117647058822
+    },
+    {
+      "strategy": "aegis",
+      "cluster": 2,
+      "n_trade_days": 1,
+      "mean_R": 0.0,
+      "gross_R": 0.0,
+      "win_rate": 0.0,
+      "pf": Infinity
+    },
+    {
+      "strategy": "aegis",
+      "cluster": 3,
+      "n_trade_days": 13,
+      "mean_R": 0.055384615384615365,
+      "gross_R": 0.7199999999999998,
+      "win_rate": 0.5384615384615384,
+      "pf": 4.8571428571428585
+    }
+  ],
+  "k_sweep_summary": {
+    "3": {
+      "best_cluster_per_strategy": {
+        "aegis": 0,
+        "guardian": 1,
+        "striker": 1
+      },
+      "best_clusters_distinct": false
+    },
+    "4": {
+      "best_cluster_per_strategy": {
+        "aegis": 3,
+        "guardian": 2,
+        "striker": 2
+      },
+      "best_clusters_distinct": false
+    },
+    "5": {
+      "best_cluster_per_strategy": {
+        "aegis": 0,
+        "guardian": 1,
+        "striker": 2
+      },
+      "best_clusters_distinct": true
+    },
+    "6": {
+      "best_cluster_per_strategy": {
+        "aegis": 3,
+        "guardian": 4,
+        "striker": 0
+      },
+      "best_clusters_distinct": true
+    }
+  },
+  "verdict": "WEAK or NEGATIVE: best clusters distinct=False, permutation p=0.074"
+}

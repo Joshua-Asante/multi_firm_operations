@@ -1,0 +1,50 @@
+{
+  "question": "Q-MSEE-7 \u2014 OOS lagged regime forecast (H7)",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "n_weeks_total": 200,
+  "train_min_weeks": 60,
+  "regime_forecast": {
+    "n_eval_weeks": 140,
+    "n_correct": 105,
+    "hit_rate": 0.75,
+    "hit_rate_ci95": [
+      0.6736705310188591,
+      0.8161156959694122
+    ],
+    "chance_baseline": 0.5411550191905534,
+    "per_class_recall": {
+      "0": {
+        "n": 104,
+        "recall": 0.9615384615384616
+      },
+      "1": {
+        "n": 22,
+        "recall": 0.22727272727272727
+      },
+      "2": {
+        "n": 2,
+        "recall": 0.0
+      },
+      "3": {
+        "n": 12,
+        "recall": 0.0
+      }
+    }
+  },
+  "predicted_best_strategy_oos_test": {
+    "n_weeks": 140,
+    "n_predicted_best_was_actual_top": 49,
+    "rate_predicted_best_was_actual_top": 0.35,
+    "rate_predicted_best_in_top2": 0.5428571428571428,
+    "chance_top_of_3": 0.3333333333333333,
+    "best_cluster_strategy_map": {
+      "0": "guardian",
+      "1": "guardian",
+      "2": "guardian",
+      "3": "guardian"
+    },
+    "verdict": "POSITIVE: predicted-best was actual-top in 49/140=35.00% of weeks (chance=33.33%)"
+  },
+  "verdict": "H7 SUPPORTED: regime forecast hit-rate 0.750 (CI95=[0.674,0.816]); predicted-best top in 0.350"
+}

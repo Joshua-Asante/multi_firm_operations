@@ -1,0 +1,88 @@
+{
+  "candidate_name": "demo_synthetic_stress_correlated",
+  "proposed_alloc": 0.005,
+  "standalone_fitness_full_axis": {
+    "n_days": 420,
+    "sum_R": 27.38324662369736,
+    "mean_daily_R": 0.06519820624689848,
+    "std_daily_R": 0.3076314367570471,
+    "annualized_R_sharpe": 3.364381250665658,
+    "win_rate": 0.5880952380952381,
+    "profit_factor": 1.7102310335452742,
+    "proposed_alloc_w": 0.005,
+    "realized_max_dd_at_alloc_pct": 0.011207941869837479
+  },
+  "standalone_fitness_overlap_with_existing_panel": {
+    "n_days": 420,
+    "sum_R": 27.38324662369736,
+    "mean_daily_R": 0.06519820624689848,
+    "std_daily_R": 0.3076314367570471,
+    "annualized_R_sharpe": 3.364381250665658,
+    "win_rate": 0.5880952380952381,
+    "profit_factor": 1.7102310335452742,
+    "proposed_alloc_w": 0.005,
+    "realized_max_dd_at_alloc_pct": 0.011207941869837479
+  },
+  "correlation_full": {
+    "label": "full",
+    "n_days": 420,
+    "candidate_vs_existing": {
+      "guardian": {
+        "r": 0.025519489535165123,
+        "n": 420
+      },
+      "striker": {
+        "r": -0.017363760098877266,
+        "n": 420
+      },
+      "aegis": {
+        "r": -0.03287234792774526,
+        "n": 420
+      }
+    }
+  },
+  "correlation_calm": {
+    "label": "calm",
+    "n_days": 391,
+    "candidate_vs_existing": {
+      "guardian": {
+        "r": 0.006104923112425764,
+        "n": 391
+      },
+      "striker": {
+        "r": -0.03148110647014914,
+        "n": 391
+      },
+      "aegis": {
+        "r": -0.042416421164630964,
+        "n": 391
+      }
+    }
+  },
+  "correlation_stress": {
+    "label": "stress",
+    "n_days": 28,
+    "candidate_vs_existing": {
+      "guardian": {
+        "r": 0.2352255846289746,
+        "n": 28
+      },
+      "striker": {
+        "r": 0.44917187367998435,
+        "n": 28
+      },
+      "aegis": {
+        "r": 0.2354887799549484,
+        "n": 28
+      }
+    }
+  },
+  "stress_threshold": 0.3,
+  "rejected_pairs_under_stress_rule": [
+    {
+      "existing_strategy": "striker",
+      "stress_r": 0.44917187367998435
+    }
+  ],
+  "battery_verdict": "REJECTED: 1 stress correlation(s) > 0.3"
+}

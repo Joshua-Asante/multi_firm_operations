@@ -1,0 +1,78 @@
+{
+  "generated": "2026-04-27T22:44:57.703374",
+  "data_panel_window": [
+    "2022-01-04",
+    "2026-04-20"
+  ],
+  "n_trade_dates": 420,
+  "indicators": {
+    "joint_loss_days": {
+      "n_days_all_three_traded": 2,
+      "n_joint_loss_days": 0,
+      "dates": [],
+      "threshold_first_occurrence": 1,
+      "crossed": false
+    },
+    "G_A_stress_correlation": {
+      "window_start": "2025-10-22",
+      "window_end": "2026-04-20",
+      "stress_threshold": 0.03857108205996594,
+      "n_stress_days": 4,
+      "G_A_stress_corr": null,
+      "threshold": 0.3,
+      "crossed": false
+    },
+    "portfolio_quarter_DD": {
+      "window_start": "2026-01-20",
+      "window_end": "2026-04-20",
+      "n_trade_dates": 31,
+      "quarter_max_dd_pct": 0.024300000000000016,
+      "soft_warn_threshold": 0.04,
+      "hard_warn_threshold": 0.045,
+      "soft_warn_crossed": false,
+      "hard_warn_crossed": false
+    },
+    "guardian_rolling_50": {
+      "n_trade_dates": 182,
+      "current_WR_last_50": 0.28,
+      "current_R_of_winners_last_50": 15.3172268907563,
+      "WR_threshold": 0.1,
+      "WR_crossed": false
+    },
+    "striker_rolling_50": {
+      "n_trade_dates": 168,
+      "current_WR_last_50": 0.7,
+      "current_R_of_winners_last_50": 0.3291428571428571,
+      "WR_threshold": 0.6,
+      "WR_crossed": false
+    },
+    "aegis_rolling_50": {
+      "n_trade_dates": 123,
+      "current_WR_last_50": 0.38,
+      "current_R_of_winners_last_50": 0.10631578947368417,
+      "WR_threshold": 0.34,
+      "WR_crossed": false
+    },
+    "aegis_hurst_90d": {
+      "window_days": 90,
+      "n_obs": 8639,
+      "hurst_H": 0.5388066014865946,
+      "threshold": 0.55,
+      "crossed": false
+    },
+    "cluster_2_quarter_count": {
+      "window_start": "2026-01-20",
+      "window_end": "2026-04-20",
+      "n_extreme_xau_days": 6,
+      "extreme_threshold_pct": 0.04,
+      "info_threshold": 1,
+      "info_crossed": true
+    }
+  },
+  "crossings": [
+    {
+      "indicator": "cluster_2_quarter_count",
+      "severity": "INFO"
+    }
+  ]
+}

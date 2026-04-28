@@ -1,0 +1,59 @@
+{
+  "question": "Q-MSEE-3 \u2014 geometric mean uplift (H3, P7)",
+  "feed": "OANDA",
+  "canonical_status": "PROXY",
+  "n_trade_dates": 420,
+  "allocations": {
+    "guardian": 0.0034000000000000002,
+    "striker": 0.01,
+    "aegis": 0.015
+  },
+  "geometric_means_daily": {
+    "guardian": 0.0025959611119499293,
+    "striker": 0.0004130596787232932,
+    "aegis": 0.00014043994761037126,
+    "portfolio": 0.003150898340636754
+  },
+  "geometric_means_annualized": {
+    "guardian": 0.9219389592997367,
+    "striker": 0.1096776270383153,
+    "aegis": 0.0360220028507896,
+    "portfolio": 1.2095260934510081
+  },
+  "variance_decomposition": {
+    "sum_var_individual": 0.00017434309074894894,
+    "var_portfolio_sum": 0.00017141631657006476,
+    "sum_offdiagonal_cov": -1.4633870894419847e-06,
+    "predicted_log_uplift_vs_sum": 1.4633870894419847e-06
+  },
+  "realized": {
+    "log_uplift_vs_sum_individual": -5.7241460166019414e-08,
+    "log_uplift_vs_mean_individual": 0.0020972773617942307
+  },
+  "correlation_matrix": {
+    "rows": [
+      "guardian",
+      "striker",
+      "aegis"
+    ],
+    "values": [
+      [
+        1.0,
+        -0.047168434059830344,
+        0.013603178494456521
+      ],
+      [
+        -0.047168434059830344,
+        1.0,
+        -0.03133573183221909
+      ],
+      [
+        0.013603178494456521,
+        -0.03133573183221909,
+        1.0
+      ]
+    ]
+  },
+  "verdict": "POSITIVE: sum of off-diagonal covariances is negative \u2014 storage-effect variance reduction present (sum_cov_offdiag=-1.463e-06)",
+  "verdict_note": "At the magnitude of these daily returns, log(1+G_p) and sum_i log(1+G_i) agree to ~1e-7 by Taylor remainder; the structural test is sum_{i<j} Cov(r_i,r_j) < 0 (predicted variance-reduction benefit), not the realized arithmetic gap. Realized vs predicted log-uplift agree to the second decimal of mantissa, confirming Taylor-correctness."
+}

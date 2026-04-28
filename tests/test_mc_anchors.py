@@ -64,6 +64,34 @@ def test_oanda_panel_shape(oanda_result):
     assert oanda_result["n_blocks"] == 223
 
 
+def test_default_panel_is_pepperstone():
+    """Locks the doc-and-default-agreement decision from 135e93c.
+
+    `test_pepperstone_anchor` and `test_oanda_anchor` both pass because they
+    use `panel_name=` explicitly. Neither exercises the bare
+    `python portfolio_mc.py` path, which depends only on the argparse
+    default (which mirrors `DEFAULT_PANEL`) and the function-signature
+    defaults of compute_default_config / mode_default / mode_sensitivity.
+
+    If a future refactor flips any of these back to "oanda", the anchor
+    tests stay green but `python portfolio_mc.py` (no flags) starts
+    producing OANDA numbers (96.05/0.48/4.79) instead of the CLAUDE.md
+    canonical headline (Pepperstone, 93.78/0.58/4.92). This test catches
+    that drift before it reaches the CLAUDE.md / code asymmetry surface
+    we just spent effort closing.
+    """
+    import inspect
+
+    import portfolio_mc as mc
+
+    assert mc.DEFAULT_PANEL == "pepperstone"
+    for fn in (mc.compute_default_config, mc.mode_default, mc.mode_sensitivity):
+        actual = inspect.signature(fn).parameters["panel_name"].default
+        assert actual == "pepperstone", (
+            f"{fn.__name__} default panel_name is {actual!r}, expected 'pepperstone'"
+        )
+
+
 def test_lock_criteria_satisfied(pepperstone_result):
     """Lock criteria from CLAUDE.md: bust <1%, p99 DD <5%.
 

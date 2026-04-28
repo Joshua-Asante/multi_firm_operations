@@ -20,7 +20,7 @@ dependencies = [
 [project.optional-dependencies]
 cli = ["rich"]
 mc = ["joblib"]
-analysis = ["nolds<0.6", "setuptools"]   # nolds 0.6.x has a Python 3.11/3.12 import bug (importlib.resources.files() called on a module, not a package). 0.5.x works but imports pkg_resources at module load, which Python 3.12 no longer provides by default — explicit setuptools dep ensures pkg_resources is available.
+analysis = ["nolds<0.6", "setuptools<81"]   # nolds 0.6.x has a Python 3.11/3.12 import bug (importlib.resources.files() on a module). 0.5.x works but imports pkg_resources at module load — and setuptools 81+ removed pkg_resources. Pin both: nolds<0.6 for the import bug, setuptools<81 for the pkg_resources removal. Local 0.5.x deprecation warning ("pin to Setuptools<81") was the breadcrumb.
 report = ["quantstats"]
 broker = ["oandapyV20"]
 dev = ["pytest", "pytest-xdist"]

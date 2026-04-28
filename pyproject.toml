@@ -20,7 +20,7 @@ dependencies = [
 [project.optional-dependencies]
 cli = ["rich"]
 mc = ["joblib"]
-analysis = ["nolds"]
+analysis = ["nolds<0.6"]   # 0.6.x has a Python 3.11/3.12 import bug: nolds.datasets calls importlib.resources.files() on a module, raising TypeError at package load. 0.5.x is the last working line.
 report = ["quantstats"]
 broker = ["oandapyV20"]
 dev = ["pytest", "pytest-xdist"]

@@ -37,7 +37,7 @@ Negative:
 
 Risks:
 - BOJ April 28, 2026 meeting is a binary vol event that could shift USDJPY regime away from Aegis's edge window. If regime shift is confirmed post-meeting, allocation may need downward adjustment. Monitor, do not preemptively cut.
-- Guardian funded ramp (0.30 → 0.40 at $210K, 0.50 at $220K, 0.55 at $225K) changes the allocation profile as challenge clears. Each ramp step requires portfolio MC rerun before activation.
+- ~~Guardian funded ramp (0.30 → 0.40 at $210K, 0.50 at $220K, 0.55 at $225K) changes the allocation profile as challenge clears. Each ramp step requires portfolio MC rerun before activation.~~ (Superseded same day, 2026-04-17, by the unified-allocation decision: challenge phase = funded phase, no re-sizing at pass. See `firm_rules.py` `RISK_TIERS` and `CLAUDE.md` Multiplier System.)
 
 ## Cross-references
 

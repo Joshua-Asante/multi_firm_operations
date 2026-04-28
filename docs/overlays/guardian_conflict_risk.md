@@ -19,8 +19,10 @@ future overlay and as a record of the Iran-Israel / Hormuz regime episode.
 
 | Field | Baseline (at activation) | Under overlay |
 |---|---|---|
-| Per-trade risk | 0.55% | 0.25% |
-| Strategy parameters | v5.1 locked | unchanged |
+| Per-trade risk | 0.55% (pre-v5.1 era) | 0.25% |
+| Strategy parameters | pre-v5.1 → v5.1 locked 2026-04-17 (mid-overlay) | unchanged |
+
+**Baseline timing note.** The overlay activated 2026-04-16 against the then-current 0.55% per-trade risk. The v5.1 lock the next day (2026-04-17) re-set the cold-start baseline to 0.30% (see `strategies/guardian/guardian_CHANGELOG.md` v5.1 entry); the overlay's reduced 0.25% level was held throughout. On 2026-04-23 the overlay deactivated and Guardian re-locked at 0.34% (see `docs/adr/2026-04-23-guardian-risk-relock-0.34.md`). The "0.55% baseline" in the table above is the pre-v5.1 figure as recorded at overlay activation, not the v5.1-era cold-start.
 
 The overlay modifies the risk multiplier applied to Guardian position sizing. The Pine strategy itself is unchanged. All other strategy parameters (EMA, SL, TP, session, hour blocks, maxHold, grace stop) operate identically to the locked v5.1 specification.
 

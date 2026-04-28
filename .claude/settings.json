@@ -5,6 +5,8 @@
   },
   "permissions": {
     "allow": [
+      "mcp__733e0d99-31e4-4160-9c89-e998d4df3c6f__notion-fetch",
+      "mcp__733e0d99-31e4-4160-9c89-e998d4df3c6f__notion-search",
       "Bash(python -m portfolio_mc:*)",
       "Bash(python portfolio_mc.py:*)",
       "Bash(python cli.py status:*)",

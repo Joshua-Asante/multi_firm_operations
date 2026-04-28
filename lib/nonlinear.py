@@ -18,21 +18,25 @@ import numpy as np
 
 
 def _looks_like_price_series(x: np.ndarray) -> bool:
-    """Heuristic: returns are stationary, prices grow with √N.
+    """Heuristic: returns are stationary I(0); prices are unit-root I(1).
 
-    Discriminator is std(series) / std(diffs):
-      - Stationary returns: std(x) ≈ std(diff(x)), ratio ≈ 0.7
-      - Random-walk prices: std(x) ≈ std(diff(x)) * √N, ratio grows with length
+    This is an I(1)-vs-I(0) discriminator dressed up as a one-liner:
+      - I(1) (prices, unit root): variance grows in t. After N steps,
+        std(x) ≈ std(diff(x)) · √N. The accumulation is the signature.
+      - I(0) (returns, stationary): variance is constant in t.
+        std(x) ≈ std(diff(x)) (ratio ≈ 0.7 for Gaussian, since diff of
+        independent Gaussians has variance 2σ²).
 
-    For N=10K random walk, ratio ≈ 100. For zero-mean returns, ratio ≈ 0.7.
-    Threshold 5 cleanly separates: long stationary returns rarely exceed it
-    (would require pathological outliers), while a price series with N≥25
-    typically does.
+    Threshold std(x)/std(diff(x)) > 5 cleanly separates: an N=10K random
+    walk has ratio ≈ 100, while stationary returns rarely exceed 1
+    (would require pathological outliers). Short series (<100) abstain.
 
-    The earlier drift-vs-noise heuristic was wrong: a random-walk price series
-    has zero-mean diffs (returns) by construction, so |drift|/noise stays
-    near zero on the diffs and the guard never fires. The series must itself
-    be inspected, not just its diffs.
+    DO NOT "simplify" this back to a drift check (|mean(diff)| > k·std(diff)).
+    A random-walk price series has zero-mean diffs *by construction* — its
+    diffs ARE the underlying returns. The drift heuristic fires on biased
+    returns and silently misses the canonical price-series shape, exactly
+    inverting what the guard needs to do. The series itself must be inspected,
+    not just its diffs. test_log_prices_raises_via_guard pins this.
     """
     if len(x) < 100:
         return False  # too short to discriminate reliably

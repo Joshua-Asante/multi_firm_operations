@@ -244,13 +244,38 @@ def _fmt_alloc(allocs: Dict[str, float]) -> str:
             f"A {allocs['aegis']:.2%}")
 
 
+def _run_seeds(blocks: np.ndarray, effective_trigger: float, dd_scale: float,
+               seeds=SEEDS, parallel: bool = False) -> list:
+    """Run all seeds. Sequential by default; joblib-parallel when requested.
+
+    Each seed is independent (RNG seeded inside run_seed) so the parallel
+    path is byte-identical to the sequential path. The seeds list is preserved
+    in order so downstream aggregation is deterministic regardless of mode.
+    """
+    if not parallel:
+        return [run_seed(seed, SIMS_PER_SEED, blocks, effective_trigger, dd_scale)
+                for seed in seeds]
+    try:
+        from joblib import Parallel, delayed
+    except ImportError as e:
+        raise ImportError(
+            "--parallel requires joblib. Install with: pip install -e .[mc]"
+        ) from e
+    return list(Parallel(n_jobs=len(seeds), backend="loky")(
+        delayed(run_seed)(seed, SIMS_PER_SEED, blocks, effective_trigger, dd_scale)
+        for seed in seeds
+    ))
+
+
 def compute_default_config(dd_trigger: float, dd_scale: float, no_protection: bool,
                            allocs: Dict[str, float],
-                           panel_name: str = DEFAULT_PANEL) -> dict:
+                           panel_name: str = DEFAULT_PANEL,
+                           parallel: bool = False) -> dict:
     """Pure compute path for default MC mode. Returns aggregated metrics dict.
 
     Consumed by mode_default (printout layered on top) and by tests/test_mc_anchors.py
-    (anchor pinning). Numerically deterministic given fixed SEEDS = (42, 123, 2026).
+    (anchor pinning). Numerically deterministic given fixed SEEDS = (42, 123, 2026)
+    regardless of `parallel` mode.
     """
     trades_by_strat, panel, blocks, scale_info = _load_all(allocs, panel_name=panel_name)
 
@@ -261,8 +286,7 @@ def compute_default_config(dd_trigger: float, dd_scale: float, no_protection: bo
     )
 
     effective_trigger = 10.0 if no_protection else dd_trigger
-    seeds_results = [run_seed(seed, SIMS_PER_SEED, blocks, effective_trigger, dd_scale)
-                     for seed in SEEDS]
+    seeds_results = _run_seeds(blocks, effective_trigger, dd_scale, parallel=parallel)
 
     per_seed = SIMS_PER_SEED
     pass_r = [r["outcomes"]["pass"] / per_seed for r in seeds_results]
@@ -351,9 +375,9 @@ def _load_all(allocs: Dict[str, float], panel_name: str = DEFAULT_PANEL):
 
 def mode_default(dd_trigger: float, dd_scale: float, no_protection: bool,
                  allocs: Dict[str, float], panel_name: str = DEFAULT_PANEL,
-                 verbose: bool = True):
+                 parallel: bool = False, verbose: bool = True):
     result = compute_default_config(dd_trigger, dd_scale, no_protection, allocs,
-                                    panel_name=panel_name)
+                                    panel_name=panel_name, parallel=parallel)
 
     if verbose:
         print("Scale factors:")
@@ -406,9 +430,13 @@ def mode_historical(dd_trigger: float, dd_scale: float, no_protection: bool,
 
 
 def mode_sensitivity(dd_scale: float, allocs: Dict[str, float],
-                     panel_name: str = DEFAULT_PANEL):
+                     panel_name: str = DEFAULT_PANEL,
+                     parallel: bool = False):
     _, _, blocks, _ = _load_all(allocs, panel_name=panel_name)
     grid = [0.005, 0.010, 0.015, 0.020, 0.025]
+    NO_PROTECT_TRIG = 10.0
+    all_trigs = grid + [NO_PROTECT_TRIG]
+
     print("=== Portfolio MC — Sensitivity grid ===")
     print(f"Panel: {panel_name}")
     print(f"Allocations: {_fmt_alloc(allocs)}")
@@ -416,23 +444,41 @@ def mode_sensitivity(dd_scale: float, allocs: Dict[str, float],
     print()
     print(f"{'DD_TRIGGER':<12} {'Pass':>8} {'Bust':>8} {'Timeout':>9} {'p99 DD':>8}")
     print("-" * 48)
-    for trig in grid:
-        results = [run_seed(seed, SIMS_PER_SEED, blocks, trig, dd_scale) for seed in SEEDS]
-        per_seed = SIMS_PER_SEED
-        pass_r = np.mean([r["outcomes"]["pass"] / per_seed for r in results])
-        bust_r = np.mean([(r["outcomes"]["bust_daily"] + r["outcomes"]["bust_static"]) / per_seed for r in results])
-        to_r   = np.mean([r["outcomes"]["timeout"] / per_seed for r in results])
+
+    # Compute all (trig, seed) cells. Order-stable: by_trig[trig] holds seed
+    # results in SEEDS order regardless of execution mode.
+    if parallel:
+        try:
+            from joblib import Parallel, delayed
+        except ImportError as e:
+            raise ImportError(
+                "--parallel requires joblib. Install with: pip install -e .[mc]"
+            ) from e
+        pairs = [(trig, seed) for trig in all_trigs for seed in SEEDS]
+        flat = list(Parallel(n_jobs=-1, backend="loky")(
+            delayed(run_seed)(seed, SIMS_PER_SEED, blocks, trig, dd_scale)
+            for trig, seed in pairs
+        ))
+        by_trig: Dict[float, list] = {trig: [] for trig in all_trigs}
+        for (trig, _seed), result in zip(pairs, flat):
+            by_trig[trig].append(result)
+    else:
+        by_trig = {
+            trig: [run_seed(seed, SIMS_PER_SEED, blocks, trig, dd_scale) for seed in SEEDS]
+            for trig in all_trigs
+        }
+
+    def _row(label: str, results: list) -> str:
+        pass_r = np.mean([r["outcomes"]["pass"] / SIMS_PER_SEED for r in results])
+        bust_r = np.mean([(r["outcomes"]["bust_daily"] + r["outcomes"]["bust_static"]) / SIMS_PER_SEED for r in results])
+        to_r   = np.mean([r["outcomes"]["timeout"] / SIMS_PER_SEED for r in results])
         dds    = [d for r in results for d in r["max_dds"]]
         p99    = np.percentile(dds, 99)
-        print(f"{trig:<12.3%} {pass_r:>8.2%} {bust_r:>8.2%} {to_r:>9.2%} {p99:>8.2%}")
-    # Also no-protection row
-    np_results = [run_seed(seed, SIMS_PER_SEED, blocks, 10.0, dd_scale) for seed in SEEDS]
-    pass_r = np.mean([r["outcomes"]["pass"] / SIMS_PER_SEED for r in np_results])
-    bust_r = np.mean([(r["outcomes"]["bust_daily"] + r["outcomes"]["bust_static"]) / SIMS_PER_SEED for r in np_results])
-    to_r   = np.mean([r["outcomes"]["timeout"] / SIMS_PER_SEED for r in np_results])
-    dds    = [d for r in np_results for d in r["max_dds"]]
-    p99    = np.percentile(dds, 99)
-    print(f"{'no-protect':<12} {pass_r:>8.2%} {bust_r:>8.2%} {to_r:>9.2%} {p99:>8.2%}")
+        return f"{label:<12} {pass_r:>8.2%} {bust_r:>8.2%} {to_r:>9.2%} {p99:>8.2%}"
+
+    for trig in grid:
+        print(_row(f"{trig:.3%}", by_trig[trig]))
+    print(_row("no-protect", by_trig[NO_PROTECT_TRIG]))
 
 
 # ── Entry ─────────────────────────────────────────────────────────────────
@@ -454,6 +500,8 @@ def main():
                    help="Override Guardian allocation for what-if MC (e.g. 0.0025 to simulate a reduced-risk overlay)")
     p.add_argument("--panel", choices=list(PANELS_BY_BROKER.keys()), default=DEFAULT_PANEL,
                    help=f"Broker panel to load (default: {DEFAULT_PANEL}, the CLAUDE.md canonical lock anchor)")
+    p.add_argument("--parallel", action="store_true",
+                   help="Parallelize seed loop with joblib (faster on multi-core; default: sequential).")
     args = p.parse_args()
 
     allocs = dict(ALLOCATIONS)
@@ -461,11 +509,12 @@ def main():
         allocs["guardian"] = args.guardian_risk
 
     if args.sensitivity:
-        mode_sensitivity(args.dd_scale, allocs, panel_name=args.panel)
+        mode_sensitivity(args.dd_scale, allocs, panel_name=args.panel, parallel=args.parallel)
     elif args.historical:
         mode_historical(args.dd_trigger, args.dd_scale, args.no_protection, allocs, panel_name=args.panel)
     else:
-        mode_default(args.dd_trigger, args.dd_scale, args.no_protection, allocs, panel_name=args.panel)
+        mode_default(args.dd_trigger, args.dd_scale, args.no_protection, allocs,
+                     panel_name=args.panel, parallel=args.parallel)
 
 
 if __name__ == "__main__":

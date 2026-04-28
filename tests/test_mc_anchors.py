@@ -74,3 +74,29 @@ def test_lock_criteria_satisfied(pepperstone_result):
     """
     assert pepperstone_result["bust_rate"] < 0.01
     assert pepperstone_result["p99_dd"] < 0.05
+
+
+def test_serial_parallel_equivalence():
+    """joblib --parallel must produce byte-identical output to sequential.
+
+    Each seed's RNG is seeded inside run_seed(), so the parallel path is just
+    a different scheduling of the same independent computations. If joblib
+    ever introduces non-determinism (e.g. backend change, worker reuse bug),
+    this test catches it before --parallel gets used in a lock decision.
+    """
+    serial = compute_default_config(
+        DD_TRIGGER, DD_SCALE, no_protection=False,
+        allocs=ALLOCATIONS, panel_name="pepperstone", parallel=False,
+    )
+    parallel = compute_default_config(
+        DD_TRIGGER, DD_SCALE, no_protection=False,
+        allocs=ALLOCATIONS, panel_name="pepperstone", parallel=True,
+    )
+    for key in (
+        "pass_rate", "bust_rate", "p50_dd", "p95_dd", "p99_dd",
+        "bust_daily_rate", "bust_static_rate", "timeout_rate",
+        "n_bdays", "n_blocks", "median_days_to_pass",
+    ):
+        assert serial[key] == parallel[key], (
+            f"divergence at {key}: serial={serial[key]!r} parallel={parallel[key]!r}"
+        )

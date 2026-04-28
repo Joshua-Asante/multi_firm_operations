@@ -27,6 +27,13 @@ dev = ["pytest", "pytest-xdist"]
 
 [tool.setuptools]
 py-modules = ["accounts", "cli", "csv_parser", "dd_protection", "firm_rules", "portfolio_mc"]
+packages = ["lib"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# pytest 9 changed default --import-mode from prepend to importlib; importlib
+# does NOT add cwd to sys.path, so test imports of top-level modules
+# (`from accounts import ...`, `from portfolio_mc import ...`) need an
+# explicit pythonpath. Setuptools handles `lib` via the packages declaration
+# above; this covers the py-modules.
+pythonpath = ["."]

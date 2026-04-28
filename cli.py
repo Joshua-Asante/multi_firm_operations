@@ -98,6 +98,19 @@ def cmd_status(args):
               f"{a.dd_remaining_pct:>6.2f}% ${a.target_remaining:>10,.2f} {flags}")
 
 
+def cmd_tearsheet(args):
+    from pathlib import Path
+    from lib.tearsheet import from_csv
+    out_path = Path(args.out) if args.out else Path(args.csv_path).with_suffix(".tearsheet.html")
+    try:
+        path = from_csv(args.csv_path, args.starting_equity, out_path,
+                        title=args.title or "Prop Firm Tearsheet")
+        print(f"Tearsheet written: {path}")
+    except (FileNotFoundError, ValueError) as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+
+
 def cmd_lots(args):
     accounts = load_accounts()
     active = [a for a in accounts if a.phase != "failed"]
@@ -145,6 +158,16 @@ def main():
     # lots
     p_lots = sub.add_parser("lots", help="Multiplier reference card for all active accounts")
     p_lots.set_defaults(func=cmd_lots)
+
+    # tearsheet
+    p_tear = sub.add_parser("tearsheet", help="Generate HTML tearsheet from DXTrade CSV")
+    p_tear.add_argument("csv_path", help="Path to DXTrade CSV export")
+    p_tear.add_argument("--out", default=None,
+                        help="Output HTML path (default: <csv>.tearsheet.html)")
+    p_tear.add_argument("--starting-equity", type=float, default=200_000.0,
+                        help="Starting equity for return-series normalization (default: 200000)")
+    p_tear.add_argument("--title", default=None, help="Tearsheet title")
+    p_tear.set_defaults(func=cmd_tearsheet)
 
     args = parser.parse_args()
     args.func(args)

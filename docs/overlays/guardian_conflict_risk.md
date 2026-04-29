@@ -67,5 +67,5 @@ If neither signal fires within 8–12 weeks of the overlay activation (2026-04-1
 ## Cross-references
 
 - Notion: [Guardian conflict risk overlay — 2026-04-16](https://www.notion.so/344dc0b53c118152bf97eca9c931050b)
-- Code: Guardian base parameters live in `strategies/guardian/guardian_gold_v5.5.txt` (overlay was applied to v5.1 at the time; successor v5.5 not modified by overlay). Overlay applied at risk-sizing layer only.
+- Code: Guardian base parameters live in `strategies/guardian/guardian_gold_v5.5.pine` (overlay was applied to v5.1 at the time; successor v5.5 not modified by overlay). Overlay applied at risk-sizing layer only.
 - Related: `docs/operational_rules.md` (hard rule: never override a valid signal based on macro volatility forecast)

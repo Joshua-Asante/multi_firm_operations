@@ -1,8 +1,17 @@
 # Q-T Tuesday-cohort bar-level concurrent-loss — findings — 2026-04-27
 
+> **Disposition (2026-04-28): CLOSED with watchlist tripwire.** The bar-level
+> finding stands and is logged. The Action proposal drafted under the lifted
+> Pepperstone gate (preserved below for trail) is **NOT EXECUTED** — Joshua's
+> call: an OANDA-proxy bar-stat without a live-PnL signal is not enough to
+> justify the lock cycle, even with a P&L-test gate built into the proposal.
+> Re-opening criterion is now a forward live-PnL tripwire rather than a
+> backtest gate. See **Disposition** section before the Action proposal.
+
 Substrate: OANDA-proxy 4yr 15min panel (XAUUSD / US30USD / USDJPY).
 Canonical status: **PROXY** end-to-end per
-[AMENDMENT_oanda_rescope.md](../../docs/methodology/identify_corpus/2026-04-26/AMENDMENT_oanda_rescope.md).
+[AMENDMENT_oanda_rescope.md](../../docs/methodology/identify_corpus/2026-04-26/AMENDMENT_oanda_rescope.md)
+(supersession applies — data-provenance tag retained).
 Brief: Q-T 2026-04-27 (Tuesday-cohort bar-level concurrent-loss falsifiability).
 Artefact: [`q_t_tuesday_2026_04_27.json`](q_t_tuesday_2026_04_27.json).
 Reproduce: [`python analysis/inquire_phase/q_t_tuesday_concurrent_loss_2026_04_27.py`](q_t_tuesday_concurrent_loss_2026_04_27.py).
@@ -163,3 +172,138 @@ Actual: < 1 hour (Phase 0 verification cached from Notice run; Phase 1–4 singl
 Production strategy-code files (Guardian/Striker/Aegis Pine sources) NOT read — schedule metadata available from `filters.py` reconstruction and the 04-26 synthesis page, both of which are operational metadata layers above the locked Pine. Rule 0 explicitly does not bind on Q-T (no risk-control decision proposed at any verdict branch).
 
 Next-action: NONE.
+
+---
+
+# Disposition (2026-04-28): closed with watchlist tripwire
+
+**Decision (Joshua, 2026-04-28):** Log the finding. Add "Tuesday K=3 concentration" to the MSEE watchlist. Set a forward tripwire on **live FXIFY P&L variance**. The Action proposal drafted under the lifted Pepperstone gate (preserved below for trail) is **NOT EXECUTED**.
+
+## Rationale
+
+The Action proposal had a defensible technical argument: day-of-week is forward-readable (no Cond 3 bottleneck), the K-matched +2.73pp residual is real, and the proposal built in a P&L-Pareto adoption gate so the bar-stat couldn't directly drive a lock change. That's the "leading indicator with P&L gate" pattern.
+
+The deeper read: that pattern is the rationalizing form of the Iran/Hormuz overlay-discipline trap. The discipline says "only a live-PnL gap vs MC justifies acting on a regime signal" — *not* "any signal you can model can be tested if you wrap it in a P&L gate". A P&L-test gate inside a backtest validates whether the bar-stat translates to backtest P&L; it does not validate whether it translates to **live P&L** that pays for the lock cycle.
+
+The honest reframing is: **a bar-stat without a live-PnL signal is not enough to justify the lock cycle, even with a P&L-test gate built in.** If the discipline holds for overlays, it holds for sizing rules. The proposal earns cycles when the bar-level concentration manifests as a daily-resolution live-PnL signal — not before. Until then, the right move is to monitor and let the substrate speak.
+
+## Tripwire — re-opening criterion
+
+**Trigger:** Over a rolling 6-month window of **live FXIFY trading** (not backtest), Tuesday daily-portfolio-R standard deviation exceeds 1.5× max(Monday std, Thursday std), with n ≥ 30 trade-days in each cohort.
+
+**Why this metric:**
+- *Live, not backtest.* The discipline that closed the proposal was about live-PnL signal. The tripwire enforces it.
+- *Variance, not mean.* The bar-level finding is about *concentration of tail-risk*, which manifests as variance asymmetry before it shows up as mean-loss asymmetry. Variance is the right first-derivative signal.
+- *vs Mon and Thu.* Monday is the natural K=2 control (G+A). Thursday is a Guardian-only day (no S, no A); using both controls bounds against single-day anomalies.
+- *1.5× threshold.* Conservative — accommodates normal week-to-week variance. A real Tuesday-K=3 concentration leaking to live P&L should show >1.5× std ratio.
+- *n ≥ 30 floor.* Avoids tripping on noise during early challenge weeks.
+
+**If tripped:** the bar-stat finding has graduated to a daily-resolution live signal. The Action proposal below earns its cycles. Run Gate 1.5 (entry-count audit) on the live data, then the sizing grid. Re-MC if the grid clears the Pareto criterion.
+
+**If not tripped after 6 months of live FXIFY trading:** the finding remains a structural watchlist item, not a candidate for action. Re-evaluate cadence (extend monitoring vs close-permanent) at the next quarterly methodology review.
+
+## Logged
+
+- Watchlist indicator added: see [`docs/methodology/msee/watch_list.md`](../../docs/methodology/msee/watch_list.md) → "Tuesday K=3 P&L variance elevation".
+- Memory observation: leading-indicator-with-P&L-gate as a rationalization pattern (Iran/Hormuz spirit refinement).
+
+---
+
+# Action proposal — Tuesday-K=3 risk scaling test (drafted 2026-04-28, NOT EXECUTED)
+
+> **Status: NOT EXECUTED.** Closed 2026-04-28 per the Disposition section above.
+> Preserved verbatim as the trail of considered-but-rejected work.
+> Re-opening criterion: live-PnL tripwire defined in Disposition.
+>
+> Drafted under the 2026-04-28 policy supersession: OANDA findings can route
+> to Action proposals; Joshua validates in TradingView against Pepperstone
+> bars before any code/lock change. Joshua's subsequent call: that gate-pattern
+> rationalizes the Iran/Hormuz overlay-discipline rather than honoring it. See
+> Disposition.
+
+## What the finding shows
+
+On the OANDA-proxy 4yr 15min panel, when all three strategies are simultaneously session-active (Tuesday-K=3 windows: G ∩ S ∩ A schedule overlap), the bar-level concurrent-loss rate (≥2 of the three instruments hitting 1σ-adverse-down on the same 15min bar) is **8.64%** vs Mon-K=2's **0.74%** — a ~12× rate elevation. K-matched control (Tue-K=2 vs Mon-K=2) attenuates Δ to +2.73pp but stays significant (p ≪ 0.05), confirming a Tuesday-specific component beyond the K=3 mechanical artifact.
+
+**Operative effect size for sizing-rule design: +2.73pp, not +5.39pp.** Roughly half the headline gap is the mechanical ≥2-of-3 vs ≥2-of-2 combinatorial artifact (K=3 windows trivially produce more concurrent-loss bars than K=2 windows, even under iid). The Tuesday-specific component the sizing change is actually correcting for is the K-matched residual. Anchor cost-benefit on the residual, not the headline ratio.
+
+This is a structural concentration of *bar-level* tail-risk on the one day of the week with maximum concurrent strategy exposure. **Pre-budget the expected gain.** Back-of-envelope on a uniform-s sizing rule applied only inside the K=3 window (~26% Tuesday-overlap exposure footprint) at the operative +2.73pp effect: a realistic ceiling on p99 DD reduction is ~0.5–1.0pp. Decide whether that clears the lock-cycle cost (3 Pine bumps, ADR, MVD, re-MC, anchor refresh) **before** running the grid, not after.
+
+## Why this is eligible for Action (not Forward-only)
+
+- Day-of-week is a **forward-readable, deterministic state variable** — known at session start, no look-ahead. Unlike DD-state / rolling-PF / cumulative-past observables, it does not trip the state-readable Cond 3 bottleneck (var-alloc 4A REJECTED precedent does not apply).
+- The proposed change is a **risk-sizing test**, not an overlay. The Iran/Hormuz overlay-trigger discipline (overlays require live-PnL-gap, not bar-stat shifts) does not block it — but the spirit (don't act on bar-stat shifts blindly) is honored by gating adoption on a Pareto-improvement criterion in TradingView, not on the bar-stat finding alone.
+- Q14 was *not* falsified — the bar-level signal Q-T identifies has not manifested as a daily-resolution P&L gap. This proposal therefore acts on a **leading indicator** and must clear an explicit P&L-test gate before adoption.
+
+## Pre-test gates (cheapest first, do these before the sizing grid)
+
+> **Substrate constraint.** Pepperstone 15min bar OHLCV is **not available** in this repo or on Joshua's workstation. The Q-T headline (bar-level concurrent-loss rate at the 15min × 1σ-adverse-down × ≥2-instrument resolution) cannot be substrate-replicated against Pepperstone without acquiring Pepperstone bars. Available Pepperstone substrate is trade-level only: per-strategy TV exports at [`data/tv_exports/pepperstone/`](../../data/tv_exports/pepperstone/) (Guardian / Striker / Aegis trade history through 2026-04-26).
+>
+> Gate 1 below is therefore re-specced as a **trade-level corroboration gate** using the Pepperstone TV exports. This is a *weaker* gate than bar-level replication would have been — see the "What Gate 1 can and cannot tell us" caveat after the spec.
+
+**Gate 1 — Pepperstone trade-level Tuesday-K=3 corroboration** (runs in this repo against committed Pepperstone CSVs). For each Tuesday and Monday in the 2022-01 → 2026-04-26 panel, mark which strategies had a trade entry inside the G ∩ S ∩ A overlap window on that day. Stratify days into Tuesday-K=3 (G+S+A all entered), Tuesday-K=2 (any 2 of 3), Monday-K=2 (G+A — Striker is Tue/Fri only, so Monday is structurally K=2). Compute per-day:
+- **Concurrent-loss-day rate**: rate of days where ≥ 2 of the active strategies had ≥ 1 losing trade exit on the day.
+- **Mean per-day portfolio R**: sum of allocation-weighted R across active strategies on that day.
+- **Days breaching dd_protection's 1.0% intraday DD trigger**: rate.
+
+**Gate 1 pass condition (any of the three is sufficient — directional consistency, not strict significance):**
+- Tuesday-K=3 concurrent-loss-day rate > Monday-K=2 by ≥ +5pp (descriptive); OR
+- Tuesday-K=3 mean per-day portfolio R < Monday-K=2 by ≥ 0.1R (descriptive); OR
+- Tuesday-K=3 dd_protection-trigger rate > Monday-K=2 (any positive Δ).
+
+**Gate 1 fail condition: all three null/reversed.** If Pepperstone trade-level shows Tuesday-K=3 days are *better* than Monday-K=2 days (or noisily indistinguishable across all three readings), the OANDA bar-level signal does not propagate to Pepperstone trade-level under any natural aggregation. **Reject the proposal here.** The structural concentration is OANDA-feed-specific or it concentrates at a resolution that doesn't show up in P&L; either way, sizing against it would be Pareto-negative.
+
+**What Gate 1 can and cannot tell us (mandatory caveat).**
+- Q14 (the OANDA equivalent at trade-day resolution) showed null. Q-T's whole motivation is that the bar-level signal is *below* trade-day aggregation — i.e., the bar-level concurrent-loss bars on Tuesday don't propagate to a daily-aggregate P&L gap, because intraday recovery and per-strategy exit logic absorb the bar-level adverse moves before they hit the books.
+- **Therefore: a passing Gate 1 (Pepperstone trade-level shows directional signal) is STRONG corroboration** — it means the bar-level concentration is severe enough on Pepperstone that it leaks into trade-level outcomes despite the same intraday absorption.
+- **A null Gate 1 (Pepperstone trade-level shows no signal) is NOT a clean rejection** — it's consistent with both (a) the Pepperstone bar-level signal being real but absorbed at trade-level (analogous to Q14 on OANDA), and (b) the bar-level signal not replicating on Pepperstone at all. Without Pepperstone bars, those two cases are indistinguishable from trade-level alone.
+- **A reversed Gate 1 (Pepperstone trade-level shows Tuesday-K=3 *better* than Mon-K=2) is the rejection trigger.** That would mean even if the bar-level concentration is real on Pepperstone, the trade-level outcome on Tuesday-K=3 days is structurally *favorable*, and sizing down would erase a profitable cohort.
+
+**Optional Gate 1-bar (cleaner substrate replication, requires manual TradingView work).** If Joshua wants the original bar-level Q-T headline replicated against Pepperstone, write a Pine indicator that flags 1σ-adverse-down 15min bars per instrument (rolling 60-day std, 1.0σ threshold matching `o4_bar_correlation.py:simultaneous_adverse()`), and outputs concurrent-loss rates by day-of-week × K-class to TradingView's data window. Run on Pepperstone XAUUSD/US30/USDJPY for the 2022-01 → 2026-04 span and read the Tuesday-K=3 vs Mon-K=2 Δ. Original Gate 1 fail condition (Δ < +1.0pp or p > 0.05) applies. **Recommended only if Gate 1 (trade-level) lands ambiguous** — Pepperstone-bar acquisition / Pine-indicator authoring is non-trivial work; do it once the cheaper trade-level gate has narrowed the question.
+
+**Gate 1.5 — K=3-window entry-count power audit.** On the Pepperstone TV exports, count entries per strategy that fall inside the Tuesday G ∩ S ∩ A overlap window over the 4yr panel. Rough back-of-envelope: Guardian ≈ 25, Striker ≈ 50–80, Aegis ≈ 35 — plausibly < 100 affected entries per strategy. **If any strategy has < 50 affected entries, flag the historical-replay leg of the sizing test as low-power and pre-commit to weighting MC re-anchor evidence over historical replay where they conflict.** Adoption decision must explicitly tag which evidence source is load-bearing. Also produces the cohort sizes Gate 1's stratification depends on, so run as part of the same pass.
+
+## Proposed sizing test (run only if both gates pass)
+
+Apply scaling factor `s ∈ {0.50, 0.70, 0.85, 1.00}` to all three strategies' `riskPerTrade` **only on Tuesdays during the G ∩ S ∩ A overlap window** (Striker 13:00–17:00 UTC ∩ Guardian 08:00–16:00 NY ∩ Aegis 10:00–13:45 NY). Run on Pepperstone 2022-01 → 2026-04 with **MC at 50K × 3 seeds** (raised from canonical 10K to tighten bust-rate CI for the comparison). Compare against the locked baseline (`s = 1.00`):
+
+| Metric | Adoption criterion (vs. baseline) |
+|---|---|
+| Pass rate | within −1.0pp |
+| Bust rate | ≤ baseline within MC bootstrap 95% CI |
+| p99 portfolio DD | strictly lower |
+| Median days-to-pass | within +5 days |
+
+**Bust-rate criterion rationale.** At 0.65% baseline on 10K MC draws ≈ 65 events; strict-inequality detection against MC sampling variance is a high bar that will reject for noise even if the signal is real. The bootstrap-CI form preserves the tail-risk discipline (don't accept anything that materially worsens bust rate) without rejecting Pareto improvements that fall inside MC noise. The strict-inequality discipline is moved to p99 DD, where the signal-to-noise ratio is higher.
+
+**Adopt** the lowest `s` that satisfies all four. **Reject** if no `s` does, with one exception:
+
+**Per-strategy follow-up (if uniform shows marginal Pareto).** Bust attribution is uneven (S 39.3% / G 33.2% / A 27.6% per the 04-23 ADR; 04-26 Pepperstone reproduction shows S still leads at 43.4%). If uniform-s clears the gate marginally on one or two metrics, the per-strategy variant `s_G`, `s_S`, `s_A` is worth a follow-up rather than an immediate reject — Striker is doing more of the bust work and may deserve a tighter scale than the others. This expands the test dimensionality, so run it only if uniform shows promise.
+
+## What this proposal does NOT do
+
+- Does **not** modify Pine code, allocations, `dd_protection`, or strategy versions until the TradingView test confirms a `s` that meets adoption criteria.
+- Does **not** touch CLAUDE.md headline MC numbers (Pepperstone-anchored lock-decision artifacts). If `s < 1.00` is adopted, a fresh re-MC fires under the existing re-MC trigger rules.
+- Does **not** stagger strategy session schedules — those are inside the locked Pine and out of scope here.
+- Does **not** add a Tuesday-specific tier in `dd_protection` (single-tier production-locked 2026-04-17). Sizing-by-day-of-week is a separate axis.
+
+## If adopted, where it lives
+
+If the TradingView test selects a non-trivial `s`, the implementation is a per-strategy Pine modification (or a `dd_protection`-style sizing layer) that reads day-of-week and the overlap-window timestamp. This is a Pine-code change requiring a fresh ADR (`docs/adr/YYYY-MM-DD-tuesday-k3-sizing.md`), an MVD assertion against the new constant, and a re-MC committed via [tests/test_mc_anchors.py](tests/test_mc_anchors.py) anchor refresh.
+
+## Reproducibility
+
+OANDA-proxy script: [`python analysis/inquire_phase/q_t_tuesday_concurrent_loss_2026_04_27.py`](q_t_tuesday_concurrent_loss_2026_04_27.py). The Pepperstone re-run is Joshua's TradingView responsibility; no script in this repo currently runs against Pepperstone bars (data not git-tracked).
+
+## Expected outcome distribution (calibrated 2026-04-28, Pepperstone-bars-unavailable variant)
+
+For sequencing expectations under the trade-level Gate 1 (Pepperstone bars not available):
+
+- **~15%** Gate 1 reversed (Pepperstone Tuesday-K=3 days are better than Mon-K=2 days at trade-level). Outcome: reject proposal, OANDA bar-level signal is feed-specific or doesn't survive trade-level aggregation in a sizable-down direction.
+- **~50%** Gate 1 ambiguous (Pepperstone trade-level null or weakly directional, consistent with both "bar-level signal real but absorbed" and "bar-level signal absent on Pepperstone"). Sub-decision required: either proceed to sizing test on weaker evidence (raise Pareto criterion strictness to compensate), or run optional Gate 1-bar in TradingView before the sizing test. Default: proceed if Gate 1.5 entry counts are healthy (≥ 50 per strategy), defer to optional Gate 1-bar otherwise.
+- **~25%** Gate 1 passes (Pepperstone trade-level shows directionally consistent Tuesday-K=3 signal on at least one of the three readings). Strong corroboration; proceed to sizing test with confidence.
+- **~10%** Sizing test clears Pareto criterion at `s ∈ {0.70, 0.85}`. Outcome: fresh ADR, MVD assertion, re-MC, anchor refresh.
+
+The shift versus the bar-level-Gate-1 variant: more mass on "ambiguous, decide what to do next" (50% vs ~0%), less on clean reject (15% vs ~40%) and clean adopt (10% vs ~25%). Trade-level Gate 1 is a weaker discriminator than bar-level would have been; expect more proposals to require a second decision point rather than resolving cleanly at Gate 1.
+
+If realized outcome diverges materially from this distribution (e.g., Gate 1 passes cleanly *and* sizing test sails through at `s = 0.50`), audit the test setup before adopting — may indicate over-fit, a substrate issue, or that the OANDA bar-level finding was actually a stronger signal than expected.

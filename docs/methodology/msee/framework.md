@@ -2,7 +2,7 @@
 
 **Established:** 2026-04-27
 **Status:** Active research track. Operational/measurement layer only.
-**Source:** [Market Ecology, the Storage Effect, and Evolutionary Dynamics.md](../../../Market%20Ecology%2C%20the%20Storage%20Effect%2C%20and%20Evolutionary%20Dynamics.md)
+**Source:** *Market Ecology, the Storage Effect, and Evolutionary Dynamics* (external reference; removed from repo 2026-04-28 — kept locally by Joshua).
 
 ## What MSEE is
 
@@ -50,11 +50,13 @@ By construction:
   first per `open_questions.md`. Each must pass the **D-S-A pre-Q gate**
   before Inquiry begins.
 
-OANDA-proxy discipline applies: per [AMENDMENT_oanda_rescope.md](../identify_corpus/2026-04-26/AMENDMENT_oanda_rescope.md),
-findings produced on the OANDA panel cannot authorize Action. Pepperstone
-re-fit gates Action on any MSEE result. Pepperstone bar-corpus acquisition
-is itself a separate Forward question and is **out of scope** for this
-research track.
+OANDA-proxy data-provenance discipline applies: per
+[AMENDMENT_oanda_rescope.md](../identify_corpus/2026-04-26/AMENDMENT_oanda_rescope.md)
+(supersession note 2026-04-28), MSEE findings produced on the OANDA panel
+**can** route to Action proposals. Joshua validates the proposed change in
+TradingView against Pepperstone bars before any code/lock change. The source
+feed is always tagged on the artefact (`canonical_status="PROXY"` or
+`"EXPLORATORY"`); silent substitution remains forbidden.
 
 ## What MSEE claims (testable)
 
@@ -96,7 +98,7 @@ rejected — the lens is not used to defend the failed mechanism.
 
 ## Cross-references
 
-- Source report: `Market Ecology, the Storage Effect, and Evolutionary Dynamics.md`
+- Source report: *Market Ecology, the Storage Effect, and Evolutionary Dynamics* (external; removed from repo 2026-04-28)
 - Operational gate: `docs/methodology/observation_routing.md`
 - Risk normalization: `docs/methodology/1r_estimation.md`
 - MVD discipline: `docs/methodology/mvd.md`, `lib/mvd.py`

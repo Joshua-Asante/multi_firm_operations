@@ -12,7 +12,7 @@ losing trade. If median ≈ 0.34%, hypothesis confirmed.
 Inputs:
   data/tv_exports/oanda/Guardian_Gold_v5.5_OANDA_XAUUSD_2026-04-25_9ae1f.csv
 
-Pine sizing block (verbatim, guardian_gold_v5.5.txt:192-194):
+Pine sizing block (verbatim, guardian_gold_v5.5.pine:192-194):
     calcSize(stopDist) =>
         risk = strategy.equity * (riskPerTrade / 100)
         stopDist > 0 ? risk / stopDist : 0

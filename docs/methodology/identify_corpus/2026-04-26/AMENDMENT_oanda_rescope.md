@@ -7,6 +7,19 @@
 
 ---
 
+## Supersession (2026-04-28) — Action-routing rule lifted
+
+**Joshua executive decision (2026-04-28):** the "no Action routing on OANDA-only findings" rule below is **superseded**. New policy:
+
+- OANDA findings *can* route to Action (structural-improvement proposals).
+- Pepperstone validation moves from blocking to **TradingView-side, post-proposal**: Joshua tests the proposed change in TradingView against Pepperstone bars before any code/lock change.
+- CLAUDE.md headline MC numbers (92.73% pass / 0.65% bust / p99 DD 4.94%) remain Pepperstone-anchored as lock-decision artifacts.
+- Data-provenance discipline (tag the source feed, don't silently substitute) **stands**.
+
+The rest of this document is retained as the historical record of the original re-scope rationale and the substituted-without-labeling failure (2026-04-23 Aegis-on-Alchemy) it was designed to prevent. The labeling discipline is unchanged; only the Action-gate is lifted.
+
+---
+
 ## Why this amendment exists
 
 Phase 0 of the parent brief halted: the brief specifies the Pepperstone feed as the canonical input (bar files at an unspecified Pepperstone path; trade CSVs at `data/tv_exports/pepperstone/{guardian,striker,aegis}.csv`). Neither the Pepperstone bar files nor the Pepperstone TV exports are present in the repo. The 2026-04-23 Aegis-on-Alchemy-mislabeled-as-Pepperstone failure is the binding prior — substituting OANDA silently would replay that failure.

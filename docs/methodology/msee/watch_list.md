@@ -15,9 +15,10 @@ Indicators are grouped by load-bearing concern. Each has a current value (filled
 | Indicator | Threshold | Routing on crossing |
 |-----------|-----------|---------------------|
 | **Joint-loss day count (any 3-strategy day with all R<0)** | First occurrence in panel ≥ 1 → auto-Forward regime-shift Q | Open Q-MSEE-portfolio.1; do NOT auto-Action; live-PnL-gap rule must fire separately |
-| **G/A stress-conditional correlation** | Rises above +0.30 (point estimate) on a sliding 6-month stress slice | Open Q-MSEE-6c.1 follow-up; Pepperstone re-fit prerequisite for Action |
+| **G/A stress-conditional correlation** | Rises above +0.30 (point estimate) on a sliding 6-month stress slice | Open Q-MSEE-6c.1 follow-up; Action proposal routes through TradingView/Pepperstone validation |
 | **Portfolio realized max DD (current quarter)** | > 4.0% | Soft-warn; review next planned `cli.py update` window |
 | **Portfolio realized max DD (current quarter)** | > 4.5% | Hard-warn; escalate to re-MC trigger evaluation under operational-rules.md |
+| **Tuesday K=3 P&L variance elevation** *(live FXIFY only, not backtest)* | std(Tue daily-portfolio-R) > 1.5 × max(std(Mon), std(Thu)), rolling 6-month, n ≥ 30 trade-days each cohort | Re-open the Q-T Tuesday-K=3 sizing proposal at [`analysis/inquire_phase/findings_q_t_2026-04-27.md`](../../../analysis/inquire_phase/findings_q_t_2026-04-27.md). Run Gate 1.5 entry-count audit on live data, then sizing grid. Bar-stat finding has graduated to live-PnL signal — earns its cycles. |
 
 ### Guardian Gold v5.5
 
@@ -58,6 +59,7 @@ Indicators are grouped by load-bearing concern. Each has a current value (filled
 - **Guardian DD > 4.6%**: Current panel realized max from H6 condition (3). Crossing this means the strategy is exceeding its 4yr panel envelope.
 - **Striker WR < 0.60**: Per CLAUDE.md headline "WR 71.18%" and source report Part V.5.2 ("herd-amplification signature; if the herd thins, win rate falls toward 50%"). The 0.60 threshold is halfway to 50%.
 - **Aegis Hurst > 0.55 persistently**: Source report Part V.5.3 ("if it drifts above 0.55 persistent, the niche is shrinking").
+- **Tuesday K=3 P&L variance > 1.5× Mon/Thu (live FXIFY)**: Tripwire derived from Q-T (2026-04-27) bar-level OANDA finding (Tuesday concurrent-loss rate ~7.4× headline, +2.73pp K-matched residual). Closed 2026-04-28 as not-ripe-for-action. Variance-not-mean because tail-concentration appears as a second-moment signal before a first-moment one. 1.5× ratio is conservative against normal weekly variance. n ≥ 30 floor avoids tripping on early-challenge noise. **Substrate: live FXIFY DXTrade exports only — backtest data does not feed this indicator.** Until Joshua's live trade history accumulates ≥ 30 Mon/Tue/Thu trade-days each, this indicator reports `insufficient_data`.
 
 ## Routing discipline (hard rule)
 
@@ -65,7 +67,7 @@ Indicators are grouped by load-bearing concern. Each has a current value (filled
 
 1. Closed (with one-paragraph archive note in `findings/`) if the trigger is a stale or already-known condition.
 2. Forward (open a new `Q-MSEE-watch.N` question) for the cheapest follow-up falsification.
-3. Action only if Rule 0 / overlay-discipline live-PnL gap / a documented re-MC trigger ALSO fires.
+3. Action proposal only if Rule 0 / overlay-discipline live-PnL gap / a documented re-MC trigger ALSO fires. Action proposals route through Joshua's TradingView/Pepperstone validation before any code/lock change (2026-04-28 policy update).
 
 ## Cross-references
 

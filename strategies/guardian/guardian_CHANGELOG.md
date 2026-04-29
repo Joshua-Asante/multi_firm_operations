@@ -2,7 +2,7 @@
 
 Long-only XAUUSD 15min trend strategy. Pine Script v6.
 
-**Source of truth:** `guardian_gold_v5.5.txt` holds the authoritative parameter values. This CHANGELOG records decisions, rationale, and active overlays. If the two ever disagree, the Pine file wins — fix the CHANGELOG.
+**Source of truth:** `guardian_gold_v5.5.pine` holds the authoritative parameter values. This CHANGELOG records decisions, rationale, and active overlays. If the two ever disagree, the Pine file wins — fix the CHANGELOG.
 
 Versioning begins at v5.1 (2026-04-17). Prior development history (v3.7 → v3.8 → v3.9 → v4 → v5.1) is archived in Notion under the FXIFY Command Center.
 

@@ -2,7 +2,7 @@
 
 Long breakout strategy on DJ30 (US30) 15min. Pine Script v6.
 
-**Source of truth:** `striker_dj30_v4.4.txt` holds the authoritative parameter values. This CHANGELOG records decisions, rationale, and known concerns. If the two ever disagree, the Pine file wins — fix the CHANGELOG.
+**Source of truth:** `striker_dj30_v4.4.pine` holds the authoritative parameter values. This CHANGELOG records decisions, rationale, and known concerns. If the two ever disagree, the Pine file wins — fix the CHANGELOG.
 
 Versioning begins at v4.3 (2026-04-17). Prior development history (v3.1 → v4.1 → v4.2 rejected → v4.3) is archived in Notion.
 

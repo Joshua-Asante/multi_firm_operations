@@ -30,7 +30,7 @@ Apply per-strategy 1R estimation based on the strategy's exit architecture:
 
 #### Equity-compounding normalization — required when reporting 1R as a percent
 
-Pine sizes positions off contemporaneous equity (`guardian_gold_v5.5.txt:192-194`):
+Pine sizes positions off contemporaneous equity (`guardian_gold_v5.5.pine:192-194`):
 
 ```pine
 calcSize(stopDist) =>

@@ -1,8 +1,14 @@
 # Identify-phase corpus — 2026-04-26 (OANDA proxy)
 
-> **All findings in this corpus are OANDA-proxy. No finding is eligible for
-> lock-decision use until re-run against Pepperstone. Routes Notice-bound
-> findings as "OANDA-only patterns" per amendment.**
+> **2026-04-28 update — Action gate lifted.** OANDA findings can now route to
+> Action proposals; Joshua validates in TradingView against Pepperstone bars
+> before any code/lock change. CLAUDE.md headline MC numbers stay
+> Pepperstone-anchored (lock-decision artifacts). Data-provenance discipline
+> (tag the source feed, never silently substitute) is unchanged. See
+> [`AMENDMENT_oanda_rescope.md`](AMENDMENT_oanda_rescope.md) supersession note.
+>
+> *Original banner (historical):* All findings in this corpus are OANDA-proxy;
+> Pepperstone re-fit was previously a hard prerequisite for Action.
 
 ## Banner — corpus identity
 

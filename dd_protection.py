@@ -49,9 +49,7 @@ STATE_FILE = Path(__file__).parent / "dd_protection_state.json"
 
 # ── State Management ──────────────────────────────────────────
 
-def load_state() -> dict:
-    if STATE_FILE.exists():
-        return json.loads(STATE_FILE.read_text())
+def _default_state() -> dict:
     return {
         "starting_equity": STARTING_EQUITY,
         "peak_equity": STARTING_EQUITY,
@@ -59,17 +57,16 @@ def load_state() -> dict:
         "history": [],
     }
 
+def load_state() -> dict:
+    if STATE_FILE.exists():
+        return json.loads(STATE_FILE.read_text())
+    return _default_state()
+
 def save_state(state: dict):
     STATE_FILE.write_text(json.dumps(state, indent=2))
 
 def reset_state():
-    state = {
-        "starting_equity": STARTING_EQUITY,
-        "peak_equity": STARTING_EQUITY,
-        "last_equity": STARTING_EQUITY,
-        "history": [],
-    }
-    save_state(state)
+    save_state(_default_state())
     print("State reset. Peak equity = $200,000.00")
 
 # ── Core Logic ────────────────────────────────────────────────

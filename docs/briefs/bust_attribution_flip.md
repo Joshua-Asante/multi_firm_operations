@@ -1,7 +1,8 @@
 # Brief — Bust-attribution flip (Aegis ↔ Guardian) between panel reads
 
-**Status:** Prep — Inquire-phase, not yet authorized.
+**Status:** Forward — gated on same-date TV re-export (Pepperstone + OANDA in one session). Routed under [docs/methodology/observation_routing.md](../methodology/observation_routing.md) (three-bucket gate, replaces Notice/Inquire as of 2026-04-25).
 **Date drafted:** 2026-04-26.
+**Status reroute:** 2026-04-29.
 **Surfaced by:** [portfolio_mc.py](../../portfolio_mc.py) canonical-OANDA migration run, 2026-04-26.
 
 ---
@@ -90,12 +91,14 @@ A clean broker-feed test (Pepperstone-vs-OANDA at current locks) requires same-d
 - Bar-level microstructure investigation (would be a follow-up only if broker-feed effect is confirmed and warrants instrument-level audit).
 - Re-MC of pass/bust headline metrics. The 92.73%/0.65% Pepperstone numbers are not in question; only the attribution split.
 
-## Acceptance criteria for promotion to Inquire
+## Forward gate (when this becomes Action)
 
-This brief is in **prep status**. Promote to active Inquire when:
+This brief is **Forward** under the three-bucket gate. The observation routes to Action — i.e., a falsification run + downstream policy check — when **all three** below hold:
 1. Joshua confirms the question is worth answering at this priority.
-2. Pepperstone × current-locks panel is available locally to run the falsification.
+2. Same-date TV re-export of Pepperstone + OANDA at current locks is available (the existing 1-day-apart panel pair sits within the panel-revision noise floor measured in § Panel-revision noise floor and does not produce a clean broker-feed test).
 3. Brief is registered against a Notion question-of-record (per repo convention; q5_break_window cites `https://www.notion.so/...`).
+
+Until those three hold, this brief is scaffolding for a Forward question, not a directive to run the experiment.
 
 ## Cross-references
 

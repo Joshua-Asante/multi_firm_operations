@@ -5,7 +5,7 @@ Single source of truth: data/accounts.json
 
 import json
 import math
-from dataclasses import dataclass, field, asdict
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 

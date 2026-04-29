@@ -22,10 +22,10 @@ FIRM_RULES = {
 # Source of truth: https://www.notion.so/346dc0b53c1181d1b8d5e12df4bd3810
 # Unified 2026-04-17; Guardian re-locked 0.30% → 0.34% on 2026-04-23 after
 # Pepperstone-sourced CSVs (2022→2026) showed headroom under 1% bust + 5% p99 DD.
-RISK_TIERS = {
-    "challenge": {"guardian": 0.0034, "striker": 0.0100, "aegis": 0.0150},
-    "funded":    {"guardian": 0.0034, "striker": 0.0100, "aegis": 0.0150},
-}
+# Phase axis retained as a lookup key for downstream callers, but both phases
+# are byte-identical by construction so a future re-lock can't desync them.
+_BASE_RISK = {"guardian": 0.0034, "striker": 0.0100, "aegis": 0.0150}
+RISK_TIERS = {phase: _BASE_RISK for phase in ("challenge", "funded")}
 
 # Baseline: Pine Script indicators output lot sizes for this account
 BASELINE_BALANCE = 200_000

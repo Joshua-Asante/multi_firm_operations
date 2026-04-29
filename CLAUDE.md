@@ -9,7 +9,7 @@ Lookup tool for Joshua's multi-firm prop trading operation. Pine Script indicato
 * **firm_rules.py** — Firm configs, risk tiers, and baseline reference ($200K challenge). Add new firms here.
 * **accounts.py** — Account dataclass, multiplier calculation, JSON persistence.
 * **csv_parser.py** — DXTrade CSV trade history parser. Normalizes to standard trade format.
-* **cli.py** — CLI interface: `add`, `update`, `status`, `lots` commands.
+* **cli.py** — CLI interface: `add`, `update`, `status`, `lots`, `tearsheet` commands.
 * **data/accounts.json** — Persistent account state.
 
 ## CLI Usage
@@ -20,6 +20,7 @@ python cli.py add 5ers-400K-01 FXIFY 400000 --phase funded
 python cli.py update FXIFY-200K-01 203500
 python cli.py status
 python cli.py lots          # multiplier reference card for all active accounts
+python cli.py tearsheet trades.csv   # quantstats HTML tearsheet from a DXTrade CSV
 ```
 
 ## Multiplier System
@@ -46,7 +47,7 @@ Strategy versions most recently re-locked 2026-04-23 (Guardian v5.4 → v5.5, St
 | Aegis USDJPY  | USDJPY 15m      | 1.50%                   | v4.3 LOCKED   | default (1)                                       |
 
 2026-04-23 lock MC anchors:
-* Alchemy reference (2026-04-20, Striker v4.4 + Aegis v4.2 era): **99.21% pass / 0.03% bust**.
+* Alchemy reference (2026-04-20, Striker v4.4 + Aegis v4.2 era — pre-2026-04-23 lock): **99.21% pass / 0.03% bust**.
 * Pepperstone directional (2026-04-23, all three at candidate versions, 10K × 3 seeds): **88.45% pass / 4.68% bust** raw; **84.37% pass / 1.03% bust** after correcting Aegis 1R for the n=1 full-stop thin-cohort artifact (median fallback inflates Aegis scale 4.4×). Bust gate passes under corrected 1R; pass-rate gap vs Alchemy attributed to feed-level drag + v5.5 added filters (blockMonH08, blockMonH09, blockH12 all-days, blockH12Day latch). Locked under brief-authorized directional read, not anchor-grade MC. Re-MC with v5.4 Pepperstone pending (would isolate feed effect from version effect).
 * Post-Guardian-risk-relock MC (G 0.34% / S 1.00% / A 1.50%, same panel): **92.73% pass / 0.65% bust / 6.62% timeout**, p99 DD 4.94%. Lock criteria: bust <1%, p99 DD <5%. Current 04-26 Pepperstone panel (the one committed to the repo) reproduces **93.78% pass / 0.58% bust / 4.92% p99 DD** under `python portfolio_mc.py --panel pepperstone` — drift within lock criteria, no re-MC triggered. `tests/test_mc_anchors.py` pins 93.78/0.58/4.92 as the code-reproducible anchor; 92.73/0.65/4.94 retained here as the 04-23 lock-decision artifact. **Bust-attribution split** also drifted: 04-23 ADR cites A 27.6% / S 39.3% / G 33.2%; 04-26 Pepperstone reproduces A 25.1% / S 43.4% / G 31.4% — Striker still the marginal contributor, ranking S > G > A preserved. Full breakdown pending in `docs/briefs/bust_attribution_flip.md`. See Protection section below.
 

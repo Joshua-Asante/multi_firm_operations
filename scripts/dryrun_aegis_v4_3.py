@@ -97,7 +97,7 @@ def resolve_pine_path() -> Path:
         return Path(env)
     return (
         Path(__file__).resolve().parent.parent
-        / "strategies" / "aegis" / "aegis_usdjpy_v4.3.txt"
+        / "strategies" / "aegis" / "aegis_usdjpy_v4.3.pine"
     )
 
 

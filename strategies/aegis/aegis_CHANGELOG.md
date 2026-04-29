@@ -2,7 +2,7 @@
 
 Mean-reversion strategy on USDJPY 15min. Pine Script v6.
 
-**Source of truth:** `aegis_usdjpy_v4.3.txt` holds the authoritative parameter values. This CHANGELOG records decisions, rationale, and portfolio role. If the two ever disagree, the Pine file wins — fix the CHANGELOG.
+**Source of truth:** `aegis_usdjpy_v4.3.pine` holds the authoritative parameter values. This CHANGELOG records decisions, rationale, and portfolio role. If the two ever disagree, the Pine file wins — fix the CHANGELOG.
 
 Versioning begins at v4.1 (2026-04-17). Prior development (v4 → v4.1 with +12% net P&L and shifted DD shape) is archived in Notion.
 
@@ -63,7 +63,7 @@ The previously-queued post-v4.3 portfolio MC re-run executed at the joint 2026-0
 **Status:** Historical. Active on FXIFY $200K challenge from 2026-04-17 to 2026-04-23. Risk 1.50%. Initial tracked version.
 
 ### Parameters
-Authoritative parameter values (as of the v4.1 lock) lived in the then-current `strategies/aegis/aegis_usdjpy_v4.1.txt` (removed when v4.3 superseded it). Partial snapshot of known fields:
+Authoritative parameter values (as of the v4.1 lock) lived in the then-current `strategies/aegis/aegis_usdjpy_v4.1.pine` (removed when v4.3 superseded it; .txt → .pine extension convention adopted 2026-04-28). Partial snapshot of known fields:
 
 | Field | Value |
 |---|---|

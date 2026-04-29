@@ -1,13 +1,13 @@
 # MSEE — Open Questions (Forward bucket)
 
 **Established:** 2026-04-27
-**Source:** [Market Ecology, the Storage Effect, and Evolutionary Dynamics.md](../../../Market%20Ecology%2C%20the%20Storage%20Effect%2C%20and%20Evolutionary%20Dynamics.md), Parts IV (P1–P10) and VIII (H1–H10).
+**Source:** *Market Ecology, the Storage Effect, and Evolutionary Dynamics*, Parts IV (P1–P10) and VIII (H1–H10) — external reference, removed from repo 2026-04-28.
 **Routing rule:** [observation_routing.md](../observation_routing.md) — three-bucket gate; cheapest-falsification first.
 **Gate audit:** Each H must pass the **D-S-A pre-Q gate** before Inquiry begins. Audit recorded inline.
 
 ## Scope and constraints
 
-- **Corpus:** OANDA-proxy panels (TV exports + 15m bars). Per [AMENDMENT_oanda_rescope.md](../identify_corpus/2026-04-26/AMENDMENT_oanda_rescope.md), no MSEE finding can route Action without Pepperstone re-fit (separately gated).
+- **Corpus:** OANDA-proxy panels (TV exports + 15m bars). Per [AMENDMENT_oanda_rescope.md](../identify_corpus/2026-04-26/AMENDMENT_oanda_rescope.md) supersession (2026-04-28), MSEE findings **can** route to Action proposals; Joshua validates in TradingView against Pepperstone bars before any code/lock change. Source feed always tagged on the artefact.
 - **Foundation:** [`analysis/msee/daily_strategy_returns.py`](../../../analysis/msee/daily_strategy_returns.py) (Phase 0 — built 2026-04-27, q14 reconcile worst |dR| = 3.55e-15). Every H below joins on this file unless noted.
 - **Locks:** No edits to Pine, `dd_protection.py`, `firm_rules.py` allocations, or `portfolio_mc.py`. H1 / H9 use `mc_explore.py` (Phase 6, EXPLORATORY).
 
@@ -58,7 +58,7 @@
 ### Q-MSEE-6c — Stress-conditional correlations (P2) — `OPEN`
 **Question:** On the worst 5% of market days (top |index move| or broker-spread proxy), do pairwise (G,S), (G,A), (S,A) correlations of daily R rise above their baseline near-zero? Khandani-Lo unwind signature would push them positive.
 **Falsifier:** Stress correlations remain near zero (storage effect holds under stress).
-**Auto-Action trigger:** If any pair > 0.3 in stress, an automatic Forward question on Khandani-Lo crowded-unwind risk opens (does NOT auto-route Action — still gated by Pepperstone re-fit + four-rules).
+**Auto-Action trigger:** If any pair > 0.3 in stress, an automatic Forward question on Khandani-Lo crowded-unwind risk opens. Action proposals from this trigger route through TradingView/Pepperstone validation (post-2026-04-28 policy) and the four-rules gate; auto-Action remains forbidden.
 **D-S-A audit:**
 - D: Restricted to 420 trade-dates joined to bar-derived stress flags.
 - S: Single-day stress proxy from XAU/US30/USDJPY |daily ret|; alternatives logged.
@@ -152,8 +152,8 @@ data accumulated through Phases 1–6.
 |--------------|-----------|-------------|
 | Hypothesis confirmed (positive) | CLOSED-POSITIVE | None — strengthens framework, no policy change. |
 | Hypothesis falsified (negative) | CLOSED-NEGATIVE | None — rejects mechanism, framework restated. |
-| Stress correlation > 0.3 | CLOSED + auto-Forward (Khandani-Lo Q) | Pepperstone re-fit + four-rules. Action separately gated. |
-| Capacity K below current capital allocation | CLOSED + auto-Forward (allocation review Q) | Pepperstone re-fit + four-rules + re-MC trigger. Action separately gated. |
-| First all-three-loss day in panel | CLOSED + auto-Forward (regime-shift Q) | Live-PnL gap rule + Pepperstone re-fit. Action separately gated. |
+| Stress correlation > 0.3 | CLOSED + auto-Forward (Khandani-Lo Q) | TradingView/Pepperstone validation + four-rules. |
+| Capacity K below current capital allocation | CLOSED + auto-Forward (allocation review Q) | TradingView/Pepperstone validation + four-rules + re-MC trigger. |
+| First all-three-loss day in panel | CLOSED + auto-Forward (regime-shift Q) | Live-PnL gap rule + TradingView/Pepperstone validation. |
 
-No MSEE result alone is sufficient for Action.
+A MSEE result can support an Action proposal; the proposal is validated by Joshua in TradingView against Pepperstone bars before any code/lock change (2026-04-28 policy update).

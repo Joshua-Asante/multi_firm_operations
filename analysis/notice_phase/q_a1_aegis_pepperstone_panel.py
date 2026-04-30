@@ -5,8 +5,9 @@ across early / mid / late) replicates on Pepperstone canonical data.
 Analysis-only. Does not touch strategy code, allocations, dd_protection,
 MC calibration, or Notion.
 
-Parent question: Q-A gated brief (2026-04-27 synthesis, in Notion / chat;
-repo artefact pending — Q-A1-d).
+Parent question: Q-A gated brief — 2026-04-27 synthesis backfilled at
+docs/methodology/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md
+(Q-A1-d closed 2026-04-29).
 Q15 closure: analysis/notice_phase/findings_2026-04-26.md:414-510.
 
 Methodology (per approved plan):

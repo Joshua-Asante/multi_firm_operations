@@ -10,7 +10,7 @@
 
 - **Parent:** [Q-A1 — Pepperstone panel-thirds replication](q_a1_pepperstone_replication.md) — verdict PARTIAL; recommended quintile split as Refinement #1 (cheapest).
 - **Q15 closure:** [findings_2026-04-26.md:414-510](../../../../analysis/notice_phase/findings_2026-04-26.md).
-- **Q-A parent gated brief** authored 2026-04-27 in chat / Notion; repo artefact pending (Q-A1-d, Joshua's task — independent of this verdict).
+- **Q-A parent gated brief:** [`q_a_aegis_panel_mechanism_gated.md`](../2026-04-27/q_a_aegis_panel_mechanism_gated.md) (2026-04-27 synthesis, backfilled to repo 2026-04-29 — Q-A1-d closed).
 - **Methodology:** [observation_routing.md](../../observation_routing.md), [1r_estimation.md](../../1r_estimation.md).
 - **Data files (reused from Q-A1):**
   - Pepperstone: `data/tv_exports/pepperstone/Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv`
@@ -188,7 +188,7 @@ EOM-block decomposition (Q-A1 Refinement #3) is now lower priority — the quint
 
 - **Parent Q-A1 brief:** [q_a1_pepperstone_replication.md](q_a1_pepperstone_replication.md) — PARTIAL verdict at tertile resolution, recommended quintile split as Refinement #1.
 - **Q15 closure:** [analysis/notice_phase/findings_2026-04-26.md:414-510](../../../../analysis/notice_phase/findings_2026-04-26.md).
-- **Q-A parent gated brief** authored 2026-04-27 in chat / Notion; repo artefact pending — Q-A1-d (Joshua's task, independent of this verdict).
+- **Q-A parent gated brief:** [`q_a_aegis_panel_mechanism_gated.md`](../2026-04-27/q_a_aegis_panel_mechanism_gated.md) (2026-04-27 synthesis, backfilled to repo 2026-04-29 — Q-A1-d closed).
 - **Q-T inquire brief:** [analysis/inquire_phase/findings_q_t_2026-04-27.md](../../../../analysis/inquire_phase/findings_q_t_2026-04-27.md) (bootstrap pattern reference).
 - **Methodology:** [observation_routing.md](../../observation_routing.md), [1r_estimation.md](../../1r_estimation.md), [operational_rules.md](../../../operational_rules.md).
 - **Memory:** [feedback_gated_q_subquestion_forking.md](../../../../../../joshu/.claude/projects/C--Users-joshu-prop-firm-pipeline/memory/feedback_gated_q_subquestion_forking.md) — methodology lesson saved with Q-A1.
@@ -196,5 +196,5 @@ EOM-block decomposition (Q-A1 Refinement #3) is now lower priority — the quint
 ## Open forks (post-Q-A1.1)
 
 - **Recent-period drill-down (cheapest next step)** — characterize Conv B q5 (Sept 2025 → April 2026) trade-by-trade. Filter activations, session times, MFE/MAE distribution. If the spike is structural, it's a finding; if it's a streak of luck, it changes the inference. Notice-phase work, no re-MC required.
-- **Q-A1-d** (carryover from Q-A1) — backfill `docs/methodology/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md` from chat draft. Joshua's task, independent.
+- **Q-A1-d** (carryover from Q-A1) — **CLOSED 2026-04-29.** Q-A parent brief landed at [`q_a_aegis_panel_mechanism_gated.md`](../2026-04-27/q_a_aegis_panel_mechanism_gated.md), pasted verbatim from Notion `34fdc0b5…bb6f` with 2026-04-29 disposition banner.
 - **Q-A2** — remains gated on next re-MC trigger as originally planned. Q-A1.1's PARTIAL verdict does not satisfy the auto-escalation bar.

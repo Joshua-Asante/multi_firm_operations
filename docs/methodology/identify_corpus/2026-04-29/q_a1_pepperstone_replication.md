@@ -8,7 +8,7 @@
 
 ## Parent / dependencies
 
-- **Parent question:** Q-A — does the Aegis OANDA panel-thirds PF lift (2.46 → 4.97 → 5.96) reflect real regime structure or an OANDA-proxy artefact? (Q-A parent gated brief authored 2026-04-27 in chat / Notion; repo artefact pending — see Q-A1-d below.)
+- **Parent question:** Q-A — does the Aegis OANDA panel-thirds PF lift (2.46 → 4.97 → 5.96) reflect real regime structure or an OANDA-proxy artefact? Parent brief: [`q_a_aegis_panel_mechanism_gated.md`](../2026-04-27/q_a_aegis_panel_mechanism_gated.md) (2026-04-27 synthesis, backfilled 2026-04-29 — Q-A1-d closed).
 - **Q15 closure (anchor for the OANDA reference numbers):** [findings_2026-04-26.md:414-510](../../../../analysis/notice_phase/findings_2026-04-26.md), specifically the panel-wide P&L sub-period table at lines 463-468.
 - **Methodology references:** [observation_routing.md](../../observation_routing.md), [1r_estimation.md](../../1r_estimation.md), [operational_rules.md](../../../operational_rules.md).
 - **Data files (canonical, on disk):**
@@ -174,11 +174,11 @@ The signal on Pepperstone is qualitatively consistent with Q15's OANDA result. T
 - **Q15 closure:** [analysis/notice_phase/findings_2026-04-26.md:414-510](../../../../analysis/notice_phase/findings_2026-04-26.md) — the OANDA panel-thirds anchor (2.46 / 4.97 / 5.96) and its `Forward → Closed (post-Q15)` routing.
 - **04-26 corpus synthesis:** same file — the Notice-phase synthesis that produced Q15.
 - **Q-T inquire-phase brief:** [analysis/inquire_phase/findings_q_t_2026-04-27.md](../../../../analysis/inquire_phase/findings_q_t_2026-04-27.md) — bootstrap pattern reference (seed 42, 10K resamples).
-- **Q-A parent gated brief** authored 2026-04-27 in chat / Notion; **repo artefact pending — see Q-A1-d below.**
+- **Q-A parent gated brief:** [`q_a_aegis_panel_mechanism_gated.md`](../2026-04-27/q_a_aegis_panel_mechanism_gated.md) (2026-04-27 synthesis, backfilled to repo 2026-04-29 — Q-A1-d closed).
 - Methodology: [docs/methodology/observation_routing.md](../../observation_routing.md), [docs/methodology/1r_estimation.md](../../1r_estimation.md), [docs/operational_rules.md](../../../operational_rules.md).
 
 ## Open forks (post-Q-A1)
 
 - **Q-A1-c — Net P&L USD column-convention diagnostic:** **CLOSED by inspection.** Pre-flight exploration's "2× delta" was a one-off read-path artefact, not a Pepperstone-specific column-convention issue. The script's `load_tv_feed()` reconciles exactly to the locked $178,208. No follow-up needed.
-- **Q-A1-d — Backfill 2026-04-27 Q-A parent brief:** the gated Q-A synthesis was authored 2026-04-27 in chat / Notion but no `docs/methodology/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md` artefact exists in the repo. **Joshua's task, not Q-A1's. Independent of this verdict.**
+- **Q-A1-d — Backfill 2026-04-27 Q-A parent brief: CLOSED 2026-04-29.** The gated Q-A synthesis is now on disk at [`q_a_aegis_panel_mechanism_gated.md`](../2026-04-27/q_a_aegis_panel_mechanism_gated.md) — pasted verbatim from Notion `34fdc0b5…bb6f` with a 2026-04-29 disposition banner reflecting the Q-A1 chain's PARTIAL outcome and forward-tripwire routing.
 - **Methodology lesson — gated-Q sub-question forking discipline:** when a parent question has both gated and ungated components, fork the ungated as a sub-question runnable on existing data without waiting for the gate. Q-A1 is the worked example: Q-A's gated component (Pepperstone re-MC) waits, but the panel-thirds replication test runs immediately on already-on-disk Pepperstone canonical. Saved to memory.

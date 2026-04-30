@@ -231,7 +231,7 @@ The chain has moved from "monotonic regime improvement" (Q-A1) → "localized st
 - **Grandparent Q-A1 brief:** [q_a1_pepperstone_replication.md](q_a1_pepperstone_replication.md).
 - **Q15 closure:** [analysis/notice_phase/findings_2026-04-26.md:414-510](../../../../analysis/notice_phase/findings_2026-04-26.md).
 - **Pine source (Rule-0 read-first):** [strategies/aegis/aegis_usdjpy_v4.3.pine:247-270](../../../../strategies/aegis/aegis_usdjpy_v4.3.pine).
-- **Q-A parent gated brief** authored 2026-04-27 in chat / Notion; repo artefact pending — Q-A1-d (Joshua's task, independent of this verdict).
+- **Q-A parent gated brief:** [`q_a_aegis_panel_mechanism_gated.md`](../2026-04-27/q_a_aegis_panel_mechanism_gated.md) (2026-04-27 synthesis, backfilled to repo 2026-04-29 — Q-A1-d closed).
 - **Methodology:** [observation_routing.md](../../observation_routing.md), [1r_estimation.md](../../1r_estimation.md), [operational_rules.md](../../../operational_rules.md).
 - **Memory rules consulted:** Rule-0-extends-to-Pine-code (read Pine before scripting); overlay-trigger discipline (live-PnL gap is the bar); leading-indicator+P&L-gate rationalization (a backtest-only structural inference is not enough).
 
@@ -240,5 +240,5 @@ The chain has moved from "monotonic regime improvement" (Q-A1) → "localized st
 - **Forward live-PnL tripwire on Aegis full-SL hits** — this is the concrete, ungated, cheapest next step. Joshua to install / track in live operations.
 - **Filter-funnel composition through-time (Q-A1 Refinement #2)** — secondary, useful only if the tripwire takes a long time to fire and intermediate evidence is wanted.
 - **2022-only diagnostic (Q-A1.1 alternative refinement)** — now lower priority. Q-A1.2 has shifted the question's center of gravity to "what's happening in q5" rather than "what was wrong in 2022."
-- **Q-A1-d** — backfill `docs/methodology/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md`. Joshua's task, unchanged.
+- **Q-A1-d** — **CLOSED 2026-04-29.** Q-A parent brief landed at [`q_a_aegis_panel_mechanism_gated.md`](../2026-04-27/q_a_aegis_panel_mechanism_gated.md), pasted verbatim from Notion `34fdc0b5…bb6f` with 2026-04-29 disposition banner.
 - **Q-A2** — remains gated on next re-MC trigger. Q-A1.2 substantially *weakens* the case for pulling Q-A2 forward; the "regime improvement" framing it would have tested is replaced by a "loss-truncation" framing that bootstrap is ill-suited for.

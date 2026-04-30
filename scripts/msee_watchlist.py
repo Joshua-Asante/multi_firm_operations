@@ -1,7 +1,7 @@
 """MSEE Phase 8 — Watch-list digest generator.
 
 Computes current values for the indicators listed in
-docs/methodology/msee/watch_list.md and writes a dated digest at
+docs/methodology/archive/msee/watch_list.md and writes a dated digest at
 analysis/msee/watch_{date}.md plus a JSON sidecar. Designed to run
 weekly aligned with the cli.py update cadence.
 
@@ -280,7 +280,7 @@ def main() -> None:
     md.append(f"Panel: {digest['data_panel_window'][0]} -> "
               f"{digest['data_panel_window'][1]}  ({digest['n_trade_dates']} trade-dates)\n")
     md.append(f"Generator: `scripts/msee_watchlist.py` per "
-              f"`docs/methodology/msee/watch_list.md`\n")
+              f"`docs/methodology/archive/msee/watch_list.md`\n")
     md.append(f"Routing: no Action authorization from this digest.\n\n")
     if crossings:
         md.append(f"## Crossings ({len(crossings)})\n\n")

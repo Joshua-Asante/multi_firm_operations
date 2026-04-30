@@ -69,6 +69,6 @@ For each cited number above, the producing script's first ~5 lines include ident
 ## References
 
 - ADR: `docs/adr/2026-04-24-mvd-discipline.md`
-- Methodology: `docs/methodology/mvd.md`
+- Methodology: `docs/rule_0.md` (corollary #4)
 - Canonical feed reconciliation framework: `<link>`
 - Prior calibration (if applicable): `<link>`

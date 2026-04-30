@@ -76,6 +76,6 @@ The "primary X" claim above is backed by the event-count + $ attribution table g
 ## References
 
 - ADR: `docs/adr/2026-04-24-mvd-discipline.md`
-- Methodology: `docs/methodology/mvd.md`
+- Methodology: `docs/rule_0.md` (corollary #4)
 - Prior bust analysis (if applicable): `<link>`
 - CHANGELOG entry: `<link>`

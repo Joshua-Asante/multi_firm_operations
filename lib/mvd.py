@@ -1,7 +1,9 @@
 """
 Minimum Viable Defense (MVD) — assertion library.
 
-See docs/adr/2026-04-24-mvd-discipline.md and docs/methodology/mvd.md.
+See docs/rule_0.md (corollary #4) for the principle. The original methodology
+framing is archived at docs/methodology/archive/mvd.md; the codifying ADR is
+docs/adr/2026-04-24-mvd-discipline.md.
 
 Producer-side enforcement layer for artifacts that cross the live capital
 boundary: MC input panels, lock decision inputs, risk-control production

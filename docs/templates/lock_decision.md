@@ -87,6 +87,6 @@ If any number above is sourced from a script that does not have identity asserti
 ## References
 
 - ADR: `docs/adr/2026-04-24-mvd-discipline.md`
-- Methodology: `docs/methodology/mvd.md`
+- Methodology: `docs/rule_0.md` (corollary #4)
 - Prior lock (if applicable): `<link>`
 - CHANGELOG entry: `<link>`

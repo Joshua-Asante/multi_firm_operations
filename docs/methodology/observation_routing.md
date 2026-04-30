@@ -90,7 +90,7 @@ superseded.
 
 ## Retroactive routing of the 2026-04 Notice run
 
-Per `analysis/notice_phase/findings.md`:
+Per `docs/methodology/archive/analysis/notice_phase/findings.md`:
 
 - A1, A2, A3, A4 — **Closed.** ATR sizing arithmetic is intact; bar-stat
   shifts do not justify an overlay; overlay door already closed by ATR-based
@@ -103,10 +103,10 @@ Per `analysis/notice_phase/findings.md`:
   bootstrap vs fixed-block (Q6) remains gated on a documented re-MC trigger.
 
 Standing JSON / figure / CSV outputs for the Closed-bucket findings were
-deleted in the same compression. Regenerable from `analysis/notice_phase/notice_phase.py`.
+deleted in the same compression. Regenerable from `docs/methodology/archive/analysis/notice_phase/notice_phase.py`.
 
 ## Cross-references
 
 - Notion: [Claude Code brief — 1R diagnosis + Open Questions reorder + Notice phase compression — 2026-04-25](https://www.notion.so/34ddc0b53c1181199976c9b1b4effb17).
-- Repo: [`analysis/notice_phase/findings.md`](../../analysis/notice_phase/findings.md) — first application of the gate.
+- Repo: [`docs/methodology/archive/analysis/notice_phase/findings.md`](archive/analysis/notice_phase/findings.md) — first application of the gate.
 - Methodology: this gate is an Algorithm-driven simplification (Question / Delete / Simplify) of the prior Notice/Inquire framework. See the permanent Algorithm reference page for context on the framework that produced it.

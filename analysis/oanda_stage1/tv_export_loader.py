@@ -1,0 +1,112 @@
+"""TradingView strategy-export CSV loader.
+
+The TV export emits two rows per trade (one Entry long, one Exit long, paired
+by Trade #). This module pairs them and returns a per-trade DataFrame.
+
+Columns returned:
+    trade_num, signal_entry, signal_exit, side,
+    entry_ts, entry_px, exit_ts, exit_px, qty,
+    net_pnl_usd, net_pnl_pct, mfe_usd, mfe_pct, mae_usd, mae_pct,
+    cum_pnl_usd, cum_pnl_pct
+
+`side` is +1 for long, -1 for short. All three strategies are long-only at
+v5.5 / v4.4 / v4.3 — short rows would be a load-bearing surprise and should
+fail the assertion in `assert_long_only`.
+
+Identity gates via `lib.mvd.assert_tv_export` are applied at the public
+loader entry point.
+"""
+from __future__ import annotations
+
+from pathlib import Path
+
+import pandas as pd
+
+from lib.mvd import assert_min_rows, assert_tv_export
+
+
+PRICE_COL_BY_INSTRUMENT = {
+    "USDJPY": "Price JPY",
+    "XAUUSD": "Price USD",
+    "US30USD": "Price USD",
+}
+
+
+def load_tv_export(
+    csv_path: str | Path,
+    *,
+    expected_strategy: str,
+    expected_version: str,
+    expected_symbol: str,
+    expected_broker: str = "OANDA",
+) -> pd.DataFrame:
+    """Load a TV export, pair entry/exit rows, return a per-trade DataFrame.
+
+    Identity (filename → strategy/version/broker/symbol) is asserted via
+    `lib.mvd.assert_tv_export` before any rows are read.
+    """
+    csv_path = Path(csv_path)
+    assert_tv_export(
+        csv_path,
+        expected_strategy=expected_strategy,
+        expected_version=expected_version,
+        expected_broker=expected_broker,
+        expected_symbol=expected_symbol,
+    )
+
+    raw = pd.read_csv(csv_path, encoding="utf-8-sig")
+    assert_min_rows(len(raw), 100, label=f"TV-export rows {csv_path.name}")
+
+    price_col = PRICE_COL_BY_INSTRUMENT[expected_symbol]
+    if price_col not in raw.columns:
+        raise AssertionError(
+            f"TV-export schema fail: expected price column '{price_col}' "
+            f"for symbol {expected_symbol}, columns={list(raw.columns)}"
+        )
+
+    raw["Date and time"] = pd.to_datetime(raw["Date and time"])
+
+    entries = raw[raw["Type"].str.startswith("Entry")].copy()
+    exits = raw[raw["Type"].str.startswith("Exit")].copy()
+    if len(entries) != len(exits):
+        raise AssertionError(
+            f"TV-export pairing fail [{csv_path.name}]: "
+            f"{len(entries)} entries vs {len(exits)} exits"
+        )
+
+    entries = entries.set_index("Trade #")
+    exits = exits.set_index("Trade #")
+    if not entries.index.equals(exits.index):
+        raise AssertionError(
+            f"TV-export pairing fail [{csv_path.name}]: "
+            f"Trade # index mismatch between entry and exit rows"
+        )
+
+    side = entries["Type"].map(lambda t: 1 if "long" in t.lower() else -1)
+    if (side != 1).any():
+        raise AssertionError(
+            f"TV-export side fail [{csv_path.name}]: "
+            f"non-long entries present (all three strategies are long-only at locked versions)"
+        )
+
+    out = pd.DataFrame({
+        "trade_num":     entries.index,
+        "signal_entry":  entries["Signal"].values,
+        "signal_exit":   exits["Signal"].values,
+        "side":          side.values,
+        "entry_ts":      entries["Date and time"].values,
+        "entry_px":      entries[price_col].values,
+        "exit_ts":       exits["Date and time"].values,
+        "exit_px":       exits[price_col].values,
+        "qty":           entries["Size (qty)"].values,
+        "net_pnl_usd":   entries["Net P&L USD"].values,
+        "net_pnl_pct":   entries["Net P&L %"].values,
+        "mfe_usd":       entries["Favorable excursion USD"].values,
+        "mfe_pct":       entries["Favorable excursion %"].values,
+        "mae_usd":       entries["Adverse excursion USD"].values,
+        "mae_pct":       entries["Adverse excursion %"].values,
+        "cum_pnl_usd":   entries["Cumulative P&L USD"].values,
+        "cum_pnl_pct":   entries["Cumulative P&L %"].values,
+    })
+    out = out.reset_index(drop=True)
+    return out

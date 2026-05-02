@@ -47,13 +47,13 @@ Per CSV exit, MFE_50 / MAE_50 over the next 50 bars in long-direction. R-units u
 
 ## Gated candidates
 
-### day_wed
+### day_wed — REJECTED at Stage 2 (Pepperstone, 2026-05-02)
 
-- **Mechanism (one falsifiable sentence):** _author after candidate review._
-- **Locked baseline:** see Pine source `strategies/guardian/guardian_gold_v5.5.pine`.
-- **Proposed direction:** removal / loosening / tightening (case-by-case).
-- **Position-gate interaction:** _flag if candidate change alters per-day eligibility (Guardian max 2/day cap interacts with hour-block removal)._
-- **Range proposal:** _bounded post-Stage-2 - Stage 1 emits the candidate, not the parameter value._
+- **Stage 1 status:** gated (n=286, mean R = +0.43, p=0.005).
+- **Stage 2 outcome:** REJECTED on Pepperstone TradingView re-run (verbal verdict, screenshots not attached).
+- **Mechanism resolved:** the OANDA-side positive-expectancy signal on Wed bars is a feed artifact, not a multi-instrument tradeable edge. Together with the Striker `day_mon_wed_thu` Stage 2 rejection (same direction, same panel, different instrument), this is the first piece of confirming evidence for the cross-strategy hypothesis "OANDA day-of-week effects do not reproduce on Pepperstone." See `feedback_oanda_dow_feed_artifact.md`.
+- **Locked baseline preserved:** Guardian Mon/Tue/Thu day filter unchanged at v5.5.
+- **No Pine work, no version bump, no re-MC.**
 
 
 ## Rejected candidates

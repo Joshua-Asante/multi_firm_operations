@@ -50,14 +50,25 @@ Per-leg post-exit MFE_50 / MAE_50 in long-direction. Pyramid legs tagged separat
 
 ## Gated candidates
 
-### day_mon_wed_thu
+### day_mon_wed_thu — REJECTED at Stage 2 (Pepperstone, 2026-05-02)
 
-- **Mechanism (one falsifiable sentence):** _author after candidate review._
-- **Locked baseline:** see Pine source `strategies/striker/striker_dj30_v4.4.pine`.
-- **Proposed direction:** removal / loosening / tightening (case-by-case).
-- **Position-gate interaction:** Striker max-3/day cap and the day soft-stop both interact with any filter loosening — re-MC must include this.
-- **Range proposal:** _bounded post-Stage-2 - Stage 1 emits the candidate, not the parameter value._
-- **Pyramid-bias note:** synthetic R for this candidate is base-leg-only — re-measure with pyramid rule active before any Pine work.
+- **Stage 1 status:** gated (n=434, mean R = +0.11, p=0.044).
+- **Stage 2 rubric (pre-committed before TV run):** locked Tue/Fri baseline on the 52-month Pepperstone panel = Net P&L $279,438 / PF 2.272 / RF 18.29 / Max DD 5.09%. Reject thresholds: NetP&L < $250K | PF < 2.0 | RF < 15 | Max DD > 5.5%. Any two triggered → reject. Note: rubric anchor numbers (RF 18.29, DD 5.09%) had no committed source in the repo; verified Tue/Fri baseline on the same TV run came in at PF 2.272 / RF 17.17 / DD 5.32% (the PF matched, RF/DD drifted ~1.1 pp / ~23 bp from the rubric anchor). Skew is downstream of the rubric being anchored on uncommitted numbers, not of the rubric being misapplied.
+- **Stage 2 outcome — Pepperstone scoreboard:**
+
+  | Variant | DD | RF | PF | Verdict |
+  |---|---:|---:|---:|---|
+  | Tue/Fri (locked) | 5.32% | 17.17 | 2.272 | hold |
+  | +Wed | 8.17% | 13.87 | 2.034 | reject (DD + RF) |
+  | +Mon | 11.42% | 8.28 | 1.922 | reject (DD + RF + PF) |
+  | +Thu | 8.54% | 16.23 | 2.113 | reject (DD only) |
+  | +Wed +Thu | 10.04% | 16.05 | 1.996 | reject (DD + PF) |
+
+  Every alternative breaches DD > 5.5%. Locked baseline best on every risk-adjusted metric.
+- **Mechanism resolved:** the OANDA-side positive-expectancy signal on Mon/Wed/Thu bars does not reproduce on Pepperstone — feed artifact, not multi-instrument signal. Confirmed alongside Guardian `day_wed` rejection on the same date. See `feedback_oanda_dow_feed_artifact.md`.
+- **Footnote (deferred, not actionable):** of the single-day adds, +Thu was the only one to clear PF and RF — only DD blocked it. If a future INQHIORI revisits day-of-week against a different risk budget (per-allocation rather than absolute DD ceiling), Thu deserves first look.
+- **Locked baseline preserved:** Striker Tue/Fri day filter unchanged at v4.4.
+- **No Pine work, no version bump, no re-MC.**
 
 
 ## Rejected candidates

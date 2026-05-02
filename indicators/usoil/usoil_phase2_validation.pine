@@ -1,0 +1,174 @@
+//@version=6
+//
+// USOIL Phase 2 validation — vol-gated verdict from Phase 1 (2026-05-02).
+//
+// Loop: USOIL 15min behavioral characterization (2026-05-02), Notice/Identify phase.
+// Plan: ~/.claude/plans/usoil-15min-behavioral-composed-tower.md (Stage D).
+// Phase 1 verdict (OANDA WTICO_USD M15, 101,305 bars 2022-01-04 -> 2026-04-19):
+//   verdict = "vol-gated"
+//   verdict rationale: ACF(1)=-0.003 weak; ACF|r|(1)=0.293>0.10; intraday peak/trough=4.07>1.5
+//   OANDA top-3 ATR bins (NY local 15min indices): [47, 48, 49] = 11:45, 12:00, 12:15 ET
+//
+// Pre-registered Phase 2 pass criterion (set BEFORE this indicator was authored,
+// see plan §Stage D step 13):
+//   Pepperstone vol-gated validation passes if top-3 ATR-percentile bins on
+//   Pepperstone overlap >=2 of 3 with top-3 OANDA bins, evaluated by 15min
+//   bin-of-day index.
+//
+// Operational use (Joshua):
+//   1. Load this indicator on a Pepperstone USOIL 15min chart in TradingView.
+//   2. Let it run across ~12 months of bars (the longer the history, the more
+//      stable the per-bin mean ATR estimates).
+//   3. Read the top-3 bins from the on-chart table (top-right) and the overlap
+//      verdict (PASS / PARTIAL / FAIL).
+//   4. Report the table contents back; I'll write the Phase 2 validation note.
+//
+// Implementation notes:
+//   - Uses MEAN ATR(14) per bin as the percentile proxy (Pine has no array median;
+//     mean is sufficient for top-3 matching since we test rank not magnitude).
+//   - Bin index = hour(t, NY)*4 + minute(t, NY)//15, ranged [0, 95].
+//   - NY chart-TZ via "America/New_York" (DST-aware).
+//   - This is an INDICATOR (study), not a strategy. No trade signals emitted.
+//
+indicator("USOIL Phase 2 — vol-gated validation (top-3 ATR bins)", "USOIL P2 vol-gated", overlay = true)
+
+// -----------------------------------------------------------------------------
+// Inputs
+// -----------------------------------------------------------------------------
+atr_len = input.int(14, "ATR length (bars)", minval = 5, maxval = 50)
+atr_smooth_method = input.string("RMA", "ATR smoothing", options = ["RMA", "SMA", "EMA"])
+oanda_top_str = input.string("47,48,49", "OANDA top-3 bins (reference, comma-separated)",
+     tooltip = "From Phase 1 result brief 2026-05-02. Bin = NY-local hour*4 + minute//15. " +
+               "Default [47,48,49] = 11:45, 12:00, 12:15 ET.")
+
+// -----------------------------------------------------------------------------
+// State: per-bin ATR sum and count (NY 15min bin index 0..95)
+// -----------------------------------------------------------------------------
+var float[] bin_atr_sum = array.new<float>(96, 0.0)
+var int[]   bin_atr_n   = array.new<int>(96, 0)
+
+// -----------------------------------------------------------------------------
+// ATR(atr_len)
+// -----------------------------------------------------------------------------
+tr = math.max(high - low, math.max(math.abs(high - close[1]), math.abs(low - close[1])))
+atr = atr_smooth_method == "RMA" ? ta.rma(tr, atr_len)
+   : atr_smooth_method == "SMA" ? ta.sma(tr, atr_len)
+   : ta.ema(tr, atr_len)
+
+// -----------------------------------------------------------------------------
+// Accumulate per-bin (NY chart-TZ)
+// -----------------------------------------------------------------------------
+ny_hour = hour(time, "America/New_York")
+ny_min  = minute(time, "America/New_York")
+bin_idx = ny_hour * 4 + ny_min / 15
+
+// Skip until ATR has warmed up
+if not na(atr) and bin_idx >= 0 and bin_idx < 96
+    array.set(bin_atr_sum, bin_idx, array.get(bin_atr_sum, bin_idx) + atr)
+    array.set(bin_atr_n,   bin_idx, array.get(bin_atr_n,   bin_idx) + 1)
+
+// -----------------------------------------------------------------------------
+// On the last bar: compute per-bin mean ATR, sort, identify top-3, compare
+// -----------------------------------------------------------------------------
+// Helper: format bin index as HH:MM ET. Pine `/` on ints returns float, and
+// str.format("{0,number,00}", 11.75) rounds to 12, producing "12:45" for bin 47
+// when it should be "11:45". Use math.floor to lock integer division.
+bin_to_clock(int b) =>
+    h = math.floor(b / 4)
+    m = (b % 4) * 15
+    str.format("{0,number,00}:{1,number,00}", h, m)
+
+if barstate.islast
+    // Compute mean ATR per bin
+    var float[] bin_means = array.new<float>(96, na)
+    for b = 0 to 95
+        n = array.get(bin_atr_n, b)
+        s = array.get(bin_atr_sum, b)
+        array.set(bin_means, b, n > 0 ? s / n : na)
+
+    // Find top-3 bins by mean ATR (find max, mask, repeat 3x — robust pattern,
+    // avoids the for-loop-decrement issue Pine v6 doesn't support natively).
+    var int[]   top_bin = array.new<int>(3, -1)
+    var float[] top_val = array.new<float>(3, na)
+    working = array.copy(bin_means)
+    for k = 0 to 2
+        max_v = -1.0
+        max_idx = -1
+        for b = 0 to 95
+            v = array.get(working, b)
+            if not na(v) and v > max_v
+                max_v := v
+                max_idx := b
+        if max_idx >= 0
+            array.set(top_val, k, max_v)
+            array.set(top_bin, k, max_idx)
+            array.set(working, max_idx, na)
+
+    // Parse OANDA reference top-3
+    oanda_strs = str.split(oanda_top_str, ",")
+    var int[] oanda_top = array.new<int>(0)
+    if array.size(oanda_strs) > 0
+        for k = 0 to array.size(oanda_strs) - 1
+            s_clean = str.replace_all(array.get(oanda_strs, k), " ", "")
+            v_int = math.round(str.tonumber(s_clean))
+            array.push(oanda_top, v_int)
+
+    // Compute overlap
+    overlap = 0
+    for k = 0 to 2
+        b = array.get(top_bin, k)
+        if b >= 0
+            for kk = 0 to array.size(oanda_top) - 1
+                if array.get(oanda_top, kk) == b
+                    overlap += 1
+                    break
+
+    verdict = overlap >= 2 ? "PASS" : (overlap == 1 ? "PARTIAL" : "FAIL")
+    verdict_color = verdict == "PASS" ? color.new(color.green, 0)
+                  : verdict == "PARTIAL" ? color.new(color.orange, 0)
+                  : color.new(color.red, 0)
+
+    // Render table
+    var table t = table.new(position.top_right, 4, 7, border_width = 1, frame_color = color.gray, frame_width = 1)
+    table.cell(t, 0, 0, "USOIL P2 vol-gated", text_color = color.white, bgcolor = color.new(color.navy, 0), text_halign = text.align_center)
+    table.cell(t, 1, 0, "", bgcolor = color.new(color.navy, 0))
+    table.cell(t, 2, 0, "", bgcolor = color.new(color.navy, 0))
+    table.cell(t, 3, 0, "Pepperstone", bgcolor = color.new(color.navy, 0), text_color = color.white)
+
+    table.cell(t, 0, 1, "Rank", bgcolor = color.new(color.gray, 50), text_color = color.white)
+    table.cell(t, 1, 1, "Bin", bgcolor = color.new(color.gray, 50), text_color = color.white)
+    table.cell(t, 2, 1, "NY clock", bgcolor = color.new(color.gray, 50), text_color = color.white)
+    table.cell(t, 3, 1, "Mean ATR", bgcolor = color.new(color.gray, 50), text_color = color.white)
+
+    for k = 0 to 2
+        b = array.get(top_bin, k)
+        v = array.get(top_val, k)
+        table.cell(t, 0, 2 + k, str.tostring(k + 1))
+        table.cell(t, 1, 2 + k, b >= 0 ? str.tostring(b) : "—")
+        table.cell(t, 2, 2 + k, b >= 0 ? bin_to_clock(b) : "—")
+        table.cell(t, 3, 2 + k, b >= 0 ? str.tostring(v, "#.0000") : "—")
+
+    table.cell(t, 0, 5, "OANDA ref", bgcolor = color.new(color.silver, 70))
+    table.cell(t, 1, 5, oanda_top_str, bgcolor = color.new(color.silver, 70))
+    table.cell(t, 2, 5, "", bgcolor = color.new(color.silver, 70))
+    table.cell(t, 3, 5, "[47,48,49]=11:45/12:00/12:15 ET", bgcolor = color.new(color.silver, 70))
+
+    table.cell(t, 0, 6, "Overlap " + str.tostring(overlap) + "/3", bgcolor = verdict_color, text_color = color.white)
+    table.cell(t, 1, 6, verdict, bgcolor = verdict_color, text_color = color.white, text_halign = text.align_center)
+    table.cell(t, 2, 6, "", bgcolor = verdict_color)
+    table.cell(t, 3, 6, "criterion: >=2/3", bgcolor = verdict_color, text_color = color.white)
+
+// -----------------------------------------------------------------------------
+// Visual: shade the OANDA reference bins (47,48,49) in light yellow on the chart
+// -----------------------------------------------------------------------------
+oanda_top_str_input = oanda_top_str  // capture for series-context use
+
+is_in_oanda_top = false
+oanda_strs2 = str.split(oanda_top_str_input, ",")
+if array.size(oanda_strs2) > 0
+    for k = 0 to array.size(oanda_strs2) - 1
+        if math.round(str.tonumber(str.replace_all(array.get(oanda_strs2, k), " ", ""))) == bin_idx
+            is_in_oanda_top := true
+            break
+
+bgcolor(is_in_oanda_top ? color.new(color.yellow, 85) : na, title = "OANDA top-3 bin shading")

@@ -1,0 +1,35 @@
+{
+  "sanity": {
+    "rs_random_walk_returns_n2000": 0.6292111492681068,
+    "rs_log_levels_trap_demo": 1.0037113542557796,
+    "rs_ar1_phi05_returns": 0.28751280338199187
+  },
+  "panel": {
+    "n_total_m15_bars": 107058,
+    "n_returns": 107057,
+    "h_full_panel_rs_inline": 0.5460985810017012
+  },
+  "event_conditional": {
+    "broad_n_returns": 2228,
+    "nfp_n_returns": 104,
+    "h_broad_rs_inline": 0.5990937639076871,
+    "h_nfp_rs_inline": 0.6137749947006894,
+    "h_broad_nolds_rs": 0.5216510112061077,
+    "h_nfp_nolds_rs": 0.40623582402793423
+  },
+  "gate": {
+    "threshold": 0.65,
+    "broad_decision_inline": "PASS",
+    "broad_decision_nolds": "PASS",
+    "final_verdict": "PASS"
+  },
+  "method_notes": [
+    "Returns: log(mid_close).diff() \u2014 log-RETURNS, not log-prices.",
+    "Sanity check confirms R/S on log-LEVELS yields spurious high H (memory feedback_hurst_rs_log_prices_trap.md).",
+    "Event-window: M15 bars at 08:30 and 08:45 ET (covering 30-min post-release).",
+    "Broad: any weekday 08:30 ET (superset of true event days; conservative \u2014 biases gate toward more returns).",
+    "NFP: first Friday of month at 08:30 ET (subset).",
+    "Threshold H >= 0.65 fires the structural-abort to G4 per stub \u00a73 component 3."
+  ],
+  "brief_commit_hash": "c3ef0448984f6fe11fba440285b5323b35209ca5"
+}

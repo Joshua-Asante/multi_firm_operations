@@ -1,0 +1,39 @@
+{
+  "sanity": {
+    "rs_random_walk_returns_n2000": 0.6292111492681068,
+    "rs_log_levels_trap_demo": 1.0037113542557796,
+    "rs_ar1_phi05_returns": 0.28751280338199187,
+    "rs_ar1_phineg05_returns": 0.19653822716484254
+  },
+  "panel": {
+    "n_total_m15_bars": 107041,
+    "n_returns": 107040,
+    "h_full_panel_rs_inline": 0.5503685631712496
+  },
+  "post_or_window": {
+    "window_bst": "09:00-11:00 BST (8 M15 bars per weekday)",
+    "n_returns": 8912,
+    "h_rs_inline": 0.5540133137366495,
+    "h_nolds_rs": 0.5010889642307571,
+    "lag1_acf_within_day": -0.020362873993629814,
+    "lag1_acf_within_day_n_pairs": 7798,
+    "lag1_acf_flat_series": -0.00942788317137792
+  },
+  "gate": {
+    "threshold_h": 0.5,
+    "threshold_lag1_acf": 0.0,
+    "inline_decision": "PASS",
+    "nolds_decision": "PASS",
+    "acf_decision": "FAIL_ABORT_G3",
+    "final_verdict": "FAIL_ABORT_G3"
+  },
+  "method_notes": [
+    "Returns: log(mid_close).diff() \u2014 log-RETURNS, not log-prices.",
+    "Sanity: R/S on log-LEVELS yields spurious high H (memory feedback_hurst_rs_log_prices_trap.md).",
+    "Window: M15 bars at 09:00, 09:15, 09:30, 09:45, 10:00, 10:15, 10:30, 10:45 BST.",
+    "lag-1 ACF computed within-day-adjacent (no cross-day boundary pairs).",
+    "Threshold INVERTED from PDSB: H>=0.50 PASS supports breakout prior; H<0.50 falsifies.",
+    "Conjunctive: ANY one of (inline, nolds, ACF) failing -> abort G1 to G3."
+  ],
+  "brief_commit_hash": "158dc61d1aae7ed87717a7291c43df51c526c9b5"
+}

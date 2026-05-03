@@ -233,7 +233,7 @@ Three archetypes pass per-cell uniqueness:
 
 ## 9. Inquire-phase entry checklist (Claude Code)
 
-> Inquire-phase execution is a separate session. Entry into Inquire requires the §0 Rule-0 reads be performed in that session, not inherited from this Notice-authoring session.
+> Inquire-phase execution is a separate session. Entry into Inquire requires the §0 Rule-0 reads be performed in that session, not inherited from this Notice-authoring session. Spawn prompt and stage-gate routing live in the entry stub: [2026-05-02_eurusd_m15_lnyo_inquire_entry.md](2026-05-02_eurusd_m15_lnyo_inquire_entry.md).
 
 - [ ] Rule 0 reads complete (§0)
 - [ ] Pepperstone session-conditional spread model built and validated against 6-month MT5 export sample

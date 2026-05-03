@@ -1,0 +1,177 @@
+{
+  "verdict": "FAIL_G2",
+  "spread_multiplier": 1.0,
+  "n_trades": 224,
+  "regime_stats": {
+    "hike_2022": {
+      "n": 52,
+      "mean_net_pips": -1.6509615384616991,
+      "median_net_pips": -2.4750000000014913,
+      "sum_net_pips": -85.85000000000835
+    },
+    "hold_2023_24": {
+      "n": 78,
+      "mean_net_pips": -3.2391025641025113,
+      "median_net_pips": -2.6500000000004174,
+      "sum_net_pips": -252.64999999999588
+    },
+    "ease_2024_26": {
+      "n": 94,
+      "mean_net_pips": -0.1734042553189314,
+      "median_net_pips": -1.5999999999990897,
+      "sum_net_pips": -16.29999999997955
+    }
+  },
+  "edge_perm": {
+    "observed_mean_pips": -1.5839285714284987,
+    "p_two_sided": 0.006,
+    "n": 224
+  },
+  "rule1_inflated_regimes": [],
+  "correlation_slices": [
+    {
+      "key": "striker_pooled",
+      "label": "Striker pooled (diagnostic)",
+      "n": 224,
+      "pearson_r": -0.08152831726945173
+    },
+    {
+      "key": "striker_active_TueFri",
+      "label": "Striker | Tue+Fri (kill #3)",
+      "n": 103,
+      "pearson_r": -0.11454270729530304
+    },
+    {
+      "key": "striker_friday_only",
+      "label": "Striker | Friday-only sub-test",
+      "n": 103,
+      "pearson_r": -0.11454270729530304
+    },
+    {
+      "key": "guardian_active_MonTueThu",
+      "label": "Guardian | Mon/Tue/Thu",
+      "n": 69,
+      "pearson_r": 0.04119360827502133
+    },
+    {
+      "key": "aegis_active_MonTueWed",
+      "label": "Aegis | Mon/Tue/Wed",
+      "n": 52,
+      "pearson_r": -0.013541432718691697
+    },
+    {
+      "key": "gsa_composite_active",
+      "label": "G/S/A composite | all weekdays (kill #2)",
+      "n": 224,
+      "pearson_r": -0.04591846087937194
+    },
+    {
+      "key": "dxy_guardian_dow",
+      "label": "DXY chg | Guardian-active dow (guardrail #6)",
+      "n": 69,
+      "pearson_r": -0.03995865017697
+    }
+  ],
+  "matrix": [
+    {
+      "name": "kill_1_edge[hike_2022]",
+      "passed": false,
+      "measured": -1.6509615384616991,
+      "threshold": 2.5,
+      "note": "n=52, mean=-1.651 pips"
+    },
+    {
+      "name": "kill_1_edge[hold_2023_24]",
+      "passed": false,
+      "measured": -3.2391025641025113,
+      "threshold": 2.5,
+      "note": "n=78, mean=-3.239 pips"
+    },
+    {
+      "name": "kill_1_edge[ease_2024_26]",
+      "passed": false,
+      "measured": -0.1734042553189314,
+      "threshold": 2.5,
+      "note": "n=94, mean=-0.173 pips"
+    },
+    {
+      "name": "kill_2_single_trade[hike_2022]",
+      "passed": false,
+      "measured": -0.07499999999954142,
+      "threshold": -0.015,
+      "note": "worst single-trade pct = -7.500% (threshold > -1.5%)"
+    },
+    {
+      "name": "kill_3_p99_dd[hike_2022]",
+      "passed": false,
+      "measured": -0.07499999999954142,
+      "threshold": -0.025,
+      "note": "p99 worst-trade DD = -7.500% (threshold > -2.5%)"
+    },
+    {
+      "name": "kill_6_spread_widen[hike_2022]",
+      "passed": true,
+      "measured": 0.23076923076923078,
+      "threshold": 0.25,
+      "note": "23.1% of trades at 5x+ baseline RT cost (threshold 25%)"
+    },
+    {
+      "name": "kill_2_single_trade[hold_2023_24]",
+      "passed": false,
+      "measured": -0.14500000000530008,
+      "threshold": -0.015,
+      "note": "worst single-trade pct = -14.500% (threshold > -1.5%)"
+    },
+    {
+      "name": "kill_3_p99_dd[hold_2023_24]",
+      "passed": false,
+      "measured": -0.14500000000530008,
+      "threshold": -0.025,
+      "note": "p99 worst-trade DD = -14.500% (threshold > -2.5%)"
+    },
+    {
+      "name": "kill_6_spread_widen[hold_2023_24]",
+      "passed": true,
+      "measured": 0.23076923076923078,
+      "threshold": 0.25,
+      "note": "23.1% of trades at 5x+ baseline RT cost (threshold 25%)"
+    },
+    {
+      "name": "kill_2_single_trade[ease_2024_26]",
+      "passed": false,
+      "measured": -0.14499999999908283,
+      "threshold": -0.015,
+      "note": "worst single-trade pct = -14.500% (threshold > -1.5%)"
+    },
+    {
+      "name": "kill_3_p99_dd[ease_2024_26]",
+      "passed": false,
+      "measured": -0.14499999999908283,
+      "threshold": -0.025,
+      "note": "p99 worst-trade DD = -14.500% (threshold > -2.5%)"
+    },
+    {
+      "name": "kill_6_spread_widen[ease_2024_26]",
+      "passed": true,
+      "measured": 0.23404255319148937,
+      "threshold": 0.25,
+      "note": "23.4% of trades at 5x+ baseline RT cost (threshold 25%)"
+    },
+    {
+      "name": "kill_4_striker",
+      "passed": true,
+      "measured": -0.11454270729530304,
+      "threshold": 0.3,
+      "note": "Tue+Fri n=103 |r|=0.115"
+    },
+    {
+      "name": "kill_5_event_n",
+      "passed": true,
+      "measured": 224,
+      "threshold": 60,
+      "note": "event count = 224"
+    }
+  ],
+  "brief_commit_hash": "c3ef0448984f6fe11fba440285b5323b35209ca5",
+  "routing": "FAIL_STRUCTURAL_G4"
+}

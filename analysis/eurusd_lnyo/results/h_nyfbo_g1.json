@@ -1,0 +1,210 @@
+{
+  "verdict": "KILL",
+  "panel": {
+    "n_bars": 107058,
+    "utc_start": "2022-01-04 00:00:00+00:00",
+    "utc_end": "2026-04-21 00:00:00+00:00",
+    "bid_le_ask_invariant": 1.0
+  },
+  "dst_check": [
+    {
+      "et_date": "2022-03-14",
+      "dst_anchor": "2022-03-13",
+      "offset": 1,
+      "utc_hour": 13
+    },
+    {
+      "et_date": "2022-11-07",
+      "dst_anchor": "2022-11-06",
+      "offset": 1,
+      "utc_hour": 14
+    },
+    {
+      "et_date": "2023-03-13",
+      "dst_anchor": "2023-03-12",
+      "offset": 1,
+      "utc_hour": 13
+    },
+    {
+      "et_date": "2023-11-06",
+      "dst_anchor": "2023-11-05",
+      "offset": 1,
+      "utc_hour": 14
+    },
+    {
+      "et_date": "2024-03-11",
+      "dst_anchor": "2024-03-10",
+      "offset": 1,
+      "utc_hour": 13
+    },
+    {
+      "et_date": "2024-11-04",
+      "dst_anchor": "2024-11-03",
+      "offset": 1,
+      "utc_hour": 14
+    },
+    {
+      "et_date": "2025-03-10",
+      "dst_anchor": "2025-03-09",
+      "offset": 1,
+      "utc_hour": 13
+    },
+    {
+      "et_date": "2025-11-03",
+      "dst_anchor": "2025-11-02",
+      "offset": 1,
+      "utc_hour": 14
+    },
+    {
+      "et_date": "2026-03-09",
+      "dst_anchor": "2026-03-08",
+      "offset": 1,
+      "utc_hour": 13
+    }
+  ],
+  "n_trades": 668,
+  "regime_stats": {
+    "hike_2022": {
+      "n": 159,
+      "mean_net_pips": -2.6963836477985192,
+      "median_net_pips": -2.3499999999997074,
+      "sum_net_pips": -428.72499999996455
+    },
+    "hold_2023_24": {
+      "n": 228,
+      "mean_net_pips": -1.7783991228069678,
+      "median_net_pips": -1.6000000000014551,
+      "sum_net_pips": -405.47499999998865
+    },
+    "ease_2024_26": {
+      "n": 281,
+      "mean_net_pips": -1.6450177935943098,
+      "median_net_pips": -1.7500000000002174,
+      "sum_net_pips": -462.250000000001
+    }
+  },
+  "edge_perm": {
+    "observed_mean_pips": -1.9407934131735844,
+    "p_two_sided": 0.0,
+    "n": 668,
+    "n_perm": 1000
+  },
+  "rule1_inflated_regimes": [],
+  "correlation_slices": [
+    {
+      "key": "striker_pooled",
+      "label": "Striker pooled (diagnostic)",
+      "n": 668,
+      "pearson_r": 0.04043222819087014
+    },
+    {
+      "key": "striker_active_TueFri",
+      "label": "Striker | Tue+Fri (kill #3)",
+      "n": 277,
+      "pearson_r": 0.07006093276394965
+    },
+    {
+      "key": "striker_friday_only",
+      "label": "Striker | Friday-only sub-test",
+      "n": 144,
+      "pearson_r": 0.12328051929456885
+    },
+    {
+      "key": "guardian_active_MonTueThu",
+      "label": "Guardian | Mon/Tue/Thu",
+      "n": 403,
+      "pearson_r": 0.04945487662713647
+    },
+    {
+      "key": "aegis_active_MonTueWed",
+      "label": "Aegis | Mon/Tue/Wed",
+      "n": 388,
+      "pearson_r": 0.06631976114315251
+    },
+    {
+      "key": "gsa_composite_active",
+      "label": "G/S/A composite | all weekdays (kill #2)",
+      "n": 668,
+      "pearson_r": 0.06123098101703379
+    },
+    {
+      "key": "dxy_guardian_dow",
+      "label": "DXY chg | Guardian-active dow (guardrail #6)",
+      "n": 387,
+      "pearson_r": -0.032784861635524264
+    }
+  ],
+  "gates": [
+    {
+      "name": "kill_1_edge[hike_2022]",
+      "passed": false,
+      "measured": -2.6963836477985192,
+      "threshold": 1.5,
+      "note": "n=159"
+    },
+    {
+      "name": "kill_1_edge[hold_2023_24]",
+      "passed": false,
+      "measured": -1.7783991228069678,
+      "threshold": 1.5,
+      "note": "n=228"
+    },
+    {
+      "name": "kill_1_edge[ease_2024_26]",
+      "passed": false,
+      "measured": -1.6450177935943098,
+      "threshold": 1.5,
+      "note": "n=281"
+    },
+    {
+      "name": "kill_2_gsa_composite",
+      "passed": true,
+      "measured": 0.06123098101703379,
+      "threshold": 0.3,
+      "note": "n=668 (|r|=0.061)"
+    },
+    {
+      "name": "kill_3_striker_active",
+      "passed": true,
+      "measured": 0.07006093276394965,
+      "threshold": 0.2,
+      "note": "Tue+Fri n=277"
+    },
+    {
+      "name": "kill_3_striker_friday_only",
+      "passed": true,
+      "measured": 0.12328051929456885,
+      "threshold": 0.2,
+      "note": "Friday-only n=144 (sub-test, recorded separately)"
+    },
+    {
+      "name": "kill_4_concentration",
+      "passed": true,
+      "measured": 0.5725190839694656,
+      "threshold": 0.75,
+      "note": "top 42.7% of positive days hold 75% of edge"
+    },
+    {
+      "name": "kill_5_recency",
+      "passed": false,
+      "measured": 0.3565505804311908,
+      "threshold": 0.25,
+      "note": "total edge negative; recency share = 35.66%"
+    },
+    {
+      "name": "kill_6_n_perm",
+      "passed": true,
+      "measured": 0.0,
+      "threshold": 0.05,
+      "note": "N=668 (>=100? True); perm_p=0.0000 (<0.05? True)"
+    },
+    {
+      "name": "guardrail_6_dxy",
+      "passed": true,
+      "measured": -0.032784861635524264,
+      "threshold": 0.3,
+      "note": "n=387; |r|=0.033"
+    }
+  ],
+  "spread_calibration": "PARAMETRIC (Pepperstone Razor literature defaults; no MT5 sample). Survival verdict requires MT5 calibration before Verify. Kill on cost grounds robust only if edge fails by wide margin."
+}

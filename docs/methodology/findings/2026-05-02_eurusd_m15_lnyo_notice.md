@@ -204,7 +204,7 @@ Three archetypes pass per-cell uniqueness:
 | Gate | Trigger | Decision |
 |---|---|---|
 | **G1** | NYFBO Inquire complete | Pass all kill criteria → promote to Verify (paper-trade scoping). Fail → audit which criterion fired; route to PDSB if failure is regime-specific; route to abandon-EURUSD-M15 if failure is structural (e.g., spread > edge in all regimes). |
-| **G2** | PDSB Inquire complete (only if NYFBO failed for non-generalizable reasons OR survived as primary and PDSB enters as decorrelated complement) | Same gate logic. PDSB additional kill: tail-event single-trade > 1.5% account. |
+| **G2** | PDSB Inquire complete (only if NYFBO failed for non-generalizable reasons OR survived as primary and PDSB enters as decorrelated complement). G2 entry handoff: [2026-05-02_eurusd_m15_lnyo_g2_inquire_entry.md](2026-05-02_eurusd_m15_lnyo_g2_inquire_entry.md) — adds §0a entry re-justification gate, brief-pinning protocol, per-regime decision matrix, 1.25× spread sensitivity, M15-FX stop-rule. | Same gate logic. PDSB additional kill: tail-event single-trade > 1.5% account. |
 | **G3** | PDDB Inquire complete (only if both NYFBO and PDSB are unviable) | Same. PDDB additional kill: drift effect not replicating on FX. |
 | **G4** | All three Inquire-failed | **Abandon EURUSD M15 in this slot.** Do not weaken kill criteria to keep candidates alive. Routing options: (a) GBPUSD M15 same archetype set (wider edge-budget, ~0.4 pip higher all-in cost), (b) EURUSD M30/H1 (different timeframe family — separate Notice phase required), (c) hold the slot empty until a new Notice phase is launched on a different candidate. |
 

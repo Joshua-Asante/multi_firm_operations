@@ -1,0 +1,123 @@
+{
+  "n_trades": 84,
+  "decomposition": {
+    "pf": 1.026388896691429,
+    "gross_profit_R": 48.88383565156052,
+    "gross_loss_R": 47.62701136882703,
+    "n_wins": 37,
+    "n_losses": 47,
+    "win_rate": 0.44047619047619047
+  },
+  "max_dd": {
+    "max_dd_pct": 0.04252045027719428,
+    "max_dd_at": "2026-04-02 05:00:00+00:00",
+    "final_equity_pct": 0.0062841214136674746
+  },
+  "atr_quartiles": {
+    "q1": {
+      "pf": 0.7545256803885806,
+      "gross_profit_R": 9.206170723802686,
+      "gross_loss_R": 12.201268907191482,
+      "n_wins": 7,
+      "n_losses": 12,
+      "win_rate": 0.3684210526315789,
+      "n": 19
+    },
+    "q2": {
+      "pf": 0.975710698371906,
+      "gross_profit_R": 11.873989468133997,
+      "gross_loss_R": 12.169580069120096,
+      "n_wins": 9,
+      "n_losses": 12,
+      "win_rate": 0.42857142857142855,
+      "n": 21
+    },
+    "q3": {
+      "pf": 0.4014343344407358,
+      "gross_profit_R": 5.283320218834071,
+      "gross_loss_R": 13.161106974555643,
+      "n_wins": 4,
+      "n_losses": 13,
+      "win_rate": 0.23529411764705882,
+      "n": 17
+    },
+    "q4": {
+      "pf": 2.230830273672841,
+      "gross_profit_R": 22.520355240789762,
+      "gross_loss_R": 10.095055417959802,
+      "n_wins": 17,
+      "n_losses": 10,
+      "win_rate": 0.6296296296296297,
+      "n": 27
+    }
+  },
+  "permutation": {
+    "observed_pf": 1.026388896691429,
+    "n_real": 84,
+    "n_perm": 1000,
+    "p_two_sided_pf": 0.944,
+    "null_pf_mean": 1.072422276172938,
+    "null_pf_p05": 0.7237586135590487,
+    "null_pf_p50": 1.0755748067684654,
+    "null_pf_p95": 1.5043160289425577,
+    "pool_size": 2913,
+    "censored_excluded": 0
+  },
+  "corr_gsa": {
+    "guardian": 0.06232502176438067,
+    "striker": 0.0006807006003874064,
+    "aegis": -0.019747048718315355,
+    "n_days": 1120
+  },
+  "verdict": {
+    "verdict": "H2_KILL",
+    "reason": "entries indistinguishable from random within mask",
+    "criteria": {
+      "a_n_floor": {
+        "passed": true,
+        "measured": 84,
+        "threshold": 80
+      },
+      "b_pf_floor": {
+        "passed": false,
+        "measured": 1.026388896691429,
+        "threshold": 2.0
+      },
+      "c_max_dd": {
+        "passed": false,
+        "measured": 0.04252045027719428,
+        "threshold": 0.03
+      },
+      "d_perm_p": {
+        "passed": false,
+        "measured": 0.944,
+        "threshold": 0.05
+      }
+    },
+    "fails": [
+      "b_pf_floor",
+      "c_max_dd",
+      "d_perm_p"
+    ]
+  },
+  "config": {
+    "risk_pct": 0.005,
+    "sl_atr_mult": 3.0,
+    "tp_atr_mult": 4.0,
+    "atr_len": 14,
+    "ema_len": 50,
+    "donchian_len": 20,
+    "session_hours_utc": [
+      8,
+      17
+    ],
+    "cost_rt_pips": 1.0,
+    "gate_thresholds": {
+      "n_floor": 80,
+      "pf_floor": 2.0,
+      "max_dd_pct": 0.03,
+      "perm_p": 0.05,
+      "park_corr": 0.3
+    }
+  }
+}

@@ -3,15 +3,18 @@
 The TV export emits two rows per trade (one Entry long, one Exit long, paired
 by Trade #). This module pairs them and returns a per-trade DataFrame.
 
+Pyramid-aware (Striker NAS100 v1+): pyramid add legs receive their own Trade #
+in the TV export. They pair the same way as base trades; the `leg_type` column
+distinguishes `base` from `pyramid_add` via the Signal text ("Long" vs "Long Add").
+
 Columns returned:
-    trade_num, signal_entry, signal_exit, side,
+    trade_num, signal_entry, signal_exit, side, leg_type,
     entry_ts, entry_px, exit_ts, exit_px, qty,
     net_pnl_usd, net_pnl_pct, mfe_usd, mfe_pct, mae_usd, mae_pct,
     cum_pnl_usd, cum_pnl_pct
 
-`side` is +1 for long, -1 for short. All three strategies are long-only at
-v5.5 / v4.4 / v4.3 — short rows would be a load-bearing surprise and should
-fail the assertion in `assert_long_only`.
+`side` is +1 for long, -1 for short. All four locked strategies are long-only
+at v5.5 / v4.5 / v4.3 / v1 — short rows would be a load-bearing surprise.
 
 Identity gates via `lib.mvd.assert_tv_export` are applied at the public
 loader entry point.
@@ -26,9 +29,11 @@ from lib.mvd import assert_min_rows, assert_tv_export
 
 
 PRICE_COL_BY_INSTRUMENT = {
-    "USDJPY": "Price JPY",
-    "XAUUSD": "Price USD",
+    "USDJPY":  "Price JPY",
+    "XAUUSD":  "Price USD",
     "US30USD": "Price USD",
+    "US30":    "Price USD",
+    "NAS100":  "Price USD",
 }
 
 
@@ -89,11 +94,16 @@ def load_tv_export(
             f"non-long entries present (all three strategies are long-only at locked versions)"
         )
 
+    leg_type = entries["Signal"].map(
+        lambda s: "pyramid_add" if "add" in str(s).lower() else "base"
+    )
+
     out = pd.DataFrame({
         "trade_num":     entries.index,
         "signal_entry":  entries["Signal"].values,
         "signal_exit":   exits["Signal"].values,
         "side":          side.values,
+        "leg_type":      leg_type.values,
         "entry_ts":      entries["Date and time"].values,
         "entry_px":      entries[price_col].values,
         "exit_ts":       exits["Date and time"].values,

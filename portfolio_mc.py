@@ -42,24 +42,36 @@ SIMS_PER_SEED = 10_000
 SEEDS = (42, 123, 2026)
 
 ALLOCATIONS: Dict[str, float] = {
-    "guardian": 0.0034,
-    "striker":  0.0100,
-    "aegis":    0.0150,
+    "guardian":       0.0034,
+    "striker":        0.0100,
+    "aegis":          0.0150,
+    "striker_nas100": 0.0040,
 }
 STRATS = tuple(ALLOCATIONS.keys())
+
+# Filename token used by the MVD identity gate. Both Striker variants (DJ30 + NAS100)
+# share the "Striker" strategy token; differentiation is via symbol (US30 vs NAS100).
+STRATEGY_FILENAME_TOKEN: Dict[str, str] = {
+    "guardian":       "Guardian",
+    "striker":        "Striker",
+    "aegis":          "Aegis",
+    "striker_nas100": "Striker",
+}
 
 OANDA_DIR = Path(__file__).parent / "data" / "tv_exports" / "oanda"
 OANDA_PANELS: Dict[str, Path] = {
     "guardian": OANDA_DIR / "Guardian_Gold_v5.5_OANDA_XAUUSD_2026-04-25_9ae1f.csv",
     "striker":  OANDA_DIR / "Striker_DJ30_v4.4_OANDA_US30USD_2026-04-25_86e9d.csv",
     "aegis":    OANDA_DIR / "Aegis_USDJPY_v4.3_OANDA_USDJPY_2026-04-25_7ee6b.csv",
+    # No OANDA NAS100 panel — striker_nas100 is Pepperstone-only at the v1 add.
 }
 
 PEPPERSTONE_DIR = Path(__file__).parent / "data" / "tv_exports" / "pepperstone"
 PEPPERSTONE_PANELS: Dict[str, Path] = {
-    "guardian": PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-04-26_87e73.csv",
-    "striker":  PEPPERSTONE_DIR / "Striker_DJ30_v4.4_PEPPERSTONE_US30_2026-04-26_3eea0.csv",
-    "aegis":    PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv",
+    "guardian":       PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-04-26_87e73.csv",
+    "striker":        PEPPERSTONE_DIR / "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv",
+    "aegis":          PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv",
+    "striker_nas100": PEPPERSTONE_DIR / "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-05_7ca6f.csv",
 }
 
 # Pepperstone is the CLAUDE.md canonical lock anchor; OANDA is the pattern-spotting proxy
@@ -71,8 +83,15 @@ PANELS_BY_BROKER: Dict[str, Dict[str, Path]] = {
 
 # Symbol field varies per broker (Pepperstone uses US30, OANDA uses US30USD for DJ30).
 EXPECTED_SYMBOLS_BY_BROKER: Dict[str, Dict[str, str]] = {
-    "pepperstone": {"guardian": "XAUUSD", "striker": "US30",    "aegis": "USDJPY"},
+    "pepperstone": {"guardian": "XAUUSD", "striker": "US30",    "aegis": "USDJPY", "striker_nas100": "NAS100"},
     "oanda":       {"guardian": "XAUUSD", "striker": "US30USD", "aegis": "USDJPY"},
+}
+
+# Version expectations vary per broker (Pepperstone migrated to DJ30 v4.5 on 2026-05-05;
+# OANDA still on v4.4 until a fresh OANDA v4.5 fetch lands).
+EXPECTED_VERSIONS_BY_BROKER: Dict[str, Dict[str, str]] = {
+    "pepperstone": {"guardian": "v5.5", "striker": "v4.5", "aegis": "v4.3", "striker_nas100": "v1"},
+    "oanda":       {"guardian": "v5.5", "striker": "v4.4", "aegis": "v4.3"},
 }
 
 DEFAULT_PANEL = "pepperstone"
@@ -199,8 +218,14 @@ def _simulate_path(path: np.ndarray, dd_trigger: float, dd_scale: float,
 
 
 def run_seed(seed: int, n_sims: int, blocks: np.ndarray,
-             dd_trigger: float, dd_scale: float, horizon: int = HORIZON_DAYS) -> dict:
-    """Run n_sims bootstrap simulations for one seed."""
+             dd_trigger: float, dd_scale: float, horizon: int = HORIZON_DAYS,
+             strats: Tuple[str, ...] = STRATS) -> dict:
+    """Run n_sims bootstrap simulations for one seed.
+
+    `strats` labels the path's column axis for bust attribution. Defaults to
+    the global 4-tuple but callers (via `_load_all`) pass the panel-specific
+    tuple — Pepperstone gets all 4, OANDA gets 3.
+    """
     rng = np.random.default_rng(seed)
     n_blocks = len(blocks)
     blocks_per_sim = (horizon + 4) // 5
@@ -208,7 +233,7 @@ def run_seed(seed: int, n_sims: int, blocks: np.ndarray,
     outcomes = {"pass": 0, "bust_daily": 0, "bust_static": 0, "timeout": 0}
     days_to_pass: list[int] = []
     max_dds: list[float] = []
-    bust_attrib = {s: 0 for s in STRATS}
+    bust_attrib = {s: 0 for s in strats}
 
     for _ in range(n_sims):
         idx = rng.integers(0, n_blocks, blocks_per_sim)
@@ -220,7 +245,7 @@ def run_seed(seed: int, n_sims: int, blocks: np.ndarray,
         if outcome == "pass":
             days_to_pass.append(day)
         elif outcome in ("bust_daily", "bust_static") and culprit is not None:
-            bust_attrib[STRATS[culprit]] += 1
+            bust_attrib[strats[culprit]] += 1
 
     return {
         "outcomes": outcomes,
@@ -238,14 +263,22 @@ def _fmt_config(dd_trigger: float, dd_scale: float, no_protection: bool) -> str:
     return f"DD {dd_trigger:.1%} / {dd_scale}× (single-tier)"
 
 
+_ALLOC_LABEL = {
+    "guardian":       "G",
+    "striker":        "S",
+    "aegis":          "A",
+    "striker_nas100": "N",
+}
+
+
 def _fmt_alloc(allocs: Dict[str, float]) -> str:
-    return (f"G {allocs['guardian']:.2%} / "
-            f"S {allocs['striker']:.2%} / "
-            f"A {allocs['aegis']:.2%}")
+    parts = [f"{_ALLOC_LABEL.get(s, s)} {v:.2%}" for s, v in allocs.items()]
+    return " / ".join(parts)
 
 
 def _serial_grid_with_progress(blocks: np.ndarray, all_trigs: list,
-                                dd_scale: float) -> dict:
+                                dd_scale: float,
+                                strats: Tuple[str, ...] = STRATS) -> dict:
     """Run the sensitivity-grid serial path with a Rich progress bar when
     Rich is installed; fall back to plain iteration otherwise.
 
@@ -262,7 +295,7 @@ def _serial_grid_with_progress(blocks: np.ndarray, all_trigs: list,
         )
     except ImportError:
         return {
-            trig: [run_seed(seed, SIMS_PER_SEED, blocks, trig, dd_scale) for seed in SEEDS]
+            trig: [run_seed(seed, SIMS_PER_SEED, blocks, trig, dd_scale, strats=strats) for seed in SEEDS]
             for trig in all_trigs
         }
 
@@ -279,13 +312,14 @@ def _serial_grid_with_progress(blocks: np.ndarray, all_trigs: list,
         task = progress.add_task("Sensitivity grid", total=total_cells)
         for trig in all_trigs:
             for seed in SEEDS:
-                out[trig].append(run_seed(seed, SIMS_PER_SEED, blocks, trig, dd_scale))
+                out[trig].append(run_seed(seed, SIMS_PER_SEED, blocks, trig, dd_scale, strats=strats))
                 progress.update(task, advance=1)
     return out
 
 
 def _run_seeds(blocks: np.ndarray, effective_trigger: float, dd_scale: float,
-               seeds=SEEDS, parallel: bool = False) -> list:
+               seeds=SEEDS, parallel: bool = False,
+               strats: Tuple[str, ...] = STRATS) -> list:
     """Run all seeds. Sequential by default; joblib-parallel when requested.
 
     Each seed is independent (RNG seeded inside run_seed) so the parallel
@@ -293,7 +327,7 @@ def _run_seeds(blocks: np.ndarray, effective_trigger: float, dd_scale: float,
     in order so downstream aggregation is deterministic regardless of mode.
     """
     if not parallel:
-        return [run_seed(seed, SIMS_PER_SEED, blocks, effective_trigger, dd_scale)
+        return [run_seed(seed, SIMS_PER_SEED, blocks, effective_trigger, dd_scale, strats=strats)
                 for seed in seeds]
     try:
         from joblib import Parallel, delayed
@@ -302,7 +336,7 @@ def _run_seeds(blocks: np.ndarray, effective_trigger: float, dd_scale: float,
             "--parallel requires joblib. Install with: pip install -e .[mc]"
         ) from e
     return list(Parallel(n_jobs=len(seeds), backend="loky")(
-        delayed(run_seed)(seed, SIMS_PER_SEED, blocks, effective_trigger, dd_scale)
+        delayed(run_seed)(seed, SIMS_PER_SEED, blocks, effective_trigger, dd_scale, strats=strats)
         for seed in seeds
     ))
 
@@ -317,7 +351,7 @@ def compute_default_config(dd_trigger: float, dd_scale: float, no_protection: bo
     (anchor pinning). Numerically deterministic given fixed SEEDS = (42, 123, 2026)
     regardless of `parallel` mode.
     """
-    trades_by_strat, panel, blocks, scale_info = _load_all(allocs, panel_name=panel_name)
+    trades_by_strat, panel, blocks, scale_info, panel_strats = _load_all(allocs, panel_name=panel_name)
 
     fallback_count = sum(1 for info in scale_info.values() if info["fell_back"])
     assert_no_fallback(
@@ -326,7 +360,8 @@ def compute_default_config(dd_trigger: float, dd_scale: float, no_protection: bo
     )
 
     effective_trigger = 10.0 if no_protection else dd_trigger
-    seeds_results = _run_seeds(blocks, effective_trigger, dd_scale, parallel=parallel)
+    seeds_results = _run_seeds(blocks, effective_trigger, dd_scale, parallel=parallel,
+                               strats=panel_strats)
 
     per_seed = SIMS_PER_SEED
     pass_r = [r["outcomes"]["pass"] / per_seed for r in seeds_results]
@@ -338,7 +373,7 @@ def compute_default_config(dd_trigger: float, dd_scale: float, no_protection: bo
     all_days = [d for r in seeds_results for d in r["days_to_pass"]]
     all_dds  = [d for r in seeds_results for d in r["max_dds"]]
 
-    attrib = {s: sum(r["bust_attribution"][s] for r in seeds_results) for s in STRATS}
+    attrib = {s: sum(r["bust_attribution"][s] for r in seeds_results) for s in panel_strats}
 
     return {
         "panel_name": panel_name,
@@ -346,6 +381,7 @@ def compute_default_config(dd_trigger: float, dd_scale: float, no_protection: bo
         "panel_end": panel.index.max(),
         "n_bdays": len(panel),
         "n_blocks": len(blocks),
+        "panel_strats": panel_strats,
         "scale_info": scale_info,
         "seeds_results": seeds_results,
         "pass_rate": float(np.mean(pass_r)),
@@ -369,9 +405,12 @@ def report_default(result: dict, dd_trigger: float, dd_scale: float,
     n_seeds = len(result["seeds_results"])
     per_seed = SIMS_PER_SEED
 
+    panel_strats = result.get("panel_strats", tuple(allocs.keys()))
+    panel_allocs = {s: allocs[s] for s in panel_strats}
+
     print("=== Portfolio MC ===")
     print(f"Config: {_fmt_config(dd_trigger, dd_scale, no_protection)}")
-    print(f"Allocations: {_fmt_alloc(allocs)}")
+    print(f"Allocations: {_fmt_alloc(panel_allocs)}")
     print(f"Sims: {per_seed:,} × {n_seeds} seeds, horizon {HORIZON_DAYS} days")
     print()
     print(f"Pass:         {result['pass_rate']:>6.2%} (sigma {result['pass_sigma']:.2%})")
@@ -388,9 +427,11 @@ def report_default(result: dict, dd_trigger: float, dd_scale: float,
     print("Bust attribution:")
     total_busts = sum(result["bust_attribution"].values())
     if total_busts > 0:
-        for s in ("aegis", "striker", "guardian"):
-            pct = result["bust_attribution"][s] / total_busts
-            print(f"  {s.capitalize():<10} {pct:>5.1%}")
+        # Print in descending share order so the marginal contributor reads first.
+        ranked = sorted(result["bust_attribution"].items(), key=lambda kv: kv[1], reverse=True)
+        for s, n in ranked:
+            pct = n / total_busts
+            print(f"  {s:<14} {pct:>5.1%}")
     else:
         print("  (no busts)")
 
@@ -404,13 +445,22 @@ def _load_all(allocs: Dict[str, float], panel_name: str = DEFAULT_PANEL):
     panels = PANELS_BY_BROKER[panel_name]
     expected_broker = panel_name.upper()
     expected_symbols = EXPECTED_SYMBOLS_BY_BROKER[panel_name]
-    assert_tv_export(panels["guardian"], expected_strategy="Guardian", expected_version="v5.5", expected_broker=expected_broker, expected_symbol=expected_symbols["guardian"])
-    assert_tv_export(panels["striker"],  expected_strategy="Striker",  expected_version="v4.4", expected_broker=expected_broker, expected_symbol=expected_symbols["striker"])
-    assert_tv_export(panels["aegis"],    expected_strategy="Aegis",    expected_version="v4.3", expected_broker=expected_broker, expected_symbol=expected_symbols["aegis"])
-    trades_by_strat = {s: load_trades(panels[s]) for s in STRATS}
-    panel, scale_info = build_daily_panel(trades_by_strat, allocs)
+    expected_versions = EXPECTED_VERSIONS_BY_BROKER[panel_name]
+    # Panel-specific strategy set: Pepperstone has all 4; OANDA has 3 (no NAS panel).
+    panel_strats = tuple(panels.keys())
+    for s in panel_strats:
+        assert_tv_export(
+            panels[s],
+            expected_strategy=STRATEGY_FILENAME_TOKEN[s],
+            expected_version=expected_versions[s],
+            expected_broker=expected_broker,
+            expected_symbol=expected_symbols[s],
+        )
+    trades_by_strat = {s: load_trades(panels[s]) for s in panel_strats}
+    panel_allocs = {s: allocs[s] for s in panel_strats}
+    panel, scale_info = build_daily_panel(trades_by_strat, panel_allocs)
     blocks = build_week_blocks(panel)
-    return trades_by_strat, panel, blocks, scale_info
+    return trades_by_strat, panel, blocks, scale_info, panel_strats
 
 
 def mode_default(dd_trigger: float, dd_scale: float, no_protection: bool,
@@ -433,7 +483,7 @@ def mode_default(dd_trigger: float, dd_scale: float, no_protection: bool,
 
 def mode_historical(dd_trigger: float, dd_scale: float, no_protection: bool,
                     allocs: Dict[str, float], panel_name: str = DEFAULT_PANEL):
-    _, panel, _, scale_info = _load_all(allocs, panel_name=panel_name)
+    _, panel, _, scale_info, panel_strats = _load_all(allocs, panel_name=panel_name)
     path = panel.values
 
     effective_trigger = 10.0 if no_protection else dd_trigger
@@ -458,7 +508,7 @@ def mode_historical(dd_trigger: float, dd_scale: float, no_protection: bool,
 
     print("=== Portfolio MC — Historical (deterministic) ===")
     print(f"Config: {_fmt_config(dd_trigger, dd_scale, no_protection)}")
-    print(f"Allocations: {_fmt_alloc(allocs)}")
+    print(f"Allocations: {_fmt_alloc({s: allocs[s] for s in panel_strats})}")
     print(f"Panel ({panel_name}): {panel.index.min().date()} -> {panel.index.max().date()}  ({len(panel)} bdays)")
     print()
     print(f"Outcome:         {outcome.upper()}")
@@ -466,20 +516,20 @@ def mode_historical(dd_trigger: float, dd_scale: float, no_protection: bool,
     print(f"Max DD:          {max_dd:.2%}")
     print(f"DD tier trigger days (through terminating day): {trigger_days}")
     if culprit is not None:
-        print(f"Bust culprit:    {STRATS[culprit]}")
+        print(f"Bust culprit:    {panel_strats[culprit]}")
 
 
 def mode_sensitivity(dd_scale: float, allocs: Dict[str, float],
                      panel_name: str = DEFAULT_PANEL,
                      parallel: bool = False):
-    _, _, blocks, _ = _load_all(allocs, panel_name=panel_name)
+    _, _, blocks, _, panel_strats = _load_all(allocs, panel_name=panel_name)
     grid = [0.005, 0.010, 0.015, 0.020, 0.025]
     NO_PROTECT_TRIG = 10.0
     all_trigs = grid + [NO_PROTECT_TRIG]
 
     print("=== Portfolio MC — Sensitivity grid ===")
     print(f"Panel: {panel_name}")
-    print(f"Allocations: {_fmt_alloc(allocs)}")
+    print(f"Allocations: {_fmt_alloc({s: allocs[s] for s in panel_strats})}")
     print(f"Sims: {SIMS_PER_SEED:,} × {len(SEEDS)} seeds (DD_SCALE fixed at {dd_scale}×)")
     print()
     print(f"{'DD_TRIGGER':<12} {'Pass':>8} {'Bust':>8} {'Timeout':>9} {'p99 DD':>8}")
@@ -496,14 +546,14 @@ def mode_sensitivity(dd_scale: float, allocs: Dict[str, float],
             ) from e
         pairs = [(trig, seed) for trig in all_trigs for seed in SEEDS]
         flat = list(Parallel(n_jobs=-1, backend="loky")(
-            delayed(run_seed)(seed, SIMS_PER_SEED, blocks, trig, dd_scale)
+            delayed(run_seed)(seed, SIMS_PER_SEED, blocks, trig, dd_scale, strats=panel_strats)
             for trig, seed in pairs
         ))
         by_trig: Dict[float, list] = {trig: [] for trig in all_trigs}
         for (trig, _seed), result in zip(pairs, flat):
             by_trig[trig].append(result)
     else:
-        by_trig = _serial_grid_with_progress(blocks, all_trigs, dd_scale)
+        by_trig = _serial_grid_with_progress(blocks, all_trigs, dd_scale, strats=panel_strats)
 
     def _row(label: str, results: list) -> str:
         pass_r = np.mean([r["outcomes"]["pass"] / SIMS_PER_SEED for r in results])

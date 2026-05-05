@@ -1,14 +1,16 @@
 """Locked MC anchor pins.
 
-Pepperstone is the CLAUDE.md canonical lock-anchor source. The 04-23 lock
-decision used 92.73 / 0.65 / 4.94 against an in-flight panel that was not
-committed; the committed 04-26 Pepperstone panel (the one in this repo)
-reproduces 93.78 / 0.58 / 4.92 deterministically. Drift is within lock
-criteria (bust <1%, p99 DD <5%); see CLAUDE.md "2026-04-23 lock MC anchors"
-for the decision audit trail.
+Pepperstone is the CLAUDE.md canonical lock-anchor source. The 2026-05-05
+4-strategy lock (after Striker DJ30 v4.4 → v4.5 migration + Striker NAS100 v1
+add at 0.40%) reproduces 98.13 / 0.22 / 4.49 deterministically — improvement
+over the 3-strategy 04-26 anchor (93.78 / 0.58 / 4.92) on every gate. See
+docs/briefs/striker_nas100_q_nas_3_mc_addition.md for the addition decision
+audit trail and CLAUDE.md "2026-04-23 lock MC anchors" for prior history.
 
-OANDA is the pattern-spotting proxy per the two-tier canonical rule. Its
-anchor is pinned independently so a drift on either side surfaces.
+OANDA is the pattern-spotting proxy per the two-tier canonical rule. OANDA
+NAS100 panel does not exist; OANDA still on DJ30 v4.4 (no v4.5 OANDA fetch
+yet). OANDA anchor stays at the 04-25 3-strategy values until the next OANDA
+fetch lands.
 
 Both anchors are deterministic given fixed SEEDS = (42, 123, 2026) in
 portfolio_mc.py. Tolerance abs=1e-4 is comfortably tighter than any
@@ -39,10 +41,13 @@ def oanda_result():
 
 
 def test_pepperstone_anchor(pepperstone_result):
-    """04-26 Pepperstone canonical anchor (code-reproducible)."""
-    assert pepperstone_result["pass_rate"] == pytest.approx(0.9378, abs=1e-4)
-    assert pepperstone_result["bust_rate"] == pytest.approx(0.0058, abs=1e-4)
-    assert pepperstone_result["p99_dd"]    == pytest.approx(0.0492, abs=1e-4)
+    """2026-05-05 Pepperstone 4-strategy canonical anchor (code-reproducible).
+
+    DJ30 v4.5 + NAS100 v1 (0.40% allocation) added 2026-05-05.
+    """
+    assert pepperstone_result["pass_rate"] == pytest.approx(0.9813, abs=1e-4)
+    assert pepperstone_result["bust_rate"] == pytest.approx(0.0022, abs=1e-4)
+    assert pepperstone_result["p99_dd"]    == pytest.approx(0.0449, abs=1e-4)
 
 
 def test_oanda_anchor(oanda_result):

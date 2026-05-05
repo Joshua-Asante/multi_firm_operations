@@ -2,7 +2,7 @@
 
 Long breakout strategy on DJ30 (US30) 15min. Pine Script v6.
 
-**Source of truth:** `striker_dj30_v4.4.pine` holds the authoritative parameter values. This CHANGELOG records decisions, rationale, and known concerns. If the two ever disagree, the Pine file wins — fix the CHANGELOG.
+**Source of truth:** `striker_dj30_v4.5.pine` holds the authoritative parameter values. This CHANGELOG records decisions, rationale, and known concerns. If the two ever disagree, the Pine file wins — fix the CHANGELOG. Prior locked versions are in `archive/`.
 
 Versioning begins at v4.3 (2026-04-17). Prior development history (v3.1 → v4.1 → v4.2 rejected → v4.3) is archived in Notion.
 
@@ -16,9 +16,39 @@ _Queued changes. Move to a dated entry on commit._
 
 ---
 
-## [v4.4] — 2026-04-23 🔒 LOCKED
+## [v4.5] — 2026-05-05 🔒 LOCKED
 
-**Status:** Active on FXIFY $200K challenge. Risk 1.00% (unchanged). Supersedes v4.3.
+**Status:** Active on FXIFY $200K challenge. Risk 1.00% (unchanged). Supersedes v4.4. v4.4 moved to `archive/`.
+
+### Delta from v4.4
+Multi-parameter tuning — five inputs adjusted:
+
+| Param | v4.4 | v4.5 | Direction |
+|---|---|---|---|
+| `minBodyRatio` | 0.25 | 0.38 | tighter (filters more weak bars) |
+| `stopAtr` | 1.25 | 1.20 | tighter SL |
+| `tpAtr` | 8.0 | 8.5 | wider TP |
+| `trailDistTight` | 0.85 | 0.80 | tighter trail in tight phase |
+| `trailTightenAt` | 1.5 | 1.0 | trail tightens earlier |
+| `pyramidSize` maxval | 500 | 1000 | input-range expansion only; default still 350 |
+
+Risk per trade, daily DD cap, max trades/day, lookback, ATR length, BE trigger, pyramid default size and trigger, maxHold, minBars all preserved from v4.4.
+
+### Rationale
+[TODO Joshua: confirm/edit lock-decision rationale.] Inferred from file-level diff: tighter entry filter (body ratio) + slightly tighter stop + slightly wider TP shifts the per-trade R-multiple distribution. Trail tightens earlier and at a shorter distance, locking gains sooner. Net intent appears to be reducing per-trade adverse-excursion exposure while preserving the pyramid-cohort upside.
+
+### Portfolio MC anchors (2026-05-05)
+- TBD — re-MC required as part of NAS100 v1 portfolio-add (this CHANGELOG entry lands ahead of the MC run; MC numbers will be filled by `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` and `tests/test_mc_anchors.py` re-pin).
+
+### Cross-reference
+- `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` (forthcoming) — joint v4.5 + NAS100 add MC results.
+- `archive/striker_dj30_v4.4.pine` — preserved for reproducibility.
+
+---
+
+## [v4.4] — 2026-04-23 🔒 LOCKED (superseded by v4.5 on 2026-05-05; archived)
+
+**Status:** Historical. Was active on FXIFY $200K challenge 2026-04-23 → 2026-05-05. Risk 1.00%. Pine file moved to `archive/striker_dj30_v4.4.pine`.
 
 ### Delta from v4.3
 - **Stop loss tightened: 1.35 × ATR → 1.25 × ATR.** Sole parameter change. All other v4.3 parameters (pyramid 350%, BE trigger 0.15, trail 0.15/0.90, maxHold 55, minBars 6, lookback 15, ATR length 11, TP 8×ATR, max 3/day) preserved.

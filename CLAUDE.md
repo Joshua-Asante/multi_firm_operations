@@ -38,18 +38,21 @@ Multipliers update weekly when balances update (via `python cli.py update`), not
 ## Strategy Reference (LOCKED — do not modify)
 
 Unified allocations (locked 2026-04-17): challenge phase = funded phase. No re-sizing at pass.
-Strategy versions most recently re-locked 2026-04-23 (Guardian v5.4 → v5.5, Striker v4.3 → v4.4, Aegis v4.1 → v4.3). Guardian risk re-locked 0.30% → 0.34% same day. See lock MC notes below the table.
+Most recent version locks: Guardian v5.5 (2026-04-23), Aegis v4.3 (2026-04-23), Striker DJ30 **v4.4 → v4.5** (2026-05-05), Striker NAS100 **v1 added** (2026-05-05, candidate-not-deployed). v4.4 archived to `strategies/striker/archive/`. See lock MC notes below the table.
 
-| Strategy      | Instrument / TF | Risk/trade              | Version       | DXTrade contractValue                             |
-|---------------|-----------------|-------------------------|---------------|---------------------------------------------------|
-| Guardian Gold | XAUUSD 15m      | 0.34% (cold-start base) | v5.5 LOCKED   | 100                                               |
-| Striker DJ30  | DJ30 15m        | 1.00%                   | v4.4 LOCKED   | **10** (critical — default of 1 gives ~7% risk)   |
-| Aegis USDJPY  | USDJPY 15m      | 1.50%                   | v4.3 LOCKED   | default (1)                                       |
+| Strategy        | Instrument / TF | Risk/trade              | Version       | DXTrade contractValue                             |
+|-----------------|-----------------|-------------------------|---------------|---------------------------------------------------|
+| Guardian Gold   | XAUUSD 15m      | 0.34% (cold-start base) | v5.5 LOCKED   | 100                                               |
+| Striker DJ30    | DJ30 15m        | 1.00%                   | v4.5 LOCKED   | **10** (critical — default of 1 gives ~7% risk)   |
+| Aegis USDJPY    | USDJPY 15m      | 1.50%                   | v4.3 LOCKED   | default (1)                                       |
+| Striker NAS100  | NAS100 15m      | 0.40%                   | v1 CANDIDATE  | TBD (verify before deployment — NOT deployed)     |
 
-2026-04-23 lock MC anchors:
+2026-05-05 lock MC anchor (4-strategy, current canonical):
+* Pepperstone 4-strategy (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, 10K × 3 seeds): **98.13% pass / 0.22% bust (0.00% daily + 0.22% static) / 1.65% timeout**, p99 DD 4.49%, median days-to-pass 23. **Bust attribution**: DJ30 49.2% / G 20.0% / A 20.0% / NAS 10.8%. NAS comes in as the lowest contributor (10.8%) consistent with the diversification thesis. Reproducible under `python portfolio_mc.py --panel pepperstone`. `tests/test_mc_anchors.py` pins these. Lock criteria (bust <1%, p99 DD <5%) — both pass with comfortable margin. See `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` for the addition decision audit.
+
+Prior 3-strategy anchors (historical):
+* 2026-04-23 lock cohort (G 0.34% / S v4.4 1.00% / A v4.3 1.50%, Pepperstone 04-26 panel): **93.78% pass / 0.58% bust / 4.92% p99 DD** — code-reproducible against pre-2026-05-05 portfolio_mc.py + v4.4 panel. Bust attribution at that lock: A 25.1% / S 43.4% / G 31.4%. The 2026-04-23 in-flight lock-decision used 92.73% pass / 0.65% bust / 4.94% p99 DD against an in-flight panel that was not committed.
 * Alchemy reference (2026-04-20, Striker v4.4 + Aegis v4.2 era — pre-2026-04-23 lock): **99.21% pass / 0.03% bust**.
-* Pepperstone directional (2026-04-23, all three at candidate versions, 10K × 3 seeds): **88.45% pass / 4.68% bust** raw; **84.37% pass / 1.03% bust** after correcting Aegis 1R for the n=1 full-stop thin-cohort artifact (median fallback inflates Aegis scale 4.4×). Bust gate passes under corrected 1R; pass-rate gap vs Alchemy attributed to feed-level drag + v5.5 added filters (blockMonH08, blockMonH09, blockH12 all-days, blockH12Day latch). Locked under brief-authorized directional read, not anchor-grade MC. Re-MC with v5.4 Pepperstone pending (would isolate feed effect from version effect).
-* Post-Guardian-risk-relock MC (G 0.34% / S 1.00% / A 1.50%, same panel): **92.73% pass / 0.65% bust / 6.62% timeout**, p99 DD 4.94%. Lock criteria: bust <1%, p99 DD <5%. Current 04-26 Pepperstone panel (the one committed to the repo) reproduces **93.78% pass / 0.58% bust / 4.92% p99 DD** under `python portfolio_mc.py --panel pepperstone` — drift within lock criteria, no re-MC triggered. `tests/test_mc_anchors.py` pins 93.78/0.58/4.92 as the code-reproducible anchor; 92.73/0.65/4.94 retained here as the 04-23 lock-decision artifact. **Bust-attribution split** also drifted: 04-23 ADR cites A 27.6% / S 39.3% / G 33.2%; 04-26 Pepperstone reproduces A 25.1% / S 43.4% / G 31.4% — Striker still the marginal contributor, ranking S > G > A preserved. Full breakdown pending in `docs/briefs/bust_attribution_flip.md`. See Protection section below.
 
 No active overlays. Guardian runs at its locked base risk. The Iran-Israel /
 Hormuz conflict overlay was deactivated 2026-04-23 after revert triggers met;
@@ -66,8 +69,8 @@ Single rule in `dd_protection.py`. `portfolio_mc` validates.
 
 * **DD tier**: if `(equity - peak) / peak <= -0.010`, multiply day's sizing by 0.40×.
 * Clears automatically when equity returns to peak.
-* MC at current config (G 0.34% / S 1.00% / A 1.50%, Pepperstone 2022→2026, 223 week-blocks, 10K × 3 seeds):
-  **92.73% pass / 0.65% bust (0.00% daily + 0.65% static) / 6.62% timeout**, p99 DD 4.94%, median days-to-pass 32.
+* MC at current 4-strategy config (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, Pepperstone 2022→2026, 223 week-blocks, 10K × 3 seeds):
+  **98.13% pass / 0.22% bust (0.00% daily + 0.22% static) / 1.65% timeout**, p99 DD 4.49%, median days-to-pass 23. Both lock gates clear with comfortable margin.
 * The prior equity tier was deleted on 2026-04-17 after it was proven to be dead code under the live `min()` combining semantics. Revert triggers for reintroducing a second tier are documented in the FINAL decision page.
 * Constants frozen — do not change without re-running `portfolio_mc`.
 

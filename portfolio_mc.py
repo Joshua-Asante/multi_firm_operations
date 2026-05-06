@@ -68,7 +68,7 @@ OANDA_PANELS: Dict[str, Path] = {
 
 PEPPERSTONE_DIR = Path(__file__).parent / "data" / "tv_exports" / "pepperstone"
 PEPPERSTONE_PANELS: Dict[str, Path] = {
-    "guardian":       PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-04-26_87e73.csv",
+    "guardian":       PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv",
     "striker":        PEPPERSTONE_DIR / "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv",
     "aegis":          PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv",
     "striker_nas100": PEPPERSTONE_DIR / "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-05_7ca6f.csv",

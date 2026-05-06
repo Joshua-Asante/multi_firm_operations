@@ -19,8 +19,8 @@ PEPPERSTONE_DIR = Path(__file__).resolve().parent.parent / "data" / "tv_exports"
     "csv_name, strategy, version, symbol, n_trades, n_base, n_pyramid",
     [
         (
-            "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-04-26_87e73.csv",
-            "Guardian", "v5.5", "XAUUSD", 209, 209, 0,
+            "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv",
+            "Guardian", "v5.5", "XAUUSD", 201, 201, 0,
         ),
         (
             "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv",

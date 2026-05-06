@@ -41,7 +41,7 @@ FRI_ONLY = {4}
 
 
 PEPPERSTONE_PANELS = {
-    "guardian": PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-04-26_87e73.csv",
+    "guardian": PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv",
     "striker":  PEPPERSTONE_DIR / "Striker_DJ30_v4.4_PEPPERSTONE_US30_2026-04-26_3eea0.csv",
     "aegis":    PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv",
 }

@@ -13,17 +13,19 @@ Adding Striker NAS100 v1 at 0.40% allocation, jointly with the DJ30 v4.4 → v4.
 
 | Metric | 3-strategy 04-26 anchor | 4-strategy 05-05 anchor | Δ |
 |---|---|---|---|
-| Pass | 93.78% | **98.13%** | +4.35 pp |
+| Pass | 93.78% | **97.88%** | +4.10 pp |
 | Bust (total) | 0.58% | **0.22%** | −0.36 pp |
 | Bust (daily) | 0.00% | 0.00% | — |
 | Bust (static) | 0.58% | 0.22% | −0.36 pp |
-| Timeout | 5.65% | **1.65%** | −4.00 pp |
+| Timeout | 5.65% | **1.90%** | −3.75 pp |
 | Median days to pass | 32 | **23** | −9 days |
-| p50 DD | 1.41% | 1.33% | −0.08 pp |
-| p95 DD | 3.81% | 3.50% | −0.31 pp |
-| p99 DD | 4.92% | **4.49%** | −0.43 pp |
+| p50 DD | 1.41% | 1.34% | −0.07 pp |
+| p95 DD | 3.81% | 3.52% | −0.29 pp |
+| p99 DD | 4.92% | **4.55%** | −0.37 pp |
 
-Lock criteria (CLAUDE.md): bust < 1% ✓ (0.22% comfortable), p99 DD < 5% ✓ (4.49% comfortable).
+Lock criteria (CLAUDE.md): bust < 1% ✓ (0.22% comfortable), p99 DD < 5% ✓ (4.55% comfortable).
+
+**Re-anchor note (2026-05-05 PM):** the headline numbers above are the post-re-export anchor (Guardian Pepperstone CSV swapped 87e73 → 33781, 209 → 201 trades after a same-day reconcile revealed the 04-26 export contained 8 phantom v5.5 signals from a Pine recompile / cache artefact). The original headline (98.13/0.22/4.49) was derived from the 209-trade panel; both anchors clear lock criteria. See [data/reconciles/2026-05-05_guardian_n_reconcile.md](../../data/reconciles/2026-05-05_guardian_n_reconcile.md) for the audit trail.
 
 ## Configuration
 
@@ -38,7 +40,7 @@ Lock criteria (CLAUDE.md): bust < 1% ✓ (0.22% comfortable), p99 DD < 5% ✓ (4
 
 | Strategy | implied 1R | scale | n_trades | fell_back |
 |---|---|---|---|---|
-| Guardian | $1,175.10 | 0.579 | 209 | False |
+| Guardian | $1,196.68 | 0.568 | 201 | False |
 | Striker DJ30 | $3,897.54 | 0.513 | 224 | False |
 | Aegis | $3,293.45 | 0.911 | 123 | False |
 | Striker NAS100 | $3,599.09 | 0.222 | 200 | False |
@@ -51,12 +53,12 @@ The NAS scale of 0.222 is the lowest in the panel — pyramid-amplified per-trad
 
 | Strategy | 3-strategy 04-26 share | 4-strategy 05-05 share | Δ |
 |---|---|---|---|
-| Striker DJ30 | 43.4% | **49.2%** | +5.8 pp |
-| Guardian | 31.4% | 20.0% | −11.4 pp |
-| Aegis | 25.1% | 20.0% | −5.1 pp |
-| Striker NAS100 | — | **10.8%** | (new) |
+| Striker DJ30 | 43.4% | **40.9%** | −2.5 pp |
+| Guardian | 31.4% | 25.8% | −5.6 pp |
+| Aegis | 25.1% | 22.7% | −2.4 pp |
+| Striker NAS100 | — | **10.6%** | (new) |
 
-Total busts down (0.58% → 0.22%) AND share redistributes — DJ30 v4.5 takes a slightly larger share of a smaller pie, NAS comes in as the lowest contributor (10.8%). Striker family combined (DJ30 + NAS) = 60.0% of busts, but absolute bust rate from Strikers = 0.22% × 0.600 = 0.13% (vs prior DJ30-alone 0.25%) — Striker family is now LESS bust-contributing in absolute terms despite owning a bigger relative share.
+Total busts down (0.58% → 0.22%) AND share redistributes. NAS comes in as the lowest contributor (10.6%). Striker family combined (DJ30 + NAS) = 51.5% of busts, but absolute bust rate from Strikers = 0.22% × 0.515 = 0.11% (vs prior DJ30-alone 0.25%) — Striker family is now LESS bust-contributing in absolute terms despite owning a slightly larger relative share.
 
 NAS as a marginal contributor ranks **lowest** of all four strategies, consistent with the diversification thesis the dashboard prior nominated.
 
@@ -75,14 +77,14 @@ The dashboard's headline (Net Return +480%, RF 125.7) is a different metric clas
 ## Test pin
 
 [tests/test_mc_anchors.py:42-48](../../tests/test_mc_anchors.py:42) re-pinned to:
-- `pass_rate == 0.9813 ± 1e-4`
+- `pass_rate == 0.9788 ± 1e-4`
 - `bust_rate == 0.0022 ± 1e-4`
-- `p99_dd == 0.0449 ± 1e-4`
+- `p99_dd == 0.0455 ± 1e-4`
 
 OANDA anchor (96.05/0.48/4.79) unchanged. The serial-vs-parallel equivalence check still passes. Lock criteria gate (bust <1%, p99 DD <5%) still passes.
 
 ## Residuals
 
-- 5-trade dashboard count gap (753 expected vs 748 reported): MC sees 209 + 224 + 123 + 200 = 756 trades. Dashboard's 748 likely reflects a slightly different panel-end date (dashboard ends 2026-04-20; CSV ends 2026-04-14 for NAS, 2026-04-20 for others). Not material.
+- Dashboard count match: MC sees 201 + 224 + 123 + 200 = **748 trades**, matching dashboard exactly (gap closed by post-re-export Guardian count). The original brief reported a 5-trade gap (756 MC vs 748 dashboard) which was the 04-26 Guardian-export anomaly; with the 05-05 re-export, dashboard ↔ MC reconcile cleanly. Independent corroboration that Guardian n=201 is the correct canonical count.
 - DJ30 v4.5 lock-decision rationale: inferred from file diff in CHANGELOG; flagged in CHANGELOG `### Rationale` for Joshua to confirm/edit.
 - OANDA v4.5 + OANDA NAS100 fetches: separate operational tasks, out of this session's scope.

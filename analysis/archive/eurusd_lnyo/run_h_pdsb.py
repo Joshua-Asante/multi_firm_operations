@@ -19,8 +19,8 @@ Six kill criteria per parent brief §4 H-PDSB:
   6. Pre-announcement spread x5+ widening on >25% event days (op unreliability)
 
 Output:
-  analysis/eurusd_lnyo/results/h_pdsb_g2.json (1.0x spread)
-  analysis/eurusd_lnyo/results/h_pdsb_g2_spread125.json (1.25x sensitivity)
+  analysis/archive/eurusd_lnyo/results/h_pdsb_g2.json (1.0x spread)
+  analysis/archive/eurusd_lnyo/results/h_pdsb_g2_spread125.json (1.25x sensitivity)
 """
 from __future__ import annotations
 
@@ -381,7 +381,7 @@ def main():
     print("[2/4] Event calendar...")
     cal = load_calendar()
     if not cal:
-        raise RuntimeError("No event calendar found; run analysis/eurusd_lnyo/event_calendar.py first")
+        raise RuntimeError("No event calendar found; run analysis/archive/eurusd_lnyo/event_calendar.py first")
     event_dates = set(d for d, _ in cal)
     event_type_lookup = {}
     for d, ev in cal:

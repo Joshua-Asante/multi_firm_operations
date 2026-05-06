@@ -47,6 +47,8 @@ Most recent version locks: Guardian v5.5 (2026-04-23), Aegis v4.3 (2026-04-23), 
 | Aegis USDJPY    | USDJPY 15m      | 1.50%                   | v4.3 LOCKED   | default (1)                                       |
 | Striker NAS100  | NAS100 15m      | 0.40%                   | v1 CANDIDATE  | TBD (verify before deployment — NOT deployed)     |
 
+Operational tooling scope: `firm_rules.py`, `dd_protection.py`, `accounts.py`, and `cli.py lots` are intentionally G/S/A only — NAS100 is excluded until it deploys live. `portfolio_mc.py` includes NAS100 (it must, to validate the 4-strategy lock anchor). When NAS100 goes live, BASE_RISK in `firm_rules` and `dd_protection`, `get_multipliers` in `accounts`, and the `lots` printout in `cli` need synchronized updates.
+
 2026-05-05 lock MC anchor (4-strategy, current canonical):
 * Pepperstone 4-strategy (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, 10K × 3 seeds): **97.88% pass / 0.22% bust (0.00% daily + 0.22% static) / 1.90% timeout**, p99 DD 4.55%, median days-to-pass 23. **Bust attribution**: DJ30 40.9% / G 25.8% / A 22.7% / NAS 10.6%. NAS comes in as the lowest contributor (10.6%) consistent with the diversification thesis. Reproducible under `python portfolio_mc.py --panel pepperstone`. `tests/test_mc_anchors.py` pins these. Lock criteria (bust <1%, p99 DD <5%) — both pass with comfortable margin. Re-anchored same day after Guardian Pepperstone re-export (87e73 → 33781, 209 → 201 trades; 04-26 export contained 8 phantom v5.5 signals — see `data/reconciles/2026-05-05_guardian_n_reconcile.md`). See `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` for the addition decision audit.
 

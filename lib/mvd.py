@@ -94,7 +94,7 @@ def assert_version(actual: str, expected: str) -> None:
     """Fail if strategy version identifier does not match.
 
     Use at top of any calibration or lock script that is version-specific
-    (Guardian v5.5, Striker v4.4, Aegis v4.3, etc.).
+    (Guardian v5.5, Striker v4.5, Aegis v4.3, etc.).
     """
     if actual != expected:
         raise AssertionError(

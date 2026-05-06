@@ -2,7 +2,7 @@
 
 Brief:    docs/methodology/findings/2026-05-02_usoil_phase3_directional.md
 Plan:     ~/.claude/plans/q-usoil-3-conditional-on-usoil-dynamic-turtle.md
-Predecessor: analysis/usoil/phase1_characterize.py (Phase 1 verdict: vol-gated)
+Predecessor: analysis/archive/usoil/phase1_characterize.py (Phase 1 verdict: vol-gated)
 
 Pre-Q gate (frozen before first statistic computed):
   D1 — exclude maintenance bars (is_maintenance==True) from cohort

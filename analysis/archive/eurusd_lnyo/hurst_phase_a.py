@@ -180,10 +180,10 @@ def main():
         ],
         "brief_commit_hash": "c3ef0448984f6fe11fba440285b5323b35209ca5",
     }
-    Path("analysis/eurusd_lnyo/results").mkdir(parents=True, exist_ok=True)
-    with open("analysis/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json", "w") as f:
+    Path("analysis/archive/eurusd_lnyo/results").mkdir(parents=True, exist_ok=True)
+    with open("analysis/archive/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json", "w") as f:
         json.dump(out, f, indent=2)
-    print("\nWritten: analysis/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json")
+    print("\nWritten: analysis/archive/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json")
 
 
 if __name__ == "__main__":

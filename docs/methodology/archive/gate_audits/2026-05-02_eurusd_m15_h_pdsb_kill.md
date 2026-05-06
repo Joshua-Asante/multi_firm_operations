@@ -20,7 +20,7 @@ This G2 session was opened fresh against the worktree at branch
   returned `c3ef0448984f6fe11fba440285b5323b35209ca5`.
 - `git status --porcelain` returned empty.
 - The brief commit hash is embedded in this audit header and in
-  `analysis/eurusd_lnyo/results/h_pdsb_g2.json` / `h_pdsb_g2_spread125.json` /
+  `analysis/archive/eurusd_lnyo/results/h_pdsb_g2.json` / `h_pdsb_g2_spread125.json` /
   `h_pdsb_g2_phaseA_hurst.json`.
 - Parent brief §0–§12 was read in full in this session (no skim, no paraphrase).
 - G1 kill audit was read in full in this session.
@@ -88,7 +88,7 @@ known H≈0.5 random walk + log-levels trap demo run first.
 H < 0.65 (0.599 inline; 0.522 nolds). NFP-only reads similarly. The
 event-conditional persistence is materially below the abort threshold —
 the §0a justification survives the diagnostic. Backtest may proceed.
-Results: `analysis/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json`.
+Results: `analysis/archive/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json`.
 
 ### 4. D-S-A discipline check
 
@@ -152,7 +152,7 @@ G/S/A composite < 0.20 and tail-event drawdown contained below the FXIFY
 - Range: 2022-01-04 00:00 UTC → 2026-04-21 00:00 UTC
 - Rows: 107,058 M15 bars
 - Event calendar: hand-constructed from BLS/BEA standard release patterns
-  (see `analysis/eurusd_lnyo/event_calendar.py` docstring for rule set);
+  (see `analysis/archive/eurusd_lnyo/event_calendar.py` docstring for rule set);
   spot-checked 2024 NFPs all match canonical 1st Friday dates.
 
 ## 4. Per-regime decision matrix — both spread variants
@@ -306,20 +306,20 @@ continuous-window AND event-conditional fade mechanism classes.
 
 ## 9. Reproducibility
 
-- Pipeline orchestrator: [analysis/eurusd_lnyo/run_h_pdsb.py](../../../../analysis/eurusd_lnyo/run_h_pdsb.py)
-- §0a Phase-A diagnostic: [analysis/eurusd_lnyo/hurst_phase_a.py](../../../../analysis/eurusd_lnyo/hurst_phase_a.py)
-  → [analysis/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json](../../../../analysis/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json)
-- Results JSON: [analysis/eurusd_lnyo/results/h_pdsb_g2.json](../../../../analysis/eurusd_lnyo/results/h_pdsb_g2.json)
-  (1.0×) and [h_pdsb_g2_spread125.json](../../../../analysis/eurusd_lnyo/results/h_pdsb_g2_spread125.json) (1.25×)
-- Event calendar: [analysis/eurusd_lnyo/event_calendar.py](../../../../analysis/eurusd_lnyo/event_calendar.py)
+- Pipeline orchestrator: [analysis/archive/eurusd_lnyo/run_h_pdsb.py](../../../../analysis/archive/eurusd_lnyo/run_h_pdsb.py)
+- §0a Phase-A diagnostic: [analysis/archive/eurusd_lnyo/hurst_phase_a.py](../../../../analysis/archive/eurusd_lnyo/hurst_phase_a.py)
+  → [analysis/archive/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json](../../../../analysis/archive/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json)
+- Results JSON: [analysis/archive/eurusd_lnyo/results/h_pdsb_g2.json](../../../../analysis/archive/eurusd_lnyo/results/h_pdsb_g2.json)
+  (1.0×) and [h_pdsb_g2_spread125.json](../../../../analysis/archive/eurusd_lnyo/results/h_pdsb_g2_spread125.json) (1.25×)
+- Event calendar: [analysis/archive/eurusd_lnyo/event_calendar.py](../../../../analysis/archive/eurusd_lnyo/event_calendar.py)
   → [data/external/us_high_impact_0830et_2022_2026.csv](../../../../data/external/us_high_impact_0830et_2022_2026.csv)
-- PDSB simulator: [analysis/eurusd_lnyo/pdsb_simulator.py](../../../../analysis/eurusd_lnyo/pdsb_simulator.py)
+- PDSB simulator: [analysis/archive/eurusd_lnyo/pdsb_simulator.py](../../../../analysis/archive/eurusd_lnyo/pdsb_simulator.py)
 - Dukascopy panel (G1-shared): `data/bar_data/EURUSD_dukascopy_m15_bidask_2022-01-04_to_2026-04-20.csv`
 - DXY panel (G1-shared): `data/external/dxy.csv`
 - Reproduction:
   ```
-  python analysis/eurusd_lnyo/event_calendar.py
-  python analysis/eurusd_lnyo/hurst_phase_a.py
+  python analysis/archive/eurusd_lnyo/event_calendar.py
+  python analysis/archive/eurusd_lnyo/hurst_phase_a.py
   python -m analysis.eurusd_lnyo.run_h_pdsb
   ```
 
@@ -333,7 +333,7 @@ overlay reintroduction, or new strategy code.
 
 ## 11. Spread-model provenance (stub §5 disclosure)
 
-The Pepperstone-Razor session-conditional spread model (`analysis/eurusd_lnyo/pepperstone_spread.py`)
+The Pepperstone-Razor session-conditional spread model (`analysis/archive/eurusd_lnyo/pepperstone_spread.py`)
 remains PARAMETRIC: 0.35 pip per-fill baseline (= 0.7 pip RT, derived from
 $7/lot commission ≈ 0.6 pip + 0.1 pip raw) with 3× multiplier on 08:30 ET
 weekday minutes (mean+2σ proxy) and 10× on NFP first minute. **Not

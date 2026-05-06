@@ -3,7 +3,7 @@
 Runs the single-config falsification per parent brief
 docs/methodology/findings/2026-05-02_eurusd_m15_lnyo_notice.md and
 emits results.json + a markdown summary at:
-  analysis/eurusd_lnyo/results/h_nyfbo_g1.json
+  analysis/archive/eurusd_lnyo/results/h_nyfbo_g1.json
 
 G1 stage gate evaluation (parent brief §4 + §6) — six kill criteria, any
 one fires => KILL:

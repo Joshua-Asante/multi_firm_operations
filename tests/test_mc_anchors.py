@@ -2,10 +2,16 @@
 
 Pepperstone is the CLAUDE.md canonical lock-anchor source. The 2026-05-05
 4-strategy lock (after Striker DJ30 v4.4 → v4.5 migration + Striker NAS100 v1
-add at 0.40%) reproduces 98.13 / 0.22 / 4.49 deterministically — improvement
-over the 3-strategy 04-26 anchor (93.78 / 0.58 / 4.92) on every gate. See
+add at 0.40%) reproduces 97.88 / 0.22 / 4.55 deterministically — improvement
+over the 3-strategy 04-26 anchor (93.78 / 0.58 / 4.92) on every gate. The
+98.13 / 0.22 / 4.49 figure that briefly circulated on 2026-05-05 was the
+pre-Guardian-re-export anchor (209-trade panel, before the same-day reconcile
+swapped 87e73 → 33781 to 201 trades — see
+data/reconciles/2026-05-05_guardian_n_reconcile.md). The 201-trade panel is
+canonical; both anchors clear lock criteria. See
 docs/briefs/striker_nas100_q_nas_3_mc_addition.md for the addition decision
-audit trail and CLAUDE.md "2026-04-23 lock MC anchors" for prior history.
+audit trail and CLAUDE.md "Prior 3-strategy anchors (historical)" for prior
+history.
 
 OANDA is the pattern-spotting proxy per the two-tier canonical rule. OANDA
 NAS100 panel does not exist; OANDA still on DJ30 v4.4 (no v4.5 OANDA fetch

@@ -177,8 +177,8 @@ artefact during the 04-26 fetch).
 4. Updated [data/tv_exports/pepperstone/SHA256SUMS](data/tv_exports/pepperstone/SHA256SUMS)
    with the new file's hash.
 5. Updated two non-MC analysis scripts that referenced the old filename:
-   [analysis/gbpusd_lon/correlation.py:44](analysis/gbpusd_lon/correlation.py:44),
-   [analysis/eurusd_lnyo/correlation.py:45](analysis/eurusd_lnyo/correlation.py:45).
+   [analysis/archive/gbpusd_lon/correlation.py:44](analysis/archive/gbpusd_lon/correlation.py:44),
+   [analysis/archive/eurusd_lnyo/correlation.py:45](analysis/archive/eurusd_lnyo/correlation.py:45).
 6. NAS100 B_15 deletion: nothing to do — no `*B_15*` artefact exists in the
    repo (verified via `Glob **/*B_15*`).
 

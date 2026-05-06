@@ -102,17 +102,17 @@ EURUSD M15 fade-the-failed-breakout has structurally negative gross edge across 
 
 ## 8. Reproducibility
 
-- Pipeline orchestrator: [analysis/eurusd_lnyo/run_h_nyfbo.py](../../../../analysis/eurusd_lnyo/run_h_nyfbo.py)
-- Results JSON: [analysis/eurusd_lnyo/results/h_nyfbo_g1.json](../../../../analysis/eurusd_lnyo/results/h_nyfbo_g1.json)
+- Pipeline orchestrator: [analysis/archive/eurusd_lnyo/run_h_nyfbo.py](../../../../analysis/archive/eurusd_lnyo/run_h_nyfbo.py)
+- Results JSON: [analysis/archive/eurusd_lnyo/results/h_nyfbo_g1.json](../../../../analysis/archive/eurusd_lnyo/results/h_nyfbo_g1.json)
 - Dukascopy panel: `data/bar_data/EURUSD_dukascopy_m15_bidask_2022-01-04_to_2026-04-20.csv` (107,058 rows)
 - DXY panel: `data/external/dxy.csv` (1079 rows, yfinance `DX-Y.NYB`)
 - Per-strategy modules:
-  - [analysis/eurusd_lnyo/dukascopy_loader.py](../../../../analysis/eurusd_lnyo/dukascopy_loader.py)
-  - [analysis/eurusd_lnyo/pepperstone_spread.py](../../../../analysis/eurusd_lnyo/pepperstone_spread.py)
-  - [analysis/eurusd_lnyo/nyfbo_simulator.py](../../../../analysis/eurusd_lnyo/nyfbo_simulator.py)
-  - [analysis/eurusd_lnyo/correlation.py](../../../../analysis/eurusd_lnyo/correlation.py)
-  - [analysis/eurusd_lnyo/permutation.py](../../../../analysis/eurusd_lnyo/permutation.py)
-  - [analysis/eurusd_lnyo/dxy_loader.py](../../../../analysis/eurusd_lnyo/dxy_loader.py)
+  - [analysis/archive/eurusd_lnyo/dukascopy_loader.py](../../../../analysis/archive/eurusd_lnyo/dukascopy_loader.py)
+  - [analysis/archive/eurusd_lnyo/pepperstone_spread.py](../../../../analysis/archive/eurusd_lnyo/pepperstone_spread.py)
+  - [analysis/archive/eurusd_lnyo/nyfbo_simulator.py](../../../../analysis/archive/eurusd_lnyo/nyfbo_simulator.py)
+  - [analysis/archive/eurusd_lnyo/correlation.py](../../../../analysis/archive/eurusd_lnyo/correlation.py)
+  - [analysis/archive/eurusd_lnyo/permutation.py](../../../../analysis/archive/eurusd_lnyo/permutation.py)
+  - [analysis/archive/eurusd_lnyo/dxy_loader.py](../../../../analysis/archive/eurusd_lnyo/dxy_loader.py)
 - Reproduction:
   ```
   python -m analysis.eurusd_lnyo.dukascopy_loader --fetch

@@ -75,7 +75,7 @@ def main() -> int:
     L.append(f"- **N bars:** {R['n_bars']:,}  N returns (excl maintenance): {R['n_returns']:,}")
     L.append(f"- **Window:** {R['first_bar_utc']} -> {R['last_bar_utc']}")
     L.append(f"- **Source:** OANDA practice endpoint (`WTICO_USD`, mid pricing, M15)")
-    L.append(f"- **Pipeline:** `analysis/usoil/phase1_characterize.py`")
+    L.append(f"- **Pipeline:** `analysis/archive/usoil/phase1_characterize.py`")
     L.append(f"- **Raw results:** `{RESULTS_JSON.name}`")
     L.append(f"- **Stage 0 reconciliation:** `2026-05-02_usoil_feed_reconciliation.md` (must pass before Phase 1)")
     L.append("")

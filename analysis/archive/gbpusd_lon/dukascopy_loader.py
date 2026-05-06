@@ -1,4 +1,4 @@
-"""Dukascopy GBPUSD M15 bid+ask loader (port of analysis/eurusd_lnyo/dukascopy_loader.py).
+"""Dukascopy GBPUSD M15 bid+ask loader (port of analysis/archive/eurusd_lnyo/dukascopy_loader.py).
 
 Per parent Notice §5 #4 (data + tz handling): IANA tz-aware UTC; ET conversion via
 zoneinfo.ZoneInfo("America/New_York") for cross-strategy DOW masks; BST conversion

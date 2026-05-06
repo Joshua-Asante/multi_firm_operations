@@ -17,7 +17,7 @@ Parent brief gate criteria (§4 H):
   All four must clear simultaneously to authorize build.
 
 Outputs:
-  analysis/usdchf_sentinel/results/sentinel_gate.json
+  analysis/archive/usdchf_sentinel/results/sentinel_gate.json
   docs/methodology/findings/2026-05-03_usdchf_h4_sentinel_gate.md
 """
 from __future__ import annotations

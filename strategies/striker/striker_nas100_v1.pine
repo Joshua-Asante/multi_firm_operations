@@ -26,10 +26,12 @@ strategy("Striker NAS100 v1.0", "Striker NAS100 v1", overlay=true,
 //   Phase 6 closure and FINAL_LOCK verification at 0.4% FXIFY-deployable risk.
 //   Predecessor branch (NAS100 v0.1 dev / B_15) is archived; v1.0 supersedes.
 //
-// SEPARATE FROM Striker DJ30 v4.4 (locked, live): shares architecture family
-//   (entry filters, exit logic, adaptive trail) but instrument-tuned.
+// SEPARATE FROM Striker DJ30 v4.5 (locked, live as of 2026-05-05): shares
+//   architecture family (entry filters, exit logic, adaptive trail) but
+//   instrument-tuned.
 //   NAS100 v1.0: 0.40% risk / 1000% pyramid / Mon+Tue.
-//   DJ30 v4.4:   1.00% risk / 350% pyramid  / [DJ30-locked DOW set].
+//   DJ30 v4.5:   1.00% risk / 350% pyramid  / [DJ30-locked DOW set]. Risk,
+//                pyramid size, and DOW set unchanged from v4.4.
 //   Effective peak-stack risk balanced ~4.4% on both via inverse-scaled levers.
 //
 // DESIGN INTENT: pyramid is load-bearing edge. Base entry is a qualifier;
@@ -61,13 +63,13 @@ inDateRange = time >= startDate and time <= endDate
 // ============================================================================
 group_risk   = "═══ RISK (FXIFY) ═══"
 riskPerTrade = input.float(0.40, "Risk Per Trade (%)", minval=0.1, maxval=3.0, step=0.01, group=group_risk,
-     tooltip="LOCKED v1.0: 0.40%. SEPARATE from DJ30 v4.4 (1.00%). Smaller base sizing balances 1000% pyramid amplification — effective peak-stack risk ~4.4% (matches DJ30 peak-stack risk despite different parameter values). Sizing = strategy.equity * risk_pct (rolling-equity, compounding).")
+     tooltip="LOCKED v1.0: 0.40%. SEPARATE from DJ30 v4.5 (1.00%). Smaller base sizing balances 1000% pyramid amplification — effective peak-stack risk ~4.4% (matches DJ30 peak-stack risk despite different parameter values). Sizing = strategy.equity * risk_pct (rolling-equity, compounding).")
 maxDailyDD   = input.float(1.00, "Max Daily DD (%)",   minval=0.5, maxval=5.0, step=0.1,  group=group_risk,
-     tooltip="LOCKED v1.0: 1.00%. Carries from v4.4.")
+     tooltip="LOCKED v1.0: 1.00%. Carries from DJ30 v4.5 (unchanged from v4.4).")
 maxTotalDD   = input.float(4.85, "Max Total DD (%)",   minval=1.0, maxval=5.0, step=0.25, group=group_risk,
      tooltip="LOCKED v1.0: 4.85%. Strategy internal kill-switch ahead of FXIFY's 5% static rule. Empirical TV DD on lock backtest: 4.56%.")
 maxDailyTrades = input.int(2,    "Max Trades Per Day",  minval=1,  maxval=5,   step=1,    group=group_risk,
-     tooltip="LOCKED v1.0: 2. Carries from v4.4 NAS100-tuned cap (DJ30 family used 3).")
+     tooltip="LOCKED v1.0: 2. NAS100-tuned cap (DJ30 v4.5 family uses 3; cap unchanged from v4.4).")
 strikerDayStopPct = input.float(-1.5, "Day Soft-Stop (% init eq)", minval=-10.0, maxval=-0.5, step=0.1, group=group_risk,
      tooltip="LOCKED v1.0: -1.5%. Anchored to strategy.initial_capital ($200K), NOT rolling equity — FXIFY-aligned. At $200K init, -1.5% = -$3K. Halts new entries for the day once realized day P&L crosses threshold. Pyramid-reversal daily-DD tail mitigation.")
 
@@ -136,7 +138,7 @@ group_pyramid  = "═══ PYRAMIDING ═══"
 pyramidTrigger = input.float(1.10,  "Trigger (ATR profit)", minval=0.5,  maxval=3.0,   step=0.01,  group=group_pyramid,
      tooltip="LOCKED v1.0: 1.10. Pyramid triggers at 1.10 ATR profit after min bars met. On NAS100, this trigger functions as the continuation FILTER — pyramid-conditional WR ~75% across regimes. The continuation filter is the structural edge, not the base entry. See Q-Striker-2 closure brief.")
 pyramidSize    = input.float(1000.0, "Size (%)",             minval=25.0, maxval=1000.0, step=25.0, group=group_pyramid,
-     tooltip="LOCKED v1.0 (NAS100): 1000%. SEPARATE from DJ30 v4.4 (350%). Pyramid is intentionally load-bearing on NAS100 — pyramid-conditional cohort carries the structural edge; base-only signals are loss-makers by design. NAS100 trend-continuation autocorrelation favors high leverage on validated trends.")
+     tooltip="LOCKED v1.0 (NAS100): 1000%. SEPARATE from DJ30 v4.5 (350%, unchanged from v4.4). Pyramid is intentionally load-bearing on NAS100 — pyramid-conditional cohort carries the structural edge; base-only signals are loss-makers by design. NAS100 trend-continuation autocorrelation favors high leverage on validated trends.")
 pyramidMinBars = input.int(6,       "Min Bars",             minval=1,    maxval=12,    step=1,    group=group_pyramid,
      tooltip="LOCKED v1.0: 6. Minimum bars after entry before pyramid can fire.")
 
@@ -152,7 +154,7 @@ allowMon = input.bool(true,  "Allow Monday",    group=group_dow, tooltip="LOCKED
 allowTue = input.bool(true,  "Allow Tuesday",   group=group_dow, tooltip="LOCKED v1.0 (NAS100): true.")
 allowWed = input.bool(false, "Allow Wednesday", group=group_dow, tooltip="LOCKED v1.0 (NAS100): false.")
 allowThu = input.bool(false, "Allow Thursday",  group=group_dow, tooltip="LOCKED v1.0 (NAS100): false.")
-allowFri = input.bool(false, "Allow Friday",    group=group_dow, tooltip="LOCKED v1.0 (NAS100): false. SEPARATE from DJ30 v4.4 (true).")
+allowFri = input.bool(false, "Allow Friday",    group=group_dow, tooltip="LOCKED v1.0 (NAS100): false. SEPARATE from DJ30 v4.5 (true, unchanged from v4.4).")
 
 currentDow = dayofweek(time, "UTC")
 dowOK = (allowMon and currentDow == dayofweek.monday) or
@@ -324,7 +326,7 @@ if strategy.position_size > 0 and not na(entryPrice) and not na(entryAtr)
     // to pyramid, trail, TP, or max-hold exit. Architectural change that lets
     // the pyramid cohort carry more size.
 
-    // Pyramiding — 1000% of initial size (NAS100 v1.0; DJ30 v4.4 uses 350%)
+    // Pyramiding — 1000% of initial size (NAS100 v1.0; DJ30 v4.5 uses 350%, unchanged from v4.4)
     if not pyramidDone and pyramidCount < 1 and profitAtr >= pyramidTrigger and barsInTrade >= pyramidMinBars
         addSize = initialSize * (pyramidSize / 100)
         strategy.entry("Long Add", strategy.long, qty=addSize)

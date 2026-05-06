@@ -46,7 +46,7 @@ $ git status --porcelain docs/methodology/
 - `docs/rule_0.md` read; production-code-first discipline reaffirmed.
 - `docs/methodology/observation_routing.md` read; three-bucket gate (Closed / Action / Forward) is downstream of the pre-Q gate.
 - Memory anchors `feedback_hurst_rs_log_prices_trap.md` (R/S on log-returns only; H>0.9 diagnostic for log-prices bug) and `feedback_d_vs_s_collapse_discipline.md` (same-class candidate compression goes under S, not D) read in full.
-- The 6 reuse-path source modules at `analysis/eurusd_lnyo/` (`pepperstone_spread.py`, `permutation.py`, `correlation.py`, `dxy_loader.py`, `hurst_phase_a.py`, `dukascopy_loader.py`) read in full.
+- The 6 reuse-path source modules at `analysis/archive/eurusd_lnyo/` (`pepperstone_spread.py`, `permutation.py`, `correlation.py`, `dxy_loader.py`, `hurst_phase_a.py`, `dukascopy_loader.py`) read in full.
 
 This audit is anchored to the pinned hash. The parent Notice and the entry stub are frozen for the duration of this G1 session per entry stub §4.
 
@@ -131,9 +131,9 @@ Status: §0a non-measurement components clear. Proceed to module porting, data f
 
 ### Data and module ports
 
-**Data fetched:** Dukascopy GBPUSD M15 bid+ask 2022-01-04 → 2026-04-21 via the ported `analysis/gbpusd_lon/dukascopy_loader.py` (symbol swap EUR/USD → GBP/USD; `Europe/London` BST ZoneInfo added; chunked 60-day fetch). 107,041 rows (vs EURUSD predecessor's 107,058; 17-bar diff from pair-specific holiday handling).
+**Data fetched:** Dukascopy GBPUSD M15 bid+ask 2022-01-04 → 2026-04-21 via the ported `analysis/archive/gbpusd_lon/dukascopy_loader.py` (symbol swap EUR/USD → GBP/USD; `Europe/London` BST ZoneInfo added; chunked 60-day fetch). 107,041 rows (vs EURUSD predecessor's 107,058; 17-bar diff from pair-specific holiday handling).
 
-**Modules ported** to `analysis/gbpusd_lon/` per parent Notice §5 #13 and entry stub §5:
+**Modules ported** to `analysis/archive/gbpusd_lon/` per parent Notice §5 #13 and entry stub §5:
 - `dukascopy_loader.py` — symbol swap, OUT_PATH update, `Europe/London` BST ZoneInfo, expanded DST_TRANSITIONS for UK BST cycle
 - `pepperstone_spread.py` — baseline 0.35 → 0.5 pip per fill (parent Notice §1.4); UK 07:00 BST 2.0× multiplier added (parent Notice §5 #2; outside H-LORB's 09:00-11:00 BST execution window so doesn't affect cost — coded for completeness; sensitivity captured by 1.25× variant); US 13:30 BST (= 08:30 ET) and NFP first-minute multipliers retained
 - `permutation.py` — ported unchanged; docstring header swapped H-NYFBO → H-LORB
@@ -298,9 +298,9 @@ The texture of the LORB Phase A failure (random-walk noise, gate fires on border
 
 This audit will be copied/renamed to `docs/methodology/archive/gate_audits/2026-05-03_gbpusd_m15_h_lorb_phaseA_abort.md` per the §8 file pattern, with the brief commit hash `158dc61d1aae7ed87717a7291c43df51c526c9b5` embedded in the header.
 
-Phase A diagnostic results JSON: [`analysis/gbpusd_lon/results/h_lorb_g1_phaseA_hurst.json`](../../../../analysis/gbpusd_lon/results/h_lorb_g1_phaseA_hurst.json).
+Phase A diagnostic results JSON: [`analysis/archive/gbpusd_lon/results/h_lorb_g1_phaseA_hurst.json`](../../../../analysis/archive/gbpusd_lon/results/h_lorb_g1_phaseA_hurst.json).
 
-Robustness JSON (per-regime Hurst + bootstrap ACF CI): [`analysis/gbpusd_lon/results/h_lorb_g1_phaseA_robustness.json`](../../../../analysis/gbpusd_lon/results/h_lorb_g1_phaseA_robustness.json).
+Robustness JSON (per-regime Hurst + bootstrap ACF CI): [`analysis/archive/gbpusd_lon/results/h_lorb_g1_phaseA_robustness.json`](../../../../analysis/archive/gbpusd_lon/results/h_lorb_g1_phaseA_robustness.json).
 
 ---
 
@@ -308,7 +308,7 @@ Robustness JSON (per-regime Hurst + bootstrap ACF CI): [`analysis/gbpusd_lon/res
 
 No edits made to: Pine strategies (Guardian v5.5 / Striker v4.4 / Aegis v4.3 — locked), `dd_protection.py`, `portfolio_mc.py`, `CLAUDE.md`, the parent Notice, the entry stub, the predecessor EURUSD Notice or its audit trail. No grid search; literature-default single-config H-LORB was specified in the Notice but Phase B was never executed because Phase A aborted. No allocation, MC re-run, overlay reintroduction, or new strategy code.
 
-The 6 ports under `analysis/gbpusd_lon/` are new code at the analysis layer (not strategy/protection/MC layer) and are governed by parent Notice §5 #13 reuse-path commitment + entry stub §5 checklist explicit authorization.
+The 6 ports under `analysis/archive/gbpusd_lon/` are new code at the analysis layer (not strategy/protection/MC layer) and are governed by parent Notice §5 #13 reuse-path commitment + entry stub §5 checklist explicit authorization.
 
 ---
 

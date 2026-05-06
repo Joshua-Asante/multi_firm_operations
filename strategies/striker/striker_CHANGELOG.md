@@ -14,6 +14,10 @@ _Queued changes. Move to a dated entry on commit._
 
 - **v5 architectural rebuild** — priority #1 post-challenge pass. Hypothesis: strip BE/trail/T1 management following the Guardian v4 → v5.1 pattern, lift μ/σ from 1.24 toward portfolio average. See Notion: "Striker v5 architectural rebuild — priority #1 post-challenge — 2026-04-17".
 
+## Outstanding TODO
+
+- **v4.5 lock-decision rationale (open)** — the [v4.5] § Rationale block (~line 38) still carries `[TODO Joshua: confirm/edit lock-decision rationale.]` plus an inferred-from-file-diff placeholder. Replace with the confirmed rationale at next touch.
+
 ---
 
 ## [v4.5] — 2026-05-05 🔒 LOCKED
@@ -38,10 +42,10 @@ Risk per trade, daily DD cap, max trades/day, lookback, ATR length, BE trigger, 
 [TODO Joshua: confirm/edit lock-decision rationale.] Inferred from file-level diff: tighter entry filter (body ratio) + slightly tighter stop + slightly wider TP shifts the per-trade R-multiple distribution. Trail tightens earlier and at a shorter distance, locking gains sooner. Net intent appears to be reducing per-trade adverse-excursion exposure while preserving the pyramid-cohort upside.
 
 ### Portfolio MC anchors (2026-05-05)
-- TBD — re-MC required as part of NAS100 v1 portfolio-add (this CHANGELOG entry lands ahead of the MC run; MC numbers will be filled by `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` and `tests/test_mc_anchors.py` re-pin).
+- 4-strategy Pepperstone lock (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, 10K × 3 seeds): **97.88% pass / 0.22% bust / p99 DD 4.55%** (median days-to-pass 23). DJ30 bust attribution 40.9% — still the marginal bust contributor; share down from 43.4% under the 3-strategy 04-26 anchor. Both lock gates (bust < 1%, p99 DD < 5%) pass with comfortable margin. Pinned in `tests/test_mc_anchors.py`.
 
 ### Cross-reference
-- `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` (forthcoming) — joint v4.5 + NAS100 add MC results.
+- `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` — joint v4.5 + NAS100 add MC results.
 - `archive/striker_dj30_v4.4.pine` — preserved for reproducibility.
 
 ---

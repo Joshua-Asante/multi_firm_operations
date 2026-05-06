@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
-# Single-tier protection (validated 2026-04-17, revalidated 2026-04-23):
-#   - 10K-sim MC: bust 0.65% / pass 92.73% at current portfolio
-#     (G 0.34% / S 1.00% / A 1.50%, Pepperstone 2022→2026 panel, 223 week-blocks)
+# Single-tier protection (validated 2026-04-17, revalidated 2026-04-23,
+# re-anchored 2026-05-05 under 4-strategy lock):
+#   - 10K-sim MC: pass 97.88% / bust 0.22% / p99 DD 4.55% at current portfolio
+#     (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, Pepperstone 2022→2026
+#     panel, 223 week-blocks)
 #   - Equity tier deleted after Claude Code proved it was dead code under min semantics
 #   - Do not change without re-running portfolio_mc
 # See: https://www.notion.so/346dc0b53c11816085bbf2292be934cc
@@ -135,8 +137,9 @@ def _validate_protection_rule():
     )
 
     # --- B. Spec pin: constants match locked values per 2026-04-17 ADR ---
-    # Validated by 10K-sim MC at G/S/A current allocation:
-    # 92.73% pass / 0.65% bust / p99 DD 4.94%. Any future change to either
+    # Re-validated 2026-05-05 by 10K-sim MC at the 4-strategy allocation
+    # (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%):
+    # 97.88% pass / 0.22% bust / p99 DD 4.55%. Any future change to either
     # constant must update both the constant AND this literal pin in the
     # same commit, tied to a re-MC run.
     if DD_TRIGGER != 0.010:

@@ -12,13 +12,19 @@ Versioning begins at v4.1 (2026-04-17). Prior development (v4 → v4.1 with +12%
 
 _Queued changes. Move to a dated entry on commit._
 
-- **BOJ April 28, 2026 meeting** — binary vol event. Monitor for regime shift post-meeting; no parameter change queued, but a dated entry should record observed behavior.
+_(none)_
+
+---
+
+## 2026-05-05 — Open queue closeout
+
+- **BOJ April 28, 2026 meeting watch — closed.** Monitoring window from the prior Unreleased entry elapsed 2026-04-28 → 2026-05-05 with no parameter change required and no dated regime-shift entry written. No behavioral note merits backfill at this point; closing the watch.
 
 ---
 
 ## [v4.3] — 2026-04-22 (candidate) / 2026-04-23 🔒 LOCKED
 
-**Status:** LOCKED 2026-04-23 (commit `e40802d`, jointly with Guardian v5.5 and Striker v4.4). Active on FXIFY $200K challenge. Risk 1.50%. Supersedes v4.2.
+**Status:** LOCKED 2026-04-23 (commit `e40802d`, jointly with Guardian v5.5 and Striker v4.4 — DJ30 later migrated v4.4 → v4.5 on 2026-05-05; Aegis v4.3 unchanged through both events). Active on FXIFY $200K challenge. Risk 1.50%. Supersedes v4.2.
 
 ### Delta from v4.2
 Single parameter change: **block calendar day 29, 30, 31 of every month** (`eom_block = dayofmonth >= 29`). All other parameters (BB(19, 1.9), ATR(19), atr_sl_mult 1.42, tp_offset 0.8, be_trigger 0.3, be_pad 0.15, min_atr_val 0.07, session 10:00–13:45, Mon/Tue/Wed only, Tuesday H10 block, max_hold 40 bars, max 1 trade/day) are preserved unchanged from v4.2.
@@ -55,6 +61,7 @@ The previously-queued post-v4.3 portfolio MC re-run executed at the joint 2026-0
 - 2026-04-23 Pepperstone directional MC re-lock (84.37% pass / 1.03% bust) vs 2026-04-20 Alchemy baseline (99.21% / 0.03%) — commit `e40802d`
 - 2026-04-23 post-Guardian-risk-relock canonical MC (92.73% pass / 0.65% bust / p99 DD 4.94%) — commit `84d3cb1`
 - 2026-04-24 Mon-H10 2024 Inversion INVESTIGATE: H-A confirmed (tail-noise, not a structural issue)
+- **2026-05-05** — portfolio re-anchored to 4-strategy lock (G 0.34% / DJ30 v4.5 1.00% / **A 1.50%** / NAS v1 0.40%): 97.88% pass / 0.22% bust / p99 DD 4.55%. Aegis allocation unchanged; Aegis bust attribution moved 25.1% → 22.7%. See `strategies/striker/striker_CHANGELOG.md` v4.5 entry and `docs/briefs/striker_nas100_q_nas_3_mc_addition.md`.
 
 ---
 

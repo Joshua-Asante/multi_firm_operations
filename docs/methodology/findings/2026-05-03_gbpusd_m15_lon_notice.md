@@ -201,16 +201,16 @@ If H-LORB fails on edge in all regimes (kill #1 × 3) OR on cost-vs-edge (#7), H
 
 12. **Hurst on log returns, never log prices** (`feedback_hurst_rs_log_prices_trap.md`). Dual-estimator: `nolds.hurst_rs` canonical, inline R/S cross-check.
 
-13. **Implementation reuse — port from `analysis/eurusd_lnyo/`.** No greenfield reimplementation. Direct ports with parameter swaps:
+13. **Implementation reuse — port from `analysis/archive/eurusd_lnyo/`.** No greenfield reimplementation. Direct ports with parameter swaps:
 
     | Source module | Reuse pattern |
     |---|---|
-    | [pepperstone_spread.py](../../../analysis/eurusd_lnyo/pepperstone_spread.py) | Port to `analysis/gbpusd_lon/`. Swap baseline (0.35 pip → 0.5 pip per fill on GBPUSD) + add UK-release multiplier from §5 #1. |
-    | [permutation.py](../../../analysis/eurusd_lnyo/permutation.py) | Port unchanged. |
-    | [correlation.py](../../../analysis/eurusd_lnyo/correlation.py) | Port unchanged; DOW masks (Striker Tue+Fri, Guardian Mon/Tue/Thu, Aegis Mon/Tue/Wed) carry over. |
-    | [dxy_loader.py](../../../analysis/eurusd_lnyo/dxy_loader.py) | Port unchanged; DXY cross-check applies identically. |
-    | [hurst_phase_a.py](../../../analysis/eurusd_lnyo/hurst_phase_a.py) | Port with inverted threshold (≤0.65 abort → ≥0.50 pass; lag-1 ACF ≥ 0). |
-    | [dukascopy_loader.py](../../../analysis/eurusd_lnyo/dukascopy_loader.py) | Port with symbol swap EUR/USD → GBP/USD. |
+    | [pepperstone_spread.py](../../../analysis/archive/eurusd_lnyo/pepperstone_spread.py) | Port to `analysis/archive/gbpusd_lon/`. Swap baseline (0.35 pip → 0.5 pip per fill on GBPUSD) + add UK-release multiplier from §5 #1. |
+    | [permutation.py](../../../analysis/archive/eurusd_lnyo/permutation.py) | Port unchanged. |
+    | [correlation.py](../../../analysis/archive/eurusd_lnyo/correlation.py) | Port unchanged; DOW masks (Striker Tue+Fri, Guardian Mon/Tue/Thu, Aegis Mon/Tue/Wed) carry over. |
+    | [dxy_loader.py](../../../analysis/archive/eurusd_lnyo/dxy_loader.py) | Port unchanged; DXY cross-check applies identically. |
+    | [hurst_phase_a.py](../../../analysis/archive/eurusd_lnyo/hurst_phase_a.py) | Port with inverted threshold (≤0.65 abort → ≥0.50 pass; lag-1 ACF ≥ 0). |
+    | [dukascopy_loader.py](../../../analysis/archive/eurusd_lnyo/dukascopy_loader.py) | Port with symbol swap EUR/USD → GBP/USD. |
 
     Parameter swaps are documented in the Inquire entry stub (§9). Any deviation from this reuse path requires its own justification in the entry stub.
 

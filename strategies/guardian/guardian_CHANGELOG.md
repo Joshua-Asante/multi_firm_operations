@@ -12,7 +12,13 @@ Versioning begins at v5.1 (2026-04-17). Prior development history (v3.7 → v3.8
 
 _Queued changes. Move to a dated entry on commit._
 
-- Re-MC with v5.4 Pepperstone CSV to isolate feed-level drag from v5.5 added-filter effect (noted at v5.5 lock).
+_(none)_
+
+---
+
+## 2026-05-05 — Open queue closeout
+
+- **v5.4 Pepperstone re-MC for feed-vs-filter isolation — closed without execution.** Question was framed against the 3-strategy MC anchor and aimed at isolating Pepperstone feed-level drag from v5.5's added filters. Under the 2026-05-05 4-strategy lock the canonical anchor is now 97.88% pass / 0.22% bust / p99 DD 4.55% (see `strategies/striker/striker_CHANGELOG.md` v4.5 entry); the v5.4-vs-v5.5 isolation no longer informs any pending decision. Re-open only if a future v5.5-attributed regression in live PnL surfaces.
 
 ---
 
@@ -36,6 +42,7 @@ Pepperstone-sourced CSVs (2022→2026) expanded the MC panel from ~14 months to 
 - 2026-04-23 joint version lock (commit `e40802d`, Guardian v5.5 / Striker v4.4 / Aegis v4.3)
 - 2026-04-23 Guardian risk re-lock (commit `84d3cb1`)
 - `docs/adr/2026-04-23-guardian-risk-relock-0.34.md`
+- **2026-05-05** — portfolio re-anchored to 4-strategy lock (**G 0.34%** / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%): 97.88% pass / 0.22% bust / p99 DD 4.55%. Guardian risk unchanged; Guardian bust attribution moved 31.4% → 25.8%. The Pepperstone Guardian export was re-fetched same day (`87e73 → 33781`, 209 → 201 trades) after a reconcile flagged 8 phantom v5.5 signals — see `data/reconciles/2026-05-05_guardian_n_reconcile.md`. See also `strategies/striker/striker_CHANGELOG.md` v4.5 entry.
 
 ---
 

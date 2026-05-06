@@ -7,13 +7,15 @@ what is the challenge pass/bust distribution?
 Not in scope: per-strategy diagnostics, allocation tuning, live integration.
 See the FINAL decision page: https://www.notion.so/346dc0b53c11816085bbf2292be934cc
 
-Invocation:
-    python -m prop_firm_pipeline.portfolio_mc                   # default run
-    python -m prop_firm_pipeline.portfolio_mc --historical      # deterministic
-    python -m prop_firm_pipeline.portfolio_mc --sensitivity     # DD-trigger grid
-    python -m prop_firm_pipeline.portfolio_mc --dd-trigger 0.01 --dd-scale 0.40
-    python -m prop_firm_pipeline.portfolio_mc --no-protection
-    python -m prop_firm_pipeline.portfolio_mc --guardian-risk 0.0025   # what-if at reduced Guardian risk
+Invocation (top-level module — pyproject declares flat py-modules, no
+`prop_firm_pipeline` package namespace):
+    python portfolio_mc.py                                 # default run (Pepperstone)
+    python portfolio_mc.py --historical                    # deterministic
+    python portfolio_mc.py --sensitivity                   # DD-trigger grid
+    python portfolio_mc.py --panel oanda                   # pattern-spotting proxy
+    python portfolio_mc.py --dd-trigger 0.01 --dd-scale 0.40
+    python portfolio_mc.py --no-protection
+    python portfolio_mc.py --guardian-risk 0.0025          # what-if at reduced Guardian risk
 """
 
 from __future__ import annotations

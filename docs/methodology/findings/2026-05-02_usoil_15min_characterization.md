@@ -18,7 +18,7 @@ USOIL 15min has volatility-clustering structure (ACF on |returns| significant, i
 - **N bars:** 101,305  N returns (excl maintenance): 101,304
 - **Window:** 2022-01-04 00:00:00+00:00 -> 2026-04-19 23:45:00+00:00
 - **Source:** OANDA practice endpoint (`WTICO_USD`, mid pricing, M15)
-- **Pipeline:** `analysis/usoil/phase1_characterize.py`
+- **Pipeline:** `analysis/archive/usoil/phase1_characterize.py`
 - **Raw results:** `2026-05-02_usoil_phase1_results.json`
 - **Stage 0 reconciliation:** `2026-05-02_usoil_feed_reconciliation.md` (must pass before Phase 1)
 

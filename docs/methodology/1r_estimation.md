@@ -213,8 +213,10 @@ not the steady-state tail of routine losses.
 applies `dd_protection` in-loop (`portfolio_mc.py:148-150`: `scale =
 dd_scale if dd_from_peak <= -dd_trigger else 1.0`); the scaled P&L feeds
 both the bust checks (lines 154-157) and the peak tracking (line 161). So
-the locked headline figures (92.73% pass / 0.65% bust / p99 DD 4.94%) are
-**already attenuated by the rule** — `dd_protection` is part of the
+the locked headline figures (92.73% pass / 0.65% bust / p99 DD 4.94% under
+the 3-strategy lock; re-anchored 2026-05-05 to 97.88% / 0.22% / 4.55% under
+the 4-strategy lock — see `strategies/striker/striker_CHANGELOG.md` v4.5
+entry) are **already attenuated by the rule** — `dd_protection` is part of the
 calibrated system, not a detachable post-hoc overlay. The 44.9% panel
 trigger frequency from the trace above is therefore a property of the same
 system whose pass/bust numbers are anchored.

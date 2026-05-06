@@ -242,10 +242,10 @@ def main():
         ],
         "brief_commit_hash": "158dc61d1aae7ed87717a7291c43df51c526c9b5",
     }
-    Path("analysis/gbpusd_lon/results").mkdir(parents=True, exist_ok=True)
-    with open("analysis/gbpusd_lon/results/h_lorb_g1_phaseA_hurst.json", "w") as f:
+    Path("analysis/archive/gbpusd_lon/results").mkdir(parents=True, exist_ok=True)
+    with open("analysis/archive/gbpusd_lon/results/h_lorb_g1_phaseA_hurst.json", "w") as f:
         json.dump(out, f, indent=2)
-    print("\nWritten: analysis/gbpusd_lon/results/h_lorb_g1_phaseA_hurst.json")
+    print("\nWritten: analysis/archive/gbpusd_lon/results/h_lorb_g1_phaseA_hurst.json")
 
 
 if __name__ == "__main__":

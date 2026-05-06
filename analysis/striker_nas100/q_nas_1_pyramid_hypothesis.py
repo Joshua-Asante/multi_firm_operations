@@ -306,7 +306,7 @@ def _render_doc(t1: dict, t2: dict, t3: dict) -> str:
     md.append("")
     md.append(
         "**Action implications:** none for production allocation — the 4-strategy MC headline at "
-        "Q-NAS-3 (98.13% pass / 0.22% bust / p99 DD 4.49%) treats NAS as a complete strategy including "
+        "Q-NAS-3 (97.88% pass / 0.22% bust / p99 DD 4.55%) treats NAS as a complete strategy including "
         "the pyramid pathway. These confirmatory tests document that the pathway is the strategy, "
         "consistent with how it was sized and locked."
     )

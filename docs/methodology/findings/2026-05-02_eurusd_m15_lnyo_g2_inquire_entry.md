@@ -107,7 +107,7 @@ Mirror artifact: the G1 kill audit §0 disclosed session-isolation slippage but 
 - [ ] Pine activation predicates cross-checked against most recent backtest CSV trade-day list (filter active in execution, not just coded)
 - [ ] §0a written into the new findings file with all five components (§3 of this stub) — abort to G4 if any component fails
 - [ ] Spread model provenance section authored in findings file (calibration source, sample window, known divergence vs Pepperstone live, mandatory 1.25× sensitivity)
-- [ ] Pepperstone session-conditional spread model loaded from `analysis/eurusd_lnyo/pepperstone_spread.py`
+- [ ] Pepperstone session-conditional spread model loaded from `analysis/archive/eurusd_lnyo/pepperstone_spread.py`
 - [ ] Dukascopy M15 EURUSD bid+ask 2022-01-04 → 2026-04-20 loaded from `data/bar_data/EURUSD_dukascopy_m15_bidask_2022-01-04_to_2026-04-20.csv`
 - [ ] DST tz-aware timestamps verified at March/November transition zones (IANA `America/New_York`)
 - [ ] Three regime sub-periods isolated using **pre-committed** boundaries from parent brief §5 #2 (no Inquire-time tuning of cutpoints — researcher-DOF leakage)

@@ -24,10 +24,14 @@ Pine Script being the source of truth for strategy parameters.
 ## Portfolio MC
 
 ```bash
-python -m prop_firm_pipeline.portfolio_mc                 # default run at locked allocations
-python -m prop_firm_pipeline.portfolio_mc --historical    # deterministic backtest
-python -m prop_firm_pipeline.portfolio_mc --sensitivity   # DD-tier grid
-python -m prop_firm_pipeline.portfolio_mc --guardian-risk 0.0025   # what-if at reduced Guardian
+python portfolio_mc.py                 # default run at locked allocations (Pepperstone)
+python portfolio_mc.py --historical    # deterministic backtest
+python portfolio_mc.py --sensitivity   # DD-tier grid
+python portfolio_mc.py --panel oanda   # pattern-spotting proxy panel
+python portfolio_mc.py --guardian-risk 0.0025   # what-if at reduced Guardian risk
 ```
 
-TradingView exports belong at `data/tv_exports/{guardian,striker,aegis}.csv`.
+TradingView exports live under `data/tv_exports/{pepperstone,oanda}/` with the
+canonical filename `<Strategy>_<Instrument>_<Version>_<Broker>_<Symbol>_<YYYY-MM-DD>_<hash>.csv`
+(MVD identity gate in `portfolio_mc.py` enforces the seven-field shape). The
+Pepperstone subdir is the lock-anchor source; OANDA is the proxy.

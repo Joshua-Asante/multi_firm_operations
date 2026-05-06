@@ -63,4 +63,4 @@ Top-half buckets (by spawn rate) account for **50.0%** of all pyramid spawns. Hi
 
 All three tests are **consistent with the design-intent statement** in the strategy header. The pyramid-dependence pattern is real (Test 2 shows pyramid contribution dominates in every profitable year), the residual base-only edge collapses without pyramid days (Test 1), and spawn likelihood is reported per (hour × dow) bucket for ongoing monitoring (Test 3).
 
-**Action implications:** none for production allocation — the 4-strategy MC headline at Q-NAS-3 (98.13% pass / 0.22% bust / p99 DD 4.49%) treats NAS as a complete strategy including the pyramid pathway. These confirmatory tests document that the pathway is the strategy, consistent with how it was sized and locked.
+**Action implications:** none for production allocation — the 4-strategy MC headline at Q-NAS-3 (97.88% pass / 0.22% bust / p99 DD 4.55%) treats NAS as a complete strategy including the pyramid pathway. These confirmatory tests document that the pathway is the strategy, consistent with how it was sized and locked.

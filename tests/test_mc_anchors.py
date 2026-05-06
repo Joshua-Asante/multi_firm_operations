@@ -44,10 +44,13 @@ def test_pepperstone_anchor(pepperstone_result):
     """2026-05-05 Pepperstone 4-strategy canonical anchor (code-reproducible).
 
     DJ30 v4.5 + NAS100 v1 (0.40% allocation) added 2026-05-05.
+    Re-anchored same day after Guardian Pepperstone re-export (87e73 → 33781,
+    209 → 201 trades; 04-26 export contained 8 phantom v5.5 signals — see
+    data/reconciles/2026-05-05_guardian_n_reconcile.md).
     """
-    assert pepperstone_result["pass_rate"] == pytest.approx(0.9813, abs=1e-4)
+    assert pepperstone_result["pass_rate"] == pytest.approx(0.9788, abs=1e-4)
     assert pepperstone_result["bust_rate"] == pytest.approx(0.0022, abs=1e-4)
-    assert pepperstone_result["p99_dd"]    == pytest.approx(0.0449, abs=1e-4)
+    assert pepperstone_result["p99_dd"]    == pytest.approx(0.0455, abs=1e-4)
 
 
 def test_oanda_anchor(oanda_result):

@@ -1,0 +1,225 @@
+trade_num,signal,entry_dt_utc,net_pnl_usd,n_entries_that_day,nearest_event_minutes_signed,nearest_event_type,in_window_30,in_window_60,in_window_90,in_window_120,in_window_180
+1,Long,2022-01-04 15:15:00,-2016.59,1,-1425,none,False,False,False,False,False
+2,Long,2022-01-07 16:45:00,-1982.5,1,195,NFP,False,False,False,False,False
+3,Long,2022-01-28 16:15:00,76.68,1,165,PCE,False,False,False,False,True
+4,Long,2022-02-04 14:30:00,-2070.44,1,60,NFP,False,True,True,True,True
+5,Long,2022-02-25 15:15:00,3906.0,2,105,PCE,False,False,False,True,True
+6,Long Add,2022-02-25 16:45:00,-737.8,2,195,PCE,False,False,False,False,False
+7,Long,2022-03-15 14:30:00,73.48,2,120,RetailSales,False,False,False,True,True
+8,Long,2022-03-15 16:15:00,-1976.63,2,225,RetailSales,False,False,False,False,False
+9,Long,2022-03-18 14:00:00,-1958.58,3,4410,none,False,False,False,False,False
+10,Long,2022-03-18 16:30:00,5494.5,3,4560,none,False,False,False,False,False
+11,Long Add,2022-03-18 19:00:00,10470.03,3,4710,none,False,False,False,False,False
+12,Long,2022-03-25 14:15:00,70.87,1,105,PCE,False,False,False,True,True
+13,Long,2022-04-08 14:45:00,75.0,1,4365,none,False,False,False,False,False
+14,Long,2022-04-19 13:45:00,74.52,2,75,RetailSales,False,False,True,True,True
+15,Long,2022-04-19 14:15:00,75.0,2,105,RetailSales,False,False,False,True,True
+16,Long,2022-05-03 15:00:00,79.58,1,-1380,none,False,False,False,False,False
+17,Long,2022-05-27 13:45:00,-68.25,2,75,PCE,False,False,True,True,True
+18,Long,2022-05-27 15:15:00,164.61,2,165,PCE,False,False,False,False,True
+19,Long,2022-05-31 15:45:00,78.69,1,-1335,none,False,False,False,False,False
+20,Long,2022-06-07 14:30:00,78.4,1,-1320,none,False,False,False,False,False
+21,Long,2022-06-21 13:45:00,617.9,1,75,RetailSales,False,False,True,True,True
+22,Long,2022-06-24 15:30:00,74.76,1,180,PCE,False,False,False,False,True
+23,Long,2022-07-15 14:15:00,79.55,1,1545,none,False,False,False,False,False
+24,Long,2022-07-19 14:00:00,2960.96,4,90,RetailSales,False,False,True,True,True
+25,Long Add,2022-07-19 15:30:00,-1234.24,4,180,RetailSales,False,False,False,False,True
+26,Long,2022-07-19 16:30:00,1343.16,4,240,RetailSales,False,False,False,False,False
+27,Long Add,2022-07-19 18:00:00,-4994.85,4,330,none,False,False,False,False,False
+28,Long,2022-07-29 14:15:00,71.53,2,105,PCE,False,False,False,True,True
+29,Long,2022-07-29 16:45:00,72.75,2,255,none,False,False,False,False,False
+30,Long,2022-08-02 16:15:00,-2095.6,1,-1305,none,False,False,False,False,False
+31,Long,2022-08-12 16:00:00,4787.37,2,1650,none,False,False,False,False,False
+32,Long Add,2022-08-12 18:30:00,3943.8,2,1800,none,False,False,False,False,False
+33,Long,2022-08-16 13:45:00,71.2,2,75,RetailSales,False,False,True,True,True
+34,Long,2022-08-16 15:15:00,1818.63,2,165,RetailSales,False,False,False,False,True
+35,Long,2022-09-02 14:30:00,81.51,1,120,NFP,False,False,False,True,True
+36,Long,2022-10-04 13:45:00,78.9,1,1425,none,False,False,False,False,False
+37,Long,2022-10-11 14:30:00,2833.6,2,-1320,none,False,False,False,False,False
+38,Long,2022-10-11 16:30:00,-2210.76,2,-1200,none,False,False,False,False,False
+39,Long,2022-10-21 13:45:00,82.56,3,4395,none,False,False,False,False,False
+40,Long,2022-10-21 16:45:00,5570.73,3,4575,none,False,False,False,False,False
+41,Long Add,2022-10-21 19:15:00,6956.34,3,4725,none,False,False,False,False,False
+42,Long,2022-10-25 15:30:00,-2318.2,1,-2700,none,False,False,False,False,False
+43,Long,2022-10-28 14:45:00,85.56,3,135,PCE,False,False,False,False,True
+44,Long,2022-10-28 16:15:00,2972.9,3,225,PCE,False,False,False,False,False
+45,Long Add,2022-10-28 18:30:00,1194.77,3,360,none,False,False,False,False,False
+46,Long,2022-11-04 14:00:00,307.98,1,90,NFP,False,False,True,True,True
+47,Long,2022-11-08 15:15:00,1655.19,2,-1335,none,False,False,False,False,False
+48,Long,2022-11-08 16:30:00,84.0,2,-1260,none,False,False,False,False,False
+49,Long,2022-11-22 15:00:00,78.47,1,-4230,none,False,False,False,False,False
+50,Long,2022-11-25 14:45:00,70.4,1,75,PCE,False,False,True,True,True
+51,Long,2022-11-29 15:15:00,-2366.54,1,-2865,none,False,False,False,False,False
+52,Long,2022-12-20 15:15:00,82.94,1,105,RetailSales,False,False,False,True,True
+53,Long,2023-01-06 13:45:00,-2339.3,2,15,NFP,True,True,True,True,True
+54,Long,2023-01-06 15:30:00,696.0,2,120,NFP,False,False,False,True,True
+55,Long,2023-01-13 15:15:00,82.65,1,1545,none,False,False,False,False,False
+56,Long,2023-01-20 16:00:00,81.54,1,4470,none,False,False,False,False,False
+57,Long,2023-01-24 15:30:00,82.62,1,-2760,none,False,False,False,False,False
+58,Long,2023-02-03 15:30:00,-55.44,1,30,ISM_Svc,True,True,True,True,True
+59,Long,2023-02-10 15:00:00,81.12,1,1530,none,False,False,False,False,False
+60,Long,2023-03-03 16:15:00,80.96,3,75,ISM_Svc,False,False,True,True,True
+61,Long,2023-03-03 16:45:00,3677.98,3,105,ISM_Svc,False,False,False,True,True
+62,Long Add,2023-03-03 19:15:00,1675.32,3,255,none,False,False,False,False,False
+63,Long,2023-03-24 15:45:00,90.24,1,4515,none,False,False,False,False,False
+64,Long,2023-03-28 14:00:00,-2386.8,1,-4230,none,False,False,False,False,False
+65,Long,2023-03-31 15:00:00,3756.83,1,150,PCE,False,False,False,False,True
+66,Long,2023-04-11 14:15:00,-3176.96,2,-1335,none,False,False,False,False,False
+67,Long,2023-04-11 15:15:00,943.92,2,-1275,none,False,False,False,False,False
+68,Long,2023-04-28 13:45:00,4699.62,3,75,PCE,False,False,True,True,True
+69,Long,2023-04-28 15:45:00,85.28,3,195,PCE,False,False,False,False,False
+70,Long,2023-04-28 16:45:00,-2419.2,3,255,none,False,False,False,False,False
+71,Long,2023-05-09 13:45:00,-3546.87,1,-1365,none,False,False,False,False,False
+72,Long,2023-05-26 14:15:00,-2351.97,1,105,PCE,False,False,False,True,True
+73,Long,2023-06-02 14:00:00,7766.25,2,90,NFP,False,False,True,True,True
+74,Long Add,2023-06-02 15:30:00,12227.02,2,180,NFP,False,False,False,False,True
+75,Long,2023-06-06 14:45:00,-2991.45,1,1485,none,False,False,False,False,False
+76,Long,2023-06-09 14:00:00,75.4,1,1530,none,False,False,False,False,False
+77,Long,2023-06-27 15:30:00,3221.64,2,-4140,none,False,False,False,False,False
+78,Long Add,2023-06-27 17:15:00,1831.5,2,-4035,none,False,False,False,False,False
+79,Long,2023-07-07 16:30:00,84.24,1,240,NFP,False,False,False,False,False
+80,Long,2023-07-11 15:45:00,82.4,1,-1245,none,False,False,False,False,False
+81,Long,2023-07-18 13:45:00,81.44,3,75,RetailSales,False,False,True,True,True
+82,Long,2023-07-18 14:15:00,5963.7,3,105,RetailSales,False,False,False,True,True
+83,Long Add,2023-07-18 15:45:00,-6022.02,3,195,RetailSales,False,False,False,False,False
+84,Long,2023-07-25 15:30:00,72.5,2,-2700,none,False,False,False,False,False
+85,Long,2023-07-25 16:45:00,73.4,2,-2625,none,False,False,False,False,False
+86,Long,2023-08-01 13:45:00,-2863.22,1,-15,ISM_Mfg,True,True,True,True,True
+87,Long,2023-08-04 14:30:00,44.07,2,120,NFP,False,False,False,True,True
+88,Long,2023-08-04 16:30:00,-2531.69,2,240,NFP,False,False,False,False,False
+89,Long,2023-08-11 14:15:00,87.36,1,1545,none,False,False,False,False,False
+90,Long,2023-08-18 15:00:00,87.17,1,4470,none,False,False,False,False,False
+91,Long,2023-08-29 14:00:00,79.35,2,-4230,none,False,False,False,False,False
+92,Long,2023-08-29 15:30:00,85.0,2,-4140,none,False,False,False,False,False
+93,Long,2023-09-08 14:00:00,766.25,1,4320,none,False,False,False,False,False
+94,Long,2023-09-12 15:15:00,7837.32,2,-1275,none,False,False,False,False,False
+95,Long Add,2023-09-12 16:45:00,11742.0,2,-1185,none,False,False,False,False,False
+96,Long,2023-10-06 15:15:00,2711.36,1,165,NFP,False,False,False,False,True
+97,Long,2023-10-10 14:00:00,90.44,3,-1350,none,False,False,False,False,False
+98,Long,2023-10-10 15:00:00,95.26,3,-1290,none,False,False,False,False,False
+99,Long,2023-10-10 15:45:00,-2747.7,3,-1245,none,False,False,False,False,False
+100,Long,2023-10-17 15:15:00,3889.92,1,165,RetailSales,False,False,False,False,True
+101,Long,2023-10-31 16:30:00,366.76,1,-1290,none,False,False,False,False,False
+102,Long,2023-11-03 16:00:00,94.2,1,120,ISM_Svc,False,False,False,True,True
+103,Long,2023-11-07 15:00:00,3216.93,2,-1350,none,False,False,False,False,False
+104,Long,2023-11-07 16:30:00,-2802.88,2,-1260,none,False,False,False,False,False
+105,Long,2023-11-14 15:15:00,496.4,1,7305,none,False,False,False,False,False
+106,Long,2023-11-24 15:15:00,76.4,1,105,PCE,False,False,False,True,True
+107,Long,2023-11-28 15:30:00,1139.06,1,-4200,none,False,False,False,False,False
+108,Long,2023-12-01 16:30:00,94.08,1,90,ISM_Mfg,False,False,True,True,True
+109,Long,2023-12-19 14:45:00,3979.17,2,75,RetailSales,False,False,True,True,True
+110,Long Add,2023-12-19 16:15:00,-6510.94,2,165,RetailSales,False,False,False,False,True
+111,Long,2024-01-02 16:45:00,93.29,1,-1335,none,False,False,False,False,False
+112,Long,2024-01-05 14:15:00,4744.22,1,45,NFP,False,True,True,True,True
+113,Long,2024-01-26 14:30:00,-2811.9,2,60,PCE,False,True,True,True,True
+114,Long,2024-01-26 15:15:00,1364.84,2,105,PCE,False,False,False,True,True
+115,Long,2024-01-30 16:15:00,1463.06,1,-2805,none,False,False,False,False,False
+116,Long,2024-03-01 15:15:00,83.2,1,15,ISM_Mfg,True,True,True,True,True
+117,Long,2024-03-08 14:45:00,-2811.06,1,4305,none,False,False,False,False,False
+118,Long,2024-03-12 14:30:00,-2770.2,1,-1320,none,False,False,False,False,False
+119,Long,2024-03-19 14:30:00,7671.58,2,120,RetailSales,False,False,False,True,True
+120,Long Add,2024-03-19 16:00:00,16271.36,2,210,RetailSales,False,False,False,False,False
+121,Long,2024-04-05 14:45:00,-2991.12,2,135,NFP,False,False,False,False,True
+122,Long,2024-04-05 15:30:00,1236.3,2,180,NFP,False,False,False,False,True
+123,Long,2024-04-23 14:30:00,101.01,1,-2760,none,False,False,False,False,False
+124,Long,2024-04-26 14:00:00,-2974.7,2,90,PCE,False,False,True,True,True
+125,Long,2024-04-26 16:45:00,-3221.12,2,255,none,False,False,False,False,False
+126,Long,2024-05-07 14:00:00,84.7,1,-1350,none,False,False,False,False,False
+127,Long,2024-05-21 14:00:00,82.2,1,90,RetailSales,False,False,True,True,True
+128,Long,2024-05-24 15:00:00,-2915.01,1,4470,none,False,False,False,False,False
+129,Long,2024-06-04 13:45:00,-101.01,1,1425,none,False,False,False,False,False
+130,Long,2024-06-07 14:15:00,1296.88,1,105,NFP,False,False,False,True,True
+131,Long,2024-06-21 14:00:00,101.2,1,4410,none,False,False,False,False,False
+132,Long,2024-07-09 16:15:00,4188.24,1,-1215,none,False,False,False,False,False
+133,Long,2024-07-12 14:15:00,-247.86,3,1545,none,False,False,False,False,False
+134,Long,2024-07-12 14:45:00,2235.04,3,1575,none,False,False,False,False,False
+135,Long,2024-07-12 16:45:00,4318.02,3,1695,none,False,False,False,False,False
+136,Long,2024-07-16 13:45:00,5651.1,2,75,RetailSales,False,False,True,True,True
+137,Long Add,2024-07-16 15:15:00,-5220.0,2,165,RetailSales,False,False,False,False,True
+138,Long,2024-07-26 13:45:00,1045.2,2,75,PCE,False,False,True,True,True
+139,Long,2024-07-26 15:45:00,915.06,2,195,PCE,False,False,False,False,False
+140,Long,2024-08-06 14:00:00,162.64,1,1440,none,False,False,False,False,False
+141,Long,2024-08-13 16:45:00,-3030.24,1,-1185,none,False,False,False,False,False
+142,Long,2024-08-16 16:45:00,102.2,1,3135,none,False,False,False,False,False
+143,Long,2024-09-13 13:45:00,102.52,3,1515,none,False,False,False,False,False
+144,Long,2024-09-13 14:30:00,-2995.92,3,1560,none,False,False,False,False,False
+145,Long,2024-09-13 15:30:00,109.82,3,1620,none,False,False,False,False,False
+146,Long,2024-09-17 14:15:00,-2974.16,1,105,RetailSales,False,False,False,True,True
+147,Long,2024-09-20 16:30:00,102.25,1,4560,none,False,False,False,False,False
+148,Long,2024-09-27 14:00:00,7752.07,1,90,PCE,False,False,True,True,True
+149,Long,2024-10-11 14:00:00,3431.32,2,1530,none,False,False,False,False,False
+150,Long Add,2024-10-11 15:30:00,-7079.27,2,1620,none,False,False,False,False,False
+151,Long,2024-10-18 16:30:00,102.0,1,4560,none,False,False,False,False,False
+152,Long,2024-10-22 15:00:00,102.12,2,-2730,none,False,False,False,False,False
+153,Long,2024-10-22 16:30:00,103.32,2,-2640,none,False,False,False,False,False
+154,Long,2024-11-01 14:15:00,-3967.44,2,15,ISM_Mfg,True,True,True,True,True
+155,Long,2024-11-01 15:15:00,-2941.76,2,75,ISM_Mfg,False,False,True,True,True
+156,Long,2024-11-05 14:45:00,5732.4,1,-15,ISM_Svc,True,True,True,True,True
+157,Long,2024-11-08 15:15:00,1919.81,1,4335,none,False,False,False,False,False
+158,Long,2024-11-12 14:30:00,-5297.4,1,-1380,none,False,False,False,False,False
+159,Long,2024-11-19 16:15:00,108.04,1,165,RetailSales,False,False,False,False,True
+160,Long,2024-11-29 15:45:00,5392.05,2,135,PCE,False,False,False,False,True
+161,Long Add,2024-11-29 17:15:00,-4561.59,2,225,PCE,False,False,False,False,False
+162,Long,2024-12-10 15:45:00,100.76,1,-1305,none,False,False,False,False,False
+163,Long,2024-12-20 15:15:00,14008.32,2,4425,none,False,False,False,False,False
+164,Long Add,2024-12-20 16:45:00,2170.74,2,4515,none,False,False,False,False,False
+165,Long,2024-12-24 16:30:00,1026.63,1,-4140,none,False,False,False,False,False
+166,Long,2025-01-17 15:45:00,1540.59,1,-5625,none,False,False,False,False,False
+167,Long,2025-01-28 15:30:00,113.13,1,-4200,none,False,False,False,False,False
+168,Long,2025-02-07 14:45:00,-11870.65,1,75,NFP,False,False,True,True,True
+169,Long,2025-02-11 15:30:00,1386.0,1,-1320,none,False,False,False,False,False
+170,Long,2025-03-14 14:45:00,760.76,1,1575,none,False,False,False,False,False
+171,Long,2025-03-21 16:15:00,114.84,1,4545,none,False,False,False,False,False
+172,Long,2025-04-01 14:45:00,1310.18,1,45,ISM_Mfg,False,True,True,True,True
+173,Long,2025-04-22 14:30:00,623.2,2,-2760,none,False,False,False,False,False
+174,Long,2025-04-22 16:00:00,114.38,2,-2670,none,False,False,False,False,False
+175,Long,2025-04-29 14:45:00,-3055.0,1,-2835,none,False,False,False,False,False
+176,Long,2025-05-02 16:00:00,-3032.39,1,210,NFP,False,False,False,False,False
+177,Long,2025-05-16 16:30:00,5330.0,2,3120,none,False,False,False,False,False
+178,Long Add,2025-05-16 18:00:00,6246.6,2,3210,none,False,False,False,False,False
+179,Long,2025-05-27 15:30:00,3701.45,2,-4140,none,False,False,False,False,False
+180,Long Add,2025-05-27 17:45:00,-4012.4,2,-4005,none,False,False,False,False,False
+181,Long,2025-06-03 15:00:00,5769.75,2,-1380,none,False,False,False,False,False
+182,Long Add,2025-06-03 16:30:00,4073.03,2,-1290,none,False,False,False,False,False
+183,Long,2025-06-27 13:45:00,22644.88,3,75,PCE,False,False,True,True,True
+184,Long Add,2025-06-27 15:15:00,43847.32,3,165,PCE,False,False,False,False,True
+185,Long,2025-06-27 16:15:00,-3893.29,3,225,PCE,False,False,False,False,False
+186,Long,2025-07-01 14:00:00,15054.12,2,0,ISM_Mfg,True,True,True,True,True
+187,Long,2025-07-01 16:00:00,-3991.55,2,120,ISM_Mfg,False,False,False,True,True
+188,Long,2025-08-12 14:00:00,147.63,1,-1350,none,False,False,False,False,False
+189,Long,2025-08-19 14:15:00,-3962.64,1,105,RetailSales,False,False,False,True,True
+190,Long,2025-08-22 14:45:00,246.35,1,4455,none,False,False,False,False,False
+191,Long,2025-09-09 15:15:00,-3923.12,1,-1275,none,False,False,False,False,False
+192,Long,2025-09-23 13:45:00,-3894.56,1,-4245,none,False,False,False,False,False
+193,Long,2025-10-03 13:45:00,13912.94,2,-15,ISM_Svc,True,True,True,True,True
+194,Long,2025-10-03 16:00:00,143.1,2,120,ISM_Svc,False,False,False,True,True
+195,Long,2025-10-14 14:15:00,13930.2,2,7305,none,False,False,False,False,False
+196,Long Add,2025-10-14 15:45:00,15953.7,2,7395,none,False,False,False,False,False
+197,Long,2025-10-21 14:30:00,8123.22,1,120,RetailSales,False,False,False,True,True
+198,Long,2025-10-24 13:45:00,-4367.49,1,1515,none,False,False,False,False,False
+199,Long,2025-11-04 14:45:00,2983.56,1,1425,none,False,False,False,False,False
+200,Long,2025-11-11 16:45:00,11561.55,2,-1245,none,False,False,False,False,False
+201,Long Add,2025-11-11 18:15:00,-10197.2,2,-1155,none,False,False,False,False,False
+202,Long,2025-11-14 16:15:00,165.6,1,1605,none,False,False,False,False,False
+203,Long,2025-11-21 16:15:00,7758.72,1,4485,none,False,False,False,False,False
+204,Long,2025-11-25 15:30:00,168.0,3,-4200,none,False,False,False,False,False
+205,Long,2025-11-25 16:45:00,12883.14,3,-4125,none,False,False,False,False,False
+206,Long Add,2025-11-25 19:00:00,28392.32,3,-3990,none,False,False,False,False,False
+207,Long,2025-11-28 15:15:00,1268.36,1,105,PCE,False,False,False,True,True
+208,Long,2025-12-02 15:00:00,-7767.76,1,1440,none,False,False,False,False,False
+209,Long,2025-12-05 15:00:00,-4798.14,1,90,NFP,False,False,True,True,True
+210,Long,2025-12-09 14:30:00,2715.66,1,-1380,none,False,False,False,False,False
+211,Long,2025-12-23 15:30:00,971.14,1,-4200,none,False,False,False,False,False
+212,Long,2026-01-06 14:30:00,9199.89,3,1410,none,False,False,False,False,False
+213,Long,2026-01-06 16:15:00,13917.12,3,1515,none,False,False,False,False,False
+214,Long Add,2026-01-06 17:45:00,8001.28,3,1605,none,False,False,False,False,False
+215,Long,2026-01-09 16:45:00,161.84,1,1635,none,False,False,False,False,False
+216,Long,2026-01-20 15:30:00,-5093.79,1,120,RetailSales,False,False,False,True,True
+217,Long,2026-02-06 15:30:00,15549.45,2,120,NFP,False,False,False,True,True
+218,Long Add,2026-02-06 17:45:00,30517.23,2,255,none,False,False,False,False,False
+219,Long,2026-02-10 14:30:00,10237.28,1,-1380,none,False,False,False,False,False
+220,Long,2026-03-10 14:45:00,217.16,1,-1305,none,False,False,False,False,False
+221,Long,2026-03-24 15:15:00,-5587.82,1,-4155,none,False,False,False,False,False
+222,Long,2026-03-31 16:30:00,-23.49,1,-1290,none,False,False,False,False,False
+223,Long,2026-04-17 13:45:00,9642.5,2,-5685,none,False,False,False,False,False
+224,Long,2026-04-17 15:45:00,211.95,2,-5565,none,False,False,False,False,False

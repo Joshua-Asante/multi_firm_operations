@@ -88,6 +88,7 @@ To add a firm: define its rules in firm_rules.py as config. Everything downstrea
 * **The Algorithm** (default problem-solving framework — Question / Delete / Simplify / Accelerate / Automate, strict order): https://www.notion.so/34ddc0b53c11811eb6a0d9192b63d252 (permanent reference page).
 * **Observation routing** (three-bucket gate Closed / Action / Forward, replaces the prior Notice/Inquire framework): [`docs/methodology/observation_routing.md`](docs/methodology/observation_routing.md).
 * **1R estimation** (per-strategy 1R, equity-compounding normalization for Guardian-style equity-sized strategies): [`docs/methodology/1r_estimation.md`](docs/methodology/1r_estimation.md).
+* **Regime-robustness gate** (mandatory before any LOCK CANDIDATE on a `dd_protection`-class risk constant; 6mo block bootstrap + half-panel split, both pinned to brief floor; Q-DDP-1 worked example 2026-05-06): [`docs/methodology/regime_robustness_gate.md`](docs/methodology/regime_robustness_gate.md).
 * **Operational rules** (incl. doc/code skew audit trigger): [`docs/operational_rules.md`](docs/operational_rules.md).
 * **Strategy-research-phase methodology archive** (INQHIORI ⊕ The Algorithm framework, Pre-Q gates, Case B audits, MVD framing — all retired 2026-04-29; 90-day review gate 2026-07-29): [`docs/methodology/archive/README.md`](docs/methodology/archive/README.md).
 

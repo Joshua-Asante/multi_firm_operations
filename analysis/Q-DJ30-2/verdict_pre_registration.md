@@ -16,16 +16,20 @@ All gate comparisons resolve against these v4.5 baseline values. If Phase B repr
 | Anchor | Value | Source |
 |---|---|---|
 | Strategy | Striker DJ30 v4.5 | `strategies/striker/striker_dj30_v4.5.pine` |
-| Primary panel | n = 197 base entries | `data/tv_exports/pepperstone/Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv`, EXIT rows where `Signal != "Long Add"` |
-| Sensitivity panel | n = 224 (197 base + 27 pyramid) | same file, all EXIT rows |
+| Primary panel (Phase C/D/F comparisons) | n = 197 base entries | `data/tv_exports/pepperstone/Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv`, entries where `Signal == "Long"` |
+| Sensitivity / PF anchor panel | n = 224 (197 base + 27 pyramid) | same file, all entries (`Type == "Entry long"`) |
 | Allocation | 1.00% per trade | 2026-05-05 lock memo |
 | Account size | $200,000 | DXTrade account spec |
 | Nominal R (dollars) | $2,000 | 1.00% × $200,000 |
-| Baseline PF | 2.755 | v4.5 lock memo |
+| Baseline PF (n=224 all entries) | **2.7528** | reproduced 2026-05-06 from CSV; matches v4.5 lock memo PF=2.755 to 0.08% |
+| Baseline PF (n=197 base only) — derived | **2.3294** | reproduced 2026-05-06; pinned anchor for Phase C ΔPF comparisons |
 | Baseline worst single-trade loss | −$11,871 | v4.5 lock memo; equals 5.94 × nominal R |
-| Baseline pyramid contribution | ≈ 94% of strategy P&L | v4.5 lock memo |
+| Baseline pyramid contribution | **42.7%** of strategy P&L | reproduced 2026-05-06; sum_pyramid $154,944.05 / sum_all $363,113.05 (was ≈94%; misattributed from Q-NAS-1 NAS100 — see `docs/methodology/gate_audits/2026-05-06_q-dj30-2_pre_reg_amend.md`) |
 | Cap formulation | `capped_pnl = max(actual_pnl, −cap_R × $2,000)` | brief Step 2 |
+| Cap target | base entries only (`Signal == "Long"`); pyramid legs untouched | brief title; cap is on base-entry stop loss |
 | Cap-level sweep | {1.5R, 2.0R, 2.5R, 3.0R, 3.5R} | brief Step 3 |
+
+**Amendment note (2026-05-06):** PF anchor cardinality and pyramid-contribution baseline corrected per `docs/methodology/gate_audits/2026-05-06_q-dj30-2_pre_reg_amend.md`. Previous values (eb5310b commit): PF=2.755 (no panel association), pyramid ≈94%. Worst-loss and trade counts unchanged.
 
 ---
 
@@ -35,10 +39,12 @@ Acceptance: ALL of the following.
 
 | Metric | Threshold |
 |---|---|
-| Reproduced PF (n=197) | within 0.5% of 2.755 |
+| Reproduced PF (n=224 all entries) | within 0.5% of 2.7528 |
+| Reproduced PF (n=197 base only) | within 0.5% of 2.3294 |
 | Reproduced worst single-trade loss | within 0.5% of −$11,871 |
 | Reproduced base-trade count | exactly 197 |
 | Reproduced pyramid-trade count | exactly 27 |
+| Reproduced pyramid contribution to total P&L | within 0.5pp of 42.7% |
 
 Failure on any line → HALT, surface to Joshua, no further phases run. The CSV is canonical; reproduction failure means the brief was drafted against a different snapshot.
 
@@ -48,9 +54,9 @@ Failure on any line → HALT, surface to Joshua, no further phases run. The CSV 
 
 Per cap level, all three thresholds must clear for the cap to advance to Phase D:
 
-| Metric | Threshold (vs uncapped baseline) |
+| Metric | Threshold (vs uncapped baseline; computed on n=197 primary panel per brief Step 3) |
 |---|---|
-| Δ PF | ≥ −5% (i.e., ≥ 0.95 × 2.755 = 2.617) |
+| Δ PF | ≥ −5% (i.e., ≥ 0.95 × 2.3294 = 2.213) |
 | Δ p99 DD | ≤ −1.0 pp (cap reduces tail) |
 | Δ WR | ≥ −5 pp |
 

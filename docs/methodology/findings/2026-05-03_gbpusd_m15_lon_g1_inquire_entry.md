@@ -5,8 +5,8 @@
 **Parent brief commit hash (record-of-pinning):** `158dc61d1aae7ed87717a7291c43df51c526c9b5` — embed in any audit-trail file written by the G1 session. The session must independently re-derive this with `git rev-parse HEAD -- docs/methodology/findings/2026-05-03_gbpusd_m15_lon_notice.md` and confirm match before any data work.
 **Predecessor template (structural mirror for this stub):** [2026-05-02_eurusd_m15_lnyo_g2_inquire_entry.md](2026-05-02_eurusd_m15_lnyo_g2_inquire_entry.md)
 **Predecessor kill audits (Rule-0 reads, load-bearing for §3 §0a components 1, 2, 5):**
-- [docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md](../archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md) — fade mechanism class (a) failure record.
-- [docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_pdsb_kill.md](../archive/gate_audits/2026-05-02_eurusd_m15_h_pdsb_kill.md) — fade mechanism class (b) failure record + SL-design lesson source.
+- [archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md](../../../archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md) — fade mechanism class (a) failure record.
+- [archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_pdsb_kill.md](../../../archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_pdsb_kill.md) — fade mechanism class (b) failure record + SL-design lesson source.
 
 **Why this file exists:** to enforce session isolation and to repeat the discipline of the G2 PDSB stub — the spawn session must read the parent Notice in full, in its own session, before any data work, and gives no prose substitute. The Notice is the structural commit; this stub is the operational handoff.
 
@@ -36,8 +36,8 @@ Step 0 — version pinning (before any reads):
 Step 1 — read in full, do not skim:
 - Parent Notice §0–§9 (no shortcuts)
 - Predecessor kill audits at
-    docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md
-    docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_pdsb_kill.md
+    archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md
+    archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_pdsb_kill.md
   in full (load-bearing for §0a components 1, 2, 5)
 - Predecessor Notice at docs/methodology/findings/2026-05-02_eurusd_m15_lnyo_notice.md
   (load-bearing — methodology guardrails carry forward unless parent Notice
@@ -88,7 +88,7 @@ Per parent Notice §1.5 + §6, the Phase-A persistence diagnostic is **conjuncti
 | inline R/S Hurst ≥ 0.50 | cross-check estimator (dual-implementation per parent Notice §5 #12) |
 | lag-1 ACF ≥ 0 | parent Notice §1.5 explicit additional gate |
 
-**Any single condition failing → Phase A ABORT.** Write `<YYYY-MM-DD>_gbpusd_m15_h_lorb_phaseA_abort.md` audit at `docs/methodology/archive/gate_audits/`, embedding parent Notice commit hash. Route to **G2 entry decision** per parent Notice §6 ("Either failing → abort to G2 entry decision (do not run backtest)"). The breakout-class persistence prior has been falsified at the conditioning window; further H-LORB work is not warranted at this configuration.
+**Any single condition failing → Phase A ABORT.** Write `<YYYY-MM-DD>_gbpusd_m15_h_lorb_phaseA_abort.md` audit at `archive/docs/methodology/archive/gate_audits/`, embedding parent Notice commit hash. Route to **G2 entry decision** per parent Notice §6 ("Either failing → abort to G2 entry decision (do not run backtest)"). The breakout-class persistence prior has been falsified at the conditioning window; further H-LORB work is not warranted at this configuration.
 
 Record measurement values and abort/proceed decision in §0a regardless of outcome.
 
@@ -104,7 +104,7 @@ Decision object is the per-regime pass/fail matrix across all 8 kill criteria fr
 ### Routing outcomes
 
 - **G1 PASS (all 8 kills × all 3 regimes × both spread variants):** H-LORB becomes primary candidate for the GBPUSD M15 LON slot. Route to **portfolio-merit Inquire** (correlation, allocation sizing, MC re-calibration scope). H-PNCB G2 stub is not authored. Pine implementation remains a post-portfolio-merit deliverable per parent Notice §7.
-- **G1 FAIL — generalizable structural** (kill #1 fails all 3 regimes OR kill #7 fails all 3 regimes): write kill audit at `docs/methodology/archive/gate_audits/<YYYY-MM-DD>_gbpusd_m15_h_lorb_kill.md`. **G2 SKIPPED** — H-PNCB inherits the same structural failure (both are post-news-low-density breakout strategies on the same instrument-timeframe; kill criteria #1/#7 are mechanism-class metrics). Route to **G3 (abandon GBPUSD M15)**. **M15-FX stop-rule generalizes** to mechanism class (d) breakout (parent Notice §6 "Stop-rule update on G3"). Track record becomes 0/4 spanning fade × 2 + breakout × 2. The next M15 retail-FX candidate's override surface narrows materially.
+- **G1 FAIL — generalizable structural** (kill #1 fails all 3 regimes OR kill #7 fails all 3 regimes): write kill audit at `archive/docs/methodology/archive/gate_audits/<YYYY-MM-DD>_gbpusd_m15_h_lorb_kill.md`. **G2 SKIPPED** — H-PNCB inherits the same structural failure (both are post-news-low-density breakout strategies on the same instrument-timeframe; kill criteria #1/#7 are mechanism-class metrics). Route to **G3 (abandon GBPUSD M15)**. **M15-FX stop-rule generalizes** to mechanism class (d) breakout (parent Notice §6 "Stop-rule update on G3"). Track record becomes 0/4 spanning fade × 2 + breakout × 2. The next M15 retail-FX candidate's override surface narrows materially.
 - **G1 FAIL — non-structural** (tail #2/#3 OR correlation #4/#5 OR mixed-regime, with edge surviving in at least one regime): write kill audit, route to **G2 (H-PNCB Inquire)**. The breakout mechanism class is not falsified; the OR-anchored implementation is suboptimal. Author H-PNCB G2 entry stub at `docs/methodology/findings/<YYYY-MM-DD>_gbpusd_m15_lon_g2_inquire_entry.md` mirroring this stub's structure.
 - **G1 FAIL — small-cell only** (kill #8 N < 60 or per-regime n < 25): trigger Rule 1 variance inflation per parent Notice §5 #8 / §4.3 kill #8 and re-evaluate. If still inconclusive, **defer**, do not fail.
 
@@ -114,9 +114,9 @@ If kill #1 fails on **edge concentration in the late-OR window** — specificall
 
 ### Audit-trail file pattern (parent Notice §8)
 
-- G1 PASS: `docs/methodology/archive/gate_audits/<YYYY-MM-DD>_gbpusd_m15_h_lorb_pass.md`
-- G1 FAIL: `docs/methodology/archive/gate_audits/<YYYY-MM-DD>_gbpusd_m15_h_lorb_kill.md`
-- Phase A abort: `docs/methodology/archive/gate_audits/<YYYY-MM-DD>_gbpusd_m15_h_lorb_phaseA_abort.md`
+- G1 PASS: `archive/docs/methodology/archive/gate_audits/<YYYY-MM-DD>_gbpusd_m15_h_lorb_pass.md`
+- G1 FAIL: `archive/docs/methodology/archive/gate_audits/<YYYY-MM-DD>_gbpusd_m15_h_lorb_kill.md`
+- Phase A abort: `archive/docs/methodology/archive/gate_audits/<YYYY-MM-DD>_gbpusd_m15_h_lorb_phaseA_abort.md`
 
 Each audit must embed the parent Notice commit hash, embed the Phase-A diagnostic results JSON path (when run), reference the parent Notice by relative path, state load-bearing facts of all Rule-0 reads in own words, and reaffirm out-of-scope per parent Notice §7.
 
@@ -181,13 +181,13 @@ Production code is read from source per Rule 0 to prevent acting on stale memory
 - [ ] §0a written into the new findings file with all 5 components (§3 of this stub) — abort to G3 if any component fails
 - [ ] **Phase A diagnostic gate run** (post-OR window 09:00–11:00 BST log-returns): `nolds` Hurst + inline R/S Hurst + lag-1 ACF; conjunctive verdict recorded; **abort to G3 if any single condition fails** (write `<date>_gbpusd_m15_h_lorb_phaseA_abort.md`)
 - [ ] Spread model provenance section authored in findings file: GBPUSD calibration source, sample window, known divergence vs Pepperstone live, UK-release multiplier rationale, mandatory 1.25× sensitivity
-- [ ] **Reuse path executed** per parent Notice §5 #13 — port the 6 modules from `analysis/archive/eurusd_lnyo/` to `analysis/archive/gbpusd_lon/` with the swaps below; no greenfield. Each port is a separate file in the new dir. Source files (read-only, must NOT be edited):
-  - [analysis/archive/eurusd_lnyo/pepperstone_spread.py](../../../analysis/archive/eurusd_lnyo/pepperstone_spread.py): port + swap baseline `PEPPERSTONE_RAZOR_BASELINE_PIPS = 0.35` → `0.5` per fill (parent Notice §1.4 / §5 #13) + add UK-release multiplier (UK 07:00 BST data calendar; multiplier magnitude calibrated and documented in port docstring with sample-window evidence per parent Notice §5 #2) + add `Europe/London` `BST` `ZoneInfo` alongside the existing `America/New_York` `ET`
-  - [analysis/archive/eurusd_lnyo/permutation.py](../../../analysis/archive/eurusd_lnyo/permutation.py): port unchanged. Update docstring header from "H-NYFBO falsification" to "H-LORB falsification"
-  - [analysis/archive/eurusd_lnyo/correlation.py](../../../analysis/archive/eurusd_lnyo/correlation.py): port unchanged. DOW masks `STRIKER_DOW = {1, 4}`, `GUARDIAN_DOW = {0, 1, 3}`, `AEGIS_DOW = {0, 1, 2}` carry over (strategy-side, pair-agnostic per parent Notice §5 #6). Hardcoded Pepperstone CSV panel paths (`Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-04-26_*.csv`, `Striker_DJ30_v4.4_PEPPERSTONE_US30_2026-04-26_*.csv`, `Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_*.csv`) stay unchanged — strategy-side panels, not pair-side
-  - [analysis/archive/eurusd_lnyo/dxy_loader.py](../../../analysis/archive/eurusd_lnyo/dxy_loader.py): port unchanged. DXY symbol `DX-Y.NYB` correct for GBPUSD anti-correlation check (parent Notice §5 #7); shared output path `data/external/dxy.csv` acceptable
-  - [analysis/archive/eurusd_lnyo/hurst_phase_a.py](../../../analysis/archive/eurusd_lnyo/hurst_phase_a.py): port + **invert threshold direction** (`< 0.65 PASS` → `≥ 0.50 PASS`) + add **lag-1 ACF on log-returns ≥ 0 conjunctive condition** (parent Notice §1.5) + swap `DATA` path to GBPUSD M15 file + swap measurement window from event-day post-08:30 ET 30-min windows to **post-OR window 09:00–11:00 BST returns** (Phase A's measurement is on the breakout-window persistence, not event-window persistence)
-  - [analysis/archive/eurusd_lnyo/dukascopy_loader.py](../../../analysis/archive/eurusd_lnyo/dukascopy_loader.py): port + symbol swap `EUR/USD` → `GBP/USD` + update `OUT_PATH` filename to `GBPUSD_dukascopy_m15_bidask_2022-01-04_to_2026-04-20.csv`. Output dir `data/bar_data/` unchanged
+- [ ] **Reuse path executed** per parent Notice §5 #13 — port the 6 modules from `archive/analysis/eurusd_lnyo/` to `archive/analysis/gbpusd_lon/` with the swaps below; no greenfield. Each port is a separate file in the new dir. Source files (read-only, must NOT be edited):
+  - [archive/analysis/eurusd_lnyo/pepperstone_spread.py](../../../archive/analysis/eurusd_lnyo/pepperstone_spread.py): port + swap baseline `PEPPERSTONE_RAZOR_BASELINE_PIPS = 0.35` → `0.5` per fill (parent Notice §1.4 / §5 #13) + add UK-release multiplier (UK 07:00 BST data calendar; multiplier magnitude calibrated and documented in port docstring with sample-window evidence per parent Notice §5 #2) + add `Europe/London` `BST` `ZoneInfo` alongside the existing `America/New_York` `ET`
+  - [archive/analysis/eurusd_lnyo/permutation.py](../../../archive/analysis/eurusd_lnyo/permutation.py): port unchanged. Update docstring header from "H-NYFBO falsification" to "H-LORB falsification"
+  - [archive/analysis/eurusd_lnyo/correlation.py](../../../archive/analysis/eurusd_lnyo/correlation.py): port unchanged. DOW masks `STRIKER_DOW = {1, 4}`, `GUARDIAN_DOW = {0, 1, 3}`, `AEGIS_DOW = {0, 1, 2}` carry over (strategy-side, pair-agnostic per parent Notice §5 #6). Hardcoded Pepperstone CSV panel paths (`Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-04-26_*.csv`, `Striker_DJ30_v4.4_PEPPERSTONE_US30_2026-04-26_*.csv`, `Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_*.csv`) stay unchanged — strategy-side panels, not pair-side
+  - [archive/analysis/eurusd_lnyo/dxy_loader.py](../../../archive/analysis/eurusd_lnyo/dxy_loader.py): port unchanged. DXY symbol `DX-Y.NYB` correct for GBPUSD anti-correlation check (parent Notice §5 #7); shared output path `data/external/dxy.csv` acceptable
+  - [archive/analysis/eurusd_lnyo/hurst_phase_a.py](../../../archive/analysis/eurusd_lnyo/hurst_phase_a.py): port + **invert threshold direction** (`< 0.65 PASS` → `≥ 0.50 PASS`) + add **lag-1 ACF on log-returns ≥ 0 conjunctive condition** (parent Notice §1.5) + swap `DATA` path to GBPUSD M15 file + swap measurement window from event-day post-08:30 ET 30-min windows to **post-OR window 09:00–11:00 BST returns** (Phase A's measurement is on the breakout-window persistence, not event-window persistence)
+  - [archive/analysis/eurusd_lnyo/dukascopy_loader.py](../../../archive/analysis/eurusd_lnyo/dukascopy_loader.py): port + symbol swap `EUR/USD` → `GBP/USD` + update `OUT_PATH` filename to `GBPUSD_dukascopy_m15_bidask_2022-01-04_to_2026-04-20.csv`. Output dir `data/bar_data/` unchanged
 - [ ] Dukascopy M15 GBPUSD bid+ask 2022-01-04 → 2026-04-20 loaded; tz-aware timestamps verified at all DST transition zones (`Europe/London` BST/GMT for OR window; `America/New_York` for cross-strategy DOW masks)
 - [ ] **Data-quality audit** (parent Notice §5 #5): missing-bar count, suspect-spread-bar count (criterion: spread > 5× session median), holiday/half-day handling, NFP/UK-data-spike artifact treatment
 - [ ] **UK-release-day OR-window spread distribution** reported (sensitivity, not headline): OR-formation spread conditional on release-day vs non-release-day per parent Notice §5 #2 (BoE / ONS calendar over the panel)
@@ -210,8 +210,8 @@ Production code is read from source per Rule 0 to prevent acting on stale memory
 - **Parent Notice:** [2026-05-03_gbpusd_m15_lon_notice.md](2026-05-03_gbpusd_m15_lon_notice.md) — §0 Rule-0 reads, §1 stop-rule override (load-bearing for §0a components 1, 2, 5), §3 corpus + S-collapse, §4 H-LORB hypothesis + 8 kill criteria, §5 13 methodology guardrails, §6 stage gates + single-knob escalation pre-commit, §7 out-of-scope, §8 audit-trail commitments, §9 entry stub deferral
 - **Predecessor structural-mirror template:** [2026-05-02_eurusd_m15_lnyo_g2_inquire_entry.md](2026-05-02_eurusd_m15_lnyo_g2_inquire_entry.md)
 - **Predecessor kill audits** (load-bearing for §3 components 1, 2, 5):
-  - [2026-05-02_eurusd_m15_h_nyfbo_kill.md](../archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md)
-  - [2026-05-02_eurusd_m15_h_pdsb_kill.md](../archive/gate_audits/2026-05-02_eurusd_m15_h_pdsb_kill.md)
+  - [2026-05-02_eurusd_m15_h_nyfbo_kill.md](../../../archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md)
+  - [2026-05-02_eurusd_m15_h_pdsb_kill.md](../../../archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_pdsb_kill.md)
 - **Predecessor Notice** (methodology guardrails inheritance): [2026-05-02_eurusd_m15_lnyo_notice.md](2026-05-02_eurusd_m15_lnyo_notice.md)
 - **Rule 0:** [docs/rule_0.md](../../rule_0.md)
 - **Observation routing:** [docs/methodology/observation_routing.md](../observation_routing.md)

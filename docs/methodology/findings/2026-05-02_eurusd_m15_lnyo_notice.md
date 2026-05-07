@@ -84,10 +84,10 @@ Pre-Q gate:
 
 ### Pre-Q gate audit
 
-- The temporal-scope D-test is on the permitted-test list (D-test discipline reference: [docs/methodology/archive/identify_corpus/2026-04-26/README.md](docs/methodology/archive/identify_corpus/2026-04-26/README.md)).
+- The temporal-scope D-test is on the permitted-test list (D-test discipline reference: [archive/docs/methodology/archive/identify_corpus/2026-04-26/README.md](archive/docs/methodology/archive/identify_corpus/2026-04-26/README.md)).
 - The directional-driver and mechanism-distinctness filters that produce the §3 CUT verdicts are **S-operations, not D-operations**. They compress same-class candidates within a working enumeration; nothing is deleted from corpus on those grounds. Each §3 CUT row declares which (driver × mechanism) cell it duplicates — a structural fact — instead of which deletion test removed it.
 - The S-reframe is deliberate: substituting a permitted-sounding D-test phrasing (e.g. "duplicated by a higher-fidelity source", "question-class extrapolation") for what is structurally an S-collapse would repeat the Iran-Hormuz failure pattern of silently relabeling. See user-memory `feedback_overlay_trigger_discipline.md` and `feedback_leading_indicator_pnl_gate_rationalization.md`.
-- If any item compressed in S later turns out to be a non-duplicate that should have stayed in the corpus, gate audit fires per the [docs/methodology/archive/gate_audits/](docs/methodology/archive/gate_audits/) convention and the per-cell uniqueness rule is revised.
+- If any item compressed in S later turns out to be a non-duplicate that should have stayed in the corpus, gate audit fires per the [archive/docs/methodology/archive/gate_audits/](archive/docs/methodology/archive/gate_audits/) convention and the per-cell uniqueness rule is revised.
 - D-S-A header convention follows the extant pattern in [docs/methodology/findings/2026-05-02_oanda_stage1_aegis.md](docs/methodology/findings/2026-05-02_oanda_stage1_aegis.md).
 
 ---
@@ -143,7 +143,7 @@ Three archetypes pass per-cell uniqueness:
 4. Trade-day concentration > 75% (under 5% daily DD, concentration is itself a tail-risk signature).
 5. Edge concentrated such that 2024-07-01 → 2026-04-20 contributes < 25% of total edge (recency-failure).
 6. **Two separate sample-size constraints, both must hold for promotion:**
-   - **Permutation-power floor:** N (effective trade count, full panel) ≥ 100, with permutation gating mandatory (Q-A1 lesson 2026-04-29: N binding + perm p just above 0.05 ≠ promotion). Reference: [docs/methodology/archive/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md](docs/methodology/archive/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md).
+   - **Permutation-power floor:** N (effective trade count, full panel) ≥ 100, with permutation gating mandatory (Q-A1 lesson 2026-04-29: N binding + perm p just above 0.05 ≠ promotion). Reference: [archive/docs/methodology/archive/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md](archive/docs/methodology/archive/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md).
    - **Rule 1 small-cell variance prior:** any regime sub-sample with n < 25 triggers Rule 1; tail statistics carry the small-cell prior and confidence intervals must be variance-inflated, not pooled to inflate N. Reference: [docs/methodology/findings/2026-05-02_usoil_15min_characterization.md](docs/methodology/findings/2026-05-02_usoil_15min_characterization.md).
 
 **Q-cost prior:** ~3 hours of Inquire work to backtest single-config falsification on Dukascopy + Pepperstone spread model. If the falsification is not testable in that budget, the hypothesis is not falsifiable enough — refine before continuing.
@@ -225,7 +225,7 @@ Three archetypes pass per-cell uniqueness:
 ## 8. Audit-trail commitments
 
 1. If any hypothesis is modified after data is touched, log as data-snooping and apply Bonferroni-equivalent t-stat hurdle bump.
-2. If any candidate is killed, write a one-paragraph kill note in `docs/methodology/archive/gate_audits/YYYY-MM-DD_<slug>.md` (slug-based naming per existing convention; pattern reference: [docs/methodology/archive/gate_audits/2026-04-25_q3_halt_rules_design_skew.md](docs/methodology/archive/gate_audits/2026-04-25_q3_halt_rules_design_skew.md)).
+2. If any candidate is killed, write a one-paragraph kill note in `archive/docs/methodology/archive/gate_audits/YYYY-MM-DD_<slug>.md` (slug-based naming per existing convention; pattern reference: [archive/docs/methodology/archive/gate_audits/2026-04-25_q3_halt_rules_design_skew.md](archive/docs/methodology/archive/gate_audits/2026-04-25_q3_halt_rules_design_skew.md)).
 3. If a forbidden D-test is detected post-hoc — for example, if the §3 S-collapse turns out to encode a hypothesis rather than a structural duplication observation — write a gate audit and revise this brief retroactively. **Do not silently amend.**
 4. If the small-cell prior fires (Rule 1: any regime sub-sample n < 25), document and apply variance-inflated confidence intervals; do not pool across regimes to inflate N.
 
@@ -268,13 +268,13 @@ Three archetypes pass per-cell uniqueness:
 - **Predecessor Notice phase:** external web report 2026-05-02 (LOR-VEB / LFLSR — operationally killed by awake-window constraint; not committed to this repo)
 - **Loop selection canon:** notion.so/34ddc0b53c1181479d7bdecc61f47078
 - **Rule 0:** [docs/rule_0.md](docs/rule_0.md)
-- **D-test discipline:** [docs/methodology/archive/identify_corpus/2026-04-26/README.md](docs/methodology/archive/identify_corpus/2026-04-26/README.md)
+- **D-test discipline:** [archive/docs/methodology/archive/identify_corpus/2026-04-26/README.md](archive/docs/methodology/archive/identify_corpus/2026-04-26/README.md)
 - **Observation routing (Closed / Action / Forward):** [docs/methodology/observation_routing.md](docs/methodology/observation_routing.md)
 - **D-S-A pre-Q header convention (extant example):** [docs/methodology/findings/2026-05-02_oanda_stage1_aegis.md](docs/methodology/findings/2026-05-02_oanda_stage1_aegis.md)
-- **Q-A1 Aegis closing brief (permutation-power lesson):** [docs/methodology/archive/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md](docs/methodology/archive/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md)
+- **Q-A1 Aegis closing brief (permutation-power lesson):** [archive/docs/methodology/archive/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md](archive/docs/methodology/archive/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md)
 - **Operational rules:** [docs/operational_rules.md](docs/operational_rules.md)
 - **1R estimation:** [docs/methodology/1r_estimation.md](docs/methodology/1r_estimation.md)
-- **Strategy-research-phase methodology archive:** [docs/methodology/archive/README.md](docs/methodology/archive/README.md)
+- **Strategy-research-phase methodology archive:** [archive/docs/methodology/archive/README.md](archive/docs/methodology/archive/README.md)
 - **Overlay history (Iran-Hormuz, deactivated 2026-04-23):** [docs/overlays/guardian_conflict_risk.md](docs/overlays/guardian_conflict_risk.md)
 - **dd_protection production source:** [dd_protection.py](dd_protection.py); MC anchors: [CLAUDE.md](CLAUDE.md), [portfolio_mc.py](portfolio_mc.py), [tests/test_mc_anchors.py](tests/test_mc_anchors.py)
 - **OODA-loop sibling skill:** for tactical / live-trade decisions during the Inquire phase

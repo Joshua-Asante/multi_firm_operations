@@ -67,3 +67,12 @@ Resurrect any individual rule only on concrete observed recurrence of its trigge
 - If no: methodology layer is empirically dead. Correct outcome. Close the gate.
 
 References at gate review time should still be: [`docs/rule_0.md`](../../rule_0.md) (Rule 0 standalone) and this README (resurrection rule).
+
+## Post-move structure note (2026-05-07)
+
+This methodology archive moved from `docs/methodology/archive/` to `archive/docs/methodology/archive/` under Approach D consolidation (commit a59985e). The two inner `archive/` segments are preserved as-is:
+
+- `analysis/archive/` — Q-series closures (Q3 / Q5 / Q11 / Q12 / Q14 / Q15) + pre-locked bar-analysis (per "What is here" §Notice/Inquire-phase-work above).
+- `analysis/msee/archive/` — H1–H10 individual hypothesis runs (per "What is here" §MSEE-framework above).
+
+Depth is the cost of truthful provenance — three nested `archive/` segments document three distinct retirements (top-level consolidation, methodology-phase retirement, individual workstream closures).

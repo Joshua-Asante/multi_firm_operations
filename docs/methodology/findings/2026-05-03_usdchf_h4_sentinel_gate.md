@@ -148,10 +148,10 @@ parameter retry, no broader framework search.** AUDNZD-style closure.
 ## Deliverables (parent brief §6)
 
 - Bar panel: [data/bar_data/USDCHF_pepperstone_h4_2020-06-25_to_2026-05-03.csv](../../../data/bar_data/USDCHF_pepperstone_h4_2020-06-25_to_2026-05-03.csv)
-- Simulator: [analysis/archive/usdchf_sentinel/sentinel_simulator.py](../../../analysis/archive/usdchf_sentinel/sentinel_simulator.py)
-- Permutation harness: [analysis/archive/usdchf_sentinel/permutation.py](../../../analysis/archive/usdchf_sentinel/permutation.py)
-- Orchestrator + decision tree: [analysis/archive/usdchf_sentinel/run_sentinel_gate.py](../../../analysis/archive/usdchf_sentinel/run_sentinel_gate.py)
-- Machine-readable results: [analysis/archive/usdchf_sentinel/results/sentinel_gate.json](../../../analysis/archive/usdchf_sentinel/results/sentinel_gate.json)
+- Simulator: [archive/analysis/usdchf_sentinel/sentinel_simulator.py](../../../archive/analysis/usdchf_sentinel/sentinel_simulator.py)
+- Permutation harness: [archive/analysis/usdchf_sentinel/permutation.py](../../../archive/analysis/usdchf_sentinel/permutation.py)
+- Orchestrator + decision tree: [archive/analysis/usdchf_sentinel/run_sentinel_gate.py](../../../archive/analysis/usdchf_sentinel/run_sentinel_gate.py)
+- Machine-readable results: [archive/analysis/usdchf_sentinel/results/sentinel_gate.json](../../../archive/analysis/usdchf_sentinel/results/sentinel_gate.json)
 - ADR: [docs/adr/2026-05-03-sentinel-gate-decision.md](../../adr/2026-05-03-sentinel-gate-decision.md)
 
 ## Cross-references

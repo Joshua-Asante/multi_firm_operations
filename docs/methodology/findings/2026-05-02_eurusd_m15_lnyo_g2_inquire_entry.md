@@ -3,7 +3,7 @@
 **Status:** entry stub for a fresh G2 Inquire-phase session. G1 (NYFBO) closed 2026-05-02 — see kill audit linked in §2.
 **Parent brief:** [2026-05-02_eurusd_m15_lnyo_notice.md](2026-05-02_eurusd_m15_lnyo_notice.md)
 **G1 sibling stub (predecessor):** [2026-05-02_eurusd_m15_lnyo_inquire_entry.md](2026-05-02_eurusd_m15_lnyo_inquire_entry.md)
-**G1 kill audit (load-bearing for §3):** [docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md](../archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md)
+**G1 kill audit (load-bearing for §3):** [archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md](../../../archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md)
 **Why this file exists:** to enforce session isolation and to **avoid** the priming failure mode of the G1 stub. The G1 stub embedded a prose summary of parent brief §3–§8; that pre-loaded the spawn session with the authoring session's framing and weakened the §0 isolation guarantee (G1 audit §0 disclosed slippage). This stub directs the G2 session to read the brief in full, in its own session, before any data work — and gives no prose substitute.
 **Out-of-scope reaffirmation:** parent brief §7 binds the G2 Inquire session in full. **Additionally: the parent brief itself is frozen for the duration of the G2 session** (see §4 brief-pinning protocol).
 **Loop:** INQHIORI — falsifiable hypothesis (H-PDSB single-config), structural decision, gated promotion, conditional entry behind §3 §0a re-justification.
@@ -26,7 +26,7 @@ Step 0 — version pinning (before any reads):
 
 Step 1 — read in full, do not skim:
 - Parent brief §0–§12 (no shortcuts)
-- G1 kill audit at docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md
+- G1 kill audit at archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md
 - The G2 §0a re-justification requirements in §3 of THIS stub file
 - docs/rule_0.md, docs/methodology/observation_routing.md
 - All Rule-0 production sources named in parent brief §0; for each Pine
@@ -57,7 +57,7 @@ Decision object is the per-regime pass/fail matrix per parent brief §5 #2 (pool
 
 - **G2 PASS (all cells, both spread variants per §3 spread-sensitivity requirement):** PDSB becomes primary candidate for the EURUSD M15 slot (NYFBO is dead). Route to **Verify (paper-trade scoping)**. Flag operational concerns from parent brief §5 #7 (08:30 alert latency 2–10s on Alchemy/DXTrade) at Verify entry, not at G2.
 - **G2 PASS at 1.0× spread but FAIL at 1.25× spread:** **Conditional pass — MT5 spread validation is a Verify-phase prerequisite.** Do not promote until validated.
-- **G2 FAIL — generalizable structural** (event-conditional Hurst gate fired in §3-prescribed §0a diagnostic, OR Hawkes overreaction empirically absent on EURUSD post-data): write kill at `docs/methodology/archive/gate_audits/<YYYY-MM-DD>_eurusd_m15_h_pdsb_kill.md`. **M15-FX stop-rule fires** (below). Route to **G4** — two distinct fade mechanisms have failed structurally in this regime.
+- **G2 FAIL — generalizable structural** (event-conditional Hurst gate fired in §3-prescribed §0a diagnostic, OR Hawkes overreaction empirically absent on EURUSD post-data): write kill at `archive/docs/methodology/archive/gate_audits/<YYYY-MM-DD>_eurusd_m15_h_pdsb_kill.md`. **M15-FX stop-rule fires** (below). Route to **G4** — two distinct fade mechanisms have failed structurally in this regime.
 - **G2 FAIL — operational only** (kill #6 spread widening, or kill #2 single-trade > 1.5% with otherwise positive edge): write kill, route to **G3 (PDDB Inquire)** — PDDB exits at 08:29 ET pre-release, has no event-window spread exposure, so the operational failure mode does not generalize.
 - **G2 FAIL — small-cell only** (kill #5 N < 60): trigger Rule 1 variance inflation per parent brief §5 #5/§4 H-PDSB kill #5 and re-evaluate; if still inconclusive, **defer**, do not fail.
 
@@ -107,7 +107,7 @@ Mirror artifact: the G1 kill audit §0 disclosed session-isolation slippage but 
 - [ ] Pine activation predicates cross-checked against most recent backtest CSV trade-day list (filter active in execution, not just coded)
 - [ ] §0a written into the new findings file with all five components (§3 of this stub) — abort to G4 if any component fails
 - [ ] Spread model provenance section authored in findings file (calibration source, sample window, known divergence vs Pepperstone live, mandatory 1.25× sensitivity)
-- [ ] Pepperstone session-conditional spread model loaded from `analysis/archive/eurusd_lnyo/pepperstone_spread.py`
+- [ ] Pepperstone session-conditional spread model loaded from `archive/analysis/eurusd_lnyo/pepperstone_spread.py`
 - [ ] Dukascopy M15 EURUSD bid+ask 2022-01-04 → 2026-04-20 loaded from `data/bar_data/EURUSD_dukascopy_m15_bidask_2022-01-04_to_2026-04-20.csv`
 - [ ] DST tz-aware timestamps verified at March/November transition zones (IANA `America/New_York`)
 - [ ] Three regime sub-periods isolated using **pre-committed** boundaries from parent brief §5 #2 (no Inquire-time tuning of cutpoints — researcher-DOF leakage)
@@ -127,7 +127,7 @@ Mirror artifact: the G1 kill audit §0 disclosed session-isolation slippage but 
 
 - Parent brief: [2026-05-02_eurusd_m15_lnyo_notice.md](2026-05-02_eurusd_m15_lnyo_notice.md) — §0 Rule-0 reads, §3 sub-corpus + S-collapse, §4 H-PDSB hypothesis + 6 kill criteria, §5 10 methodology guardrails, §6 stage gates, §7 out-of-scope, §8 audit-trail commitments
 - G1 sibling stub: [2026-05-02_eurusd_m15_lnyo_inquire_entry.md](2026-05-02_eurusd_m15_lnyo_inquire_entry.md)
-- G1 kill audit (load-bearing for §3 components 2 + 5): [docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md](../archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md)
+- G1 kill audit (load-bearing for §3 components 2 + 5): [archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md](../../../archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md)
 - Rule 0: [docs/rule_0.md](../../rule_0.md)
 - D-S-A discipline memory: `feedback_d_vs_s_collapse_discipline.md`
 - Hurst trap memory: `feedback_hurst_rs_log_prices_trap.md`

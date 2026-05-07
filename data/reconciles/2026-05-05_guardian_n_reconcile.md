@@ -23,7 +23,7 @@ memory or briefs.
 | [data/tv_exports/pepperstone/Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-04-26_87e73.csv](data/tv_exports/pepperstone/Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-04-26_87e73.csv) | 418 lines (1 header + 417 data rows = 209 entries + 209 exits, all `Entry long`/`Exit long`) |
 | [docs/adr/2026-04-23-guardian-risk-relock-0.34.md](docs/adr/2026-04-23-guardian-risk-relock-0.34.md) | 22 (**source of the stale "201 trades"** — pre-04-26 v5.5 CSV used in the 0.30→0.50% headroom sweep, three days before the current 04-26 export was committed) |
 | [docs/briefs/striker_nas100_q_nas_3_mc_addition.md](docs/briefs/striker_nas100_q_nas_3_mc_addition.md) | 41 (independent confirmation: Guardian n=209 in the 4-strategy MC addition brief, 2026-05-05) |
-| [docs/methodology/archive/gate_audits/2026-05-03_gbpusd_m15_h_lorb_phaseA_abort.md](docs/methodology/archive/gate_audits/2026-05-03_gbpusd_m15_h_lorb_phaseA_abort.md) | 44 (independent DOW breakdown: Mon 57 + Tue 64 + Thu 88 = 209) |
+| [archive/docs/methodology/archive/gate_audits/2026-05-03_gbpusd_m15_h_lorb_phaseA_abort.md](archive/docs/methodology/archive/gate_audits/2026-05-03_gbpusd_m15_h_lorb_phaseA_abort.md) | 44 (independent DOW breakdown: Mon 57 + Tue 64 + Thu 88 = 209) |
 
 ## Counts table A–G
 
@@ -177,8 +177,8 @@ artefact during the 04-26 fetch).
 4. Updated [data/tv_exports/pepperstone/SHA256SUMS](data/tv_exports/pepperstone/SHA256SUMS)
    with the new file's hash.
 5. Updated two non-MC analysis scripts that referenced the old filename:
-   [analysis/archive/gbpusd_lon/correlation.py:44](analysis/archive/gbpusd_lon/correlation.py:44),
-   [analysis/archive/eurusd_lnyo/correlation.py:45](analysis/archive/eurusd_lnyo/correlation.py:45).
+   [archive/analysis/gbpusd_lon/correlation.py:44](archive/analysis/gbpusd_lon/correlation.py:44),
+   [archive/analysis/eurusd_lnyo/correlation.py:45](archive/analysis/eurusd_lnyo/correlation.py:45).
 6. NAS100 B_15 deletion: nothing to do — no `*B_15*` artefact exists in the
    repo (verified via `Glob **/*B_15*`).
 

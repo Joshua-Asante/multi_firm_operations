@@ -7,7 +7,7 @@ Source declaration (per findings §5):
   Census / ISM release patterns published in their respective release schedules.
 
 Provenance:
-  - Extends `analysis/archive/eurusd_lnyo/event_calendar.py` (NFP, CPI, PCE,
+  - Extends `archive/analysis/eurusd_lnyo/event_calendar.py` (NFP, CPI, PCE,
     Retail Sales, GDP Advance) with PPI, ISM Manufacturing, ISM Services.
   - Adds 08:30 ET / 10:00 ET timestamps per BLS / BEA / ISM standard.
   - Approximation error: +/- 1 trading day vs actual release date for

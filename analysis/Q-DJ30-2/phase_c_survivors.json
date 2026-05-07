@@ -1,0 +1,15 @@
+{
+  "survivors_R": [
+    1.5
+  ],
+  "baseline": {
+    "n": 197,
+    "PF": 2.3293874915256487,
+    "WR_pct": 74.11167512690355,
+    "expectancy_R": 0.5283477157360407,
+    "max_consec_loss": 3,
+    "p99_DD_pct": 6.3046056000000075,
+    "worst_loss_R": -5.935325,
+    "n_cap_touched": 0
+  }
+}

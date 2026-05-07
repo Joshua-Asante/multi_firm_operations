@@ -1,0 +1,45 @@
+{
+  "cap_R": 1.5,
+  "full_panel": {
+    "PF": 2.892344602132407,
+    "p99_DD_pct": 5.190330200000001,
+    "n": 197
+  },
+  "bootstrap": {
+    "n_panels": 100,
+    "block_months": 6,
+    "n_blocks_avail": 9,
+    "seed": 20260506,
+    "PF_p05": 2.0346758630153934,
+    "PF_p50": 2.832635287376757,
+    "PF_p95": 3.738988532577391,
+    "p99_DD_p05_pct": 4.302734879999995,
+    "p99_DD_p95_pct": 6.5783097999999995
+  },
+  "half_panel": {
+    "h_split_trade_num": 98,
+    "H1": {
+      "n": 86,
+      "PF": 1.8555192223083143,
+      "p99_DD_pct": 2.8859977500000067
+    },
+    "H2": {
+      "n": 111,
+      "PF": 3.4288315180215037,
+      "p99_DD_pct": 5.2337644999999995
+    },
+    "PF_spread_abs": 1.5733122957131893,
+    "PF_spread_rel_pct": 59.54609650361674
+  },
+  "gate_criteria": {
+    "PF_floor": 2.7477273720257864,
+    "DD_ceiling_pct": 5.690330200000001,
+    "PF_spread_ceiling_pct": 10.0
+  },
+  "results": {
+    "p05_PF_passes": false,
+    "PF_spread_passes": false,
+    "p05_DD_passes": true,
+    "all_pass": false
+  }
+}

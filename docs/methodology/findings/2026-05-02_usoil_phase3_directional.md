@@ -6,7 +6,7 @@ USOIL 15min volatility-clustering structure (Phase 1 verdict `vol-gated`) is rea
 
 **Loop:** USOIL 15min behavioral characterization (2026-05-02), Phase 3 — Inquire phase
 **Plan:** [`~/.claude/plans/q-usoil-3-conditional-on-usoil-dynamic-turtle.md`](../../../../.claude/plans/q-usoil-3-conditional-on-usoil-dynamic-turtle.md)
-**Pipeline:** [analysis/archive/usoil/phase3_directional.py](../../../analysis/archive/usoil/phase3_directional.py)
+**Pipeline:** [archive/analysis/usoil/phase3_directional.py](../../../archive/analysis/usoil/phase3_directional.py)
 **Routing:** [docs/methodology/observation_routing.md](../observation_routing.md) (three-bucket gate). Q-USOIL-3 routes **Closed** (cheapest-falsification result clears the question; no Pepperstone validation leg required).
 **D-S-A domain:** data + system. Strategy code, allocations, dd_protection, MC calibration untouched.
 
@@ -167,7 +167,7 @@ Phase 3 adds: **the vol cluster also has no non-linear (Donchian-conditioned) di
 - **Phase 2 (Pepperstone visual validation, predecessor):** [`2026-05-02_usoil_phase2_validation.md`](2026-05-02_usoil_phase2_validation.md)
 - **Stage 0 feed reconciliation:** [`2026-05-02_usoil_feed_reconciliation.md`](2026-05-02_usoil_feed_reconciliation.md)
 - **Plan:** [`~/.claude/plans/q-usoil-3-conditional-on-usoil-dynamic-turtle.md`](../../../../.claude/plans/q-usoil-3-conditional-on-usoil-dynamic-turtle.md)
-- **Pipeline:** [`analysis/archive/usoil/phase3_directional.py`](../../../analysis/archive/usoil/phase3_directional.py)
+- **Pipeline:** [`archive/analysis/usoil/phase3_directional.py`](../../../archive/analysis/usoil/phase3_directional.py)
 - **Methodology — observation routing (Closed/Action/Forward):** [`docs/methodology/observation_routing.md`](../observation_routing.md)
 - **Methodology — Rule 0:** [`docs/rule_0.md`](../../rule_0.md) — not engaged here (no risk-control change).
 - **Brief format precedent:** [`docs/briefs/bust_attribution_flip.md`](../../briefs/bust_attribution_flip.md)

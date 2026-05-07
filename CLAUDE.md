@@ -38,7 +38,7 @@ Multipliers update weekly when balances update (via `python cli.py update`), not
 ## Strategy Reference (LOCKED — do not modify)
 
 Unified allocations (locked 2026-04-17): challenge phase = funded phase. No re-sizing at pass.
-Most recent version locks: Guardian v5.5 (2026-04-23), Aegis v4.3 (2026-04-23), Striker DJ30 **v4.4 → v4.5** (2026-05-05), Striker NAS100 **v1 added** (2026-05-05, candidate-not-deployed). v4.4 archived to `strategies/striker/archive/`. See lock MC notes below the table.
+Most recent version locks: Guardian v5.5 (2026-04-23), Aegis v4.3 (2026-04-23), Striker DJ30 **v4.4 → v4.5** (2026-05-05), Striker NAS100 **v1 added** (2026-05-05, candidate-not-deployed). v4.4 archived to `archive/strategies/striker/`. See lock MC notes below the table.
 
 | Strategy        | Instrument / TF | Risk/trade              | Version       | DXTrade contractValue                             |
 |-----------------|-----------------|-------------------------|---------------|---------------------------------------------------|
@@ -90,7 +90,7 @@ To add a firm: define its rules in firm_rules.py as config. Everything downstrea
 * **1R estimation** (per-strategy 1R, equity-compounding normalization for Guardian-style equity-sized strategies): [`docs/methodology/1r_estimation.md`](docs/methodology/1r_estimation.md).
 * **Regime-robustness gate** (mandatory before any LOCK CANDIDATE on a `dd_protection`-class risk constant; 6mo block bootstrap + half-panel split, both pinned to brief floor; Q-DDP-1 worked example 2026-05-06): [`docs/methodology/regime_robustness_gate.md`](docs/methodology/regime_robustness_gate.md).
 * **Operational rules** (incl. doc/code skew audit trigger): [`docs/operational_rules.md`](docs/operational_rules.md).
-* **Strategy-research-phase methodology archive** (INQHIORI ⊕ The Algorithm framework, Pre-Q gates, Case B audits, MVD framing — all retired 2026-04-29; 90-day review gate 2026-07-29): [`docs/methodology/archive/README.md`](docs/methodology/archive/README.md).
+* **Strategy-research-phase methodology archive** (INQHIORI ⊕ The Algorithm framework, Pre-Q gates, Case B audits, MVD framing — all retired 2026-04-29; 90-day review gate 2026-07-29): [`archive/docs/methodology/archive/README.md`](archive/docs/methodology/archive/README.md).
 
 ## Key Principle
 

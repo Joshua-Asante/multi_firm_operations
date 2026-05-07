@@ -82,7 +82,7 @@ The pyramid-leg mechanism scope (S, not D) was added at execution time after Ste
 
 Surfaced to Joshua at execution time. Joshua authorized **option 2: one-time, declared substitution to a single authoritative-adjacent source** (chat record 2026-05-06).
 
-**Substitution declared:** rule-derivation from canonical BLS / BEA / Census / ISM release patterns (publicly-documented release schedules), implemented in [analysis/Q-DJ30-1/build_calendar.py](analysis/Q-DJ30-1/build_calendar.py). Extends [analysis/archive/eurusd_lnyo/event_calendar.py](analysis/archive/eurusd_lnyo/event_calendar.py) with PPI, ISM Manufacturing, ISM Services and adds 08:30 ET / 10:00 ET timestamps.
+**Substitution declared:** rule-derivation from canonical BLS / BEA / Census / ISM release patterns (publicly-documented release schedules), implemented in [analysis/Q-DJ30-1/build_calendar.py](analysis/Q-DJ30-1/build_calendar.py). Extends [archive/analysis/eurusd_lnyo/event_calendar.py](archive/analysis/eurusd_lnyo/event_calendar.py) with PPI, ISM Manufacturing, ISM Services and adds 08:30 ET / 10:00 ET timestamps.
 
 Rules used:
 

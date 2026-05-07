@@ -48,7 +48,7 @@ Then:
 
 Evaluate against G1 stage gate (parent brief §6). If any kill
 criterion fires, write a kill note at
-docs/methodology/archive/gate_audits/<YYYY-MM-DD>_eurusd_m15_h_nyfbo_kill.md
+archive/docs/methodology/archive/gate_audits/<YYYY-MM-DD>_eurusd_m15_h_nyfbo_kill.md
 per parent brief §8.
 
 Do not modify Pine, dd_protection, portfolio_mc, or CLAUDE.md.

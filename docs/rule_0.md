@@ -26,4 +26,4 @@ discipline, mandatory header ordering, MVD methodology framing) were retired
 with the strategy-research phase. New rules are written only against observed
 failures during execution phase, not hypothesized ones.
 
-See [`docs/methodology/archive/README.md`](methodology/archive/README.md) for the resurrection rule and 90-day review gate.
+See [`archive/docs/methodology/archive/README.md`](../archive/docs/methodology/archive/README.md) for the resurrection rule and 90-day review gate.

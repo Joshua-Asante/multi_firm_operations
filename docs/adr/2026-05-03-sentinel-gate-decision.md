@@ -133,3 +133,7 @@ search.**
 - AUDNZD precedent: [docs/methodology/archive/findings/2026-04-26_audnzd_REJECTED.md](../methodology/archive/findings/2026-04-26_audnzd_REJECTED.md)
 - No-overlay rule (Iran/Hormuz deactivation): [docs/overlays/guardian_conflict_risk.md](../overlays/guardian_conflict_risk.md)
 - Two-tier canonical (Pepperstone-anchored): user memory `feedback_two_tier_canonical_pepperstone_oanda.md`
+
+---
+
+**Path move addendum (2026-05-07):** `docs/methodology/archive/findings/2026-04-26_audnzd_REJECTED.md` → `archive/docs/methodology/archive/findings/2026-04-26_audnzd_REJECTED.md` (Approach D restructure; commit a59985e).

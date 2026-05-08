@@ -32,3 +32,8 @@ Thumbs.db
 
 # AUDNZD discovery loop raw bar CSVs (large; SHA256 sidecars are committed)
 data/audnzd_oanda_m15_*.csv
+
+# Live runtime data — DXTrade exports, journal outputs (size + churn + privacy)
+live_journal/data/*.csv
+live_journal/data/*.json
+!live_journal/data/.gitkeep

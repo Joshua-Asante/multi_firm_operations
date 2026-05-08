@@ -304,14 +304,11 @@ _Last refreshed: 2026-05-08_
 - Windows console emoji bug (`dd_protection.py:201`) — `PYTHONIOENCODING=utf-8` workaround live; ASCII-replacement is a 5-min task.
 - Multiplier-equal-across-strategies design observation (formula cancels per-strategy risk under unified allocations) — confirm whether per-strategy multiplier divergence is ever expected; if no, document the cancellation and consider simplifying `get_multipliers` to a single value.
 
-**live_journal subtree (added 2026-05-08):**
-- **CI test policy.** No unit tests currently exercise `live_journal/scripts/`. Three options:
-  (a) extend `tests/` with `test_journal_review.py` pinning loader behavior + edge-captured ratio computation against synthetic DXTrade fixtures;
-  (b) treat live_journal as runtime tooling, no unit tests, rely on integration runs against weekly DXTrade exports;
-  (c) hybrid — unit tests for pairing logic only (pure function), nothing for I/O paths.
-  Joshua to decide before any production use.
-- **execution_lessons.md sync policy.** Two copies now exist: skill-bundle `references/execution_lessons.md` (CC context-loading canonical, currently at the local-agent-mode sandbox path — ephemeral) and `live_journal/references/execution_lessons.md` (repo runtime, durable). When a new E-entry is added, which is source of truth and how does the other update? Mirrors the brief-authoring SKILL.md ↔ Notion §7 sync clause; same failure mode. Note: because the skill bundle lives in a session-ephemeral sandbox, the repo copy is the de-facto durable canon — sync direction proposal: edit repo, propagate to skill bundle on next session install.
-- **m7 backfill execution.** Script in place but not yet run end-to-end against real DXTrade fills. Until run, M-7 lesson status remains CANDIDATE. Schedule for next weekly review (target: 2026-05-11 morning, before live NAS100 first fill at 13:00 UTC). Verdict updates `execution_lessons.md` registry; on-disk lesson-file capture deferred per §0.C C3 verdict (no `docs/methodology/lessons/` registry exists yet for M-1..M-6).
+**live_journal subtree (added 2026-05-08; closeout 2026-05-08):**
+- **CI test policy:** DECIDED option (a) — `tests/test_journal_review.py` with synthetic DXTrade fixtures pinning loader behavior + edge-captured ratio computation. Implementation pending; queue alongside the next `live_journal/` touch (no separate brief required — mechanical).
+- **execution_lessons.md sync direction:** CONFIRMED — repo `live_journal/references/execution_lessons.md` is the durable canon. The skill bundle (session-ephemeral sandbox) is downstream. New E-entry workflow: edit repo, propagate to skill bundle on next session install. (Mirrors the brief-authoring SKILL.md ↔ Notion §7 sync clause shape — repo wins for the live_journal pair.)
+- **m7 backfill first run:** CONFIRMED target 2026-05-11 morning, before live NAS100 first fill at 13:00 UTC. Verdict updates `execution_lessons.md` registry; on-disk M-7 lesson-file capture deferred per §0.C C3 verdict.
+- **Methodology lesson registry on-disk format:** Joshua to author a separate brief migrating M-1..M-6 from memory/Notion to `docs/methodology/lessons/` (or explicitly accept memory-only as canonical). Carry-forward from §0.C C3 verdict — open until brief lands.
 
 CC adds new items as they surface; Joshua resolves or graduates them out.
 

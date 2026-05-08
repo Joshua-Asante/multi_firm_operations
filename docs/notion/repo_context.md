@@ -348,10 +348,13 @@ CC refreshes the relevant section on each trigger. Multiple sections may refresh
 | Any methodology lesson capture | §7 (canon) |
 | Any new pending decision or resolved decision | §6 (queue) |
 | Any cross-reference path change (Notion ID, important repo path) | §8 (cross-refs) |
+| Any §7 sub-rule edit (added, removed, substantively reworded) | brief-authoring SKILL.md sub-rules subsection — see sync clause below |
 
 **Manual refresh:** Joshua triggers a full refresh by asking CC "refresh repo context" — useful as a periodic sanity-check (e.g., monthly).
 
 **Drift detection:** If web Claude flags a section as stale during brief authoring (a referenced file is missing per CC's §0, a schema doesn't match), Joshua triggers a targeted refresh of the affected section.
+
+**SKILL.md sync clause.** Notion §7 is canonical for the sub-rule substance. The brief-authoring skill carries a generalized propagation in its "Rule 0 sub-rules — context scope" subsection (`~/.claude/skills/brief-authoring/SKILL.md` user-override; the published `anthropic-skills:brief-authoring` is upstream-only and not edited directly). When §7 is edited, propagate to SKILL.md in the same conversation; when SKILL.md drifts first, re-sync to §7. Drift between the two surfaces means web Claude reads divergent canons during brief authoring — the failure this section was built to prevent.
 
 **On-disk source for this section:** `docs/notion/repo_context.md` — CC edits this file in place; Joshua copy-pastes to Notion. Treating the on-disk file as the canonical pre-publish surface (versioned, diff-able) avoids the "Notion edit then forget to update repo" failure mode.
 

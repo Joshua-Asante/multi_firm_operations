@@ -58,7 +58,7 @@ Prior 3-strategy anchors (historical):
 
 No active overlays. Guardian runs at its locked base risk. The Iran-Israel /
 Hormuz conflict overlay was deactivated 2026-04-23 after revert triggers met;
-`docs/overlays/guardian_conflict_risk.md` retains the historical record.
+`archive/docs/methodology/archive/overlays/guardian_conflict_risk.md` retains the historical record.
 
 Strategy parameters (SL/TP/ATR/hour-blocks/session/BE/trail/pyramid/etc.) live in Pine Script
 and are NOT duplicated here. See Key Principle.

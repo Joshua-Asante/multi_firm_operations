@@ -47,7 +47,7 @@ Two methodology docs remain active outside this archive:
 
 ### Iran/Hormuz overlay (kept live, not archived)
 
-The Iran/Hormuz conflict overlay was deactivated 2026-04-23 after revert triggers met. Historical record retained at [`docs/overlays/guardian_conflict_risk.md`](../../overlays/guardian_conflict_risk.md) — referenced from CLAUDE.md as the canonical overlay-discipline case (per memory `feedback_overlay_trigger_discipline.md`).
+The Iran/Hormuz conflict overlay was deactivated 2026-04-23 after revert triggers met. Historical record retained at [`archive/docs/methodology/archive/overlays/guardian_conflict_risk.md`](overlays/guardian_conflict_risk.md) — referenced from CLAUDE.md as the canonical overlay-discipline case (per memory `feedback_overlay_trigger_discipline.md`).
 
 ## Q-A1-d / Q-A1 chain status (at archive time)
 

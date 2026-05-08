@@ -1,7 +1,7 @@
 # Q-NAS-2 — 4-week forward gate-state capture plan (Striker NAS100 v1)
 
 **Date authored:** 2026-05-05
-**Indicator file:** [strategies/striker/striker_nas100_v1_research.pine](../../strategies/striker/striker_nas100_v1_research.pine)
+**Indicator file:** [archive/strategies/striker/striker_nas100_v1_research.pine](../../archive/strategies/striker/striker_nas100_v1_research.pine)
 **Brief:** Striker NAS100 v1 — Phase 4C/6 investigation (rev 2)
 
 ## Why this capture exists

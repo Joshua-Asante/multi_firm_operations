@@ -131,7 +131,7 @@ search.**
 - Finding (technical record): [docs/methodology/findings/2026-05-03_usdchf_h4_sentinel_gate.md](../methodology/findings/2026-05-03_usdchf_h4_sentinel_gate.md)
 - Parent brief: chat 2026-05-03 (Sentinel USDCHF build/no-build gate)
 - AUDNZD precedent: [docs/methodology/archive/findings/2026-04-26_audnzd_REJECTED.md](../methodology/archive/findings/2026-04-26_audnzd_REJECTED.md)
-- No-overlay rule (Iran/Hormuz deactivation): [docs/overlays/guardian_conflict_risk.md](../overlays/guardian_conflict_risk.md)
+- No-overlay rule (Iran/Hormuz deactivation): [archive/docs/methodology/archive/overlays/guardian_conflict_risk.md](../../archive/docs/methodology/archive/overlays/guardian_conflict_risk.md)
 - Two-tier canonical (Pepperstone-anchored): user memory `feedback_two_tier_canonical_pepperstone_oanda.md`
 
 ---

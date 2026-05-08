@@ -28,6 +28,7 @@ INSTRUMENTS = [
     ("USDJPY", "USD_JPY"),
     ("XAUUSD", "XAU_USD"),
     ("US30USD", "US30_USD"),
+    ("NAS100USD", "NAS100_USD"),
 ]
 
 START = "2022-01-01T00:00:00Z"

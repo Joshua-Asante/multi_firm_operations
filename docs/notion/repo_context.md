@@ -9,7 +9,7 @@ This section is the canonical architecture-truth surface for web Claude when aut
 ---
 
 ## §1 — Active file tree
-_Last refreshed: 2026-05-07_
+_Last refreshed: 2026-05-08_
 
 ```
 prop_firm_pipeline/
@@ -48,6 +48,14 @@ prop_firm_pipeline/
 │   ├── fetch_oanda_bars.py                           # hard-coded USDJPY/XAUUSD/US30USD only
 │   ├── lock_event_hook.py                            # post-lock hook
 │   └── run_v55_validation.py                         # [?] template-vs-one-shot disposition open
+│
+├── live_journal/                                     # signal-vs-fill reconciliation runtime; skill ↔ repo runtime mirror
+│   ├── scripts/
+│   │   ├── journal_review.py                         # canonical reconciliation pipeline
+│   │   └── m7_anticipation_gap_backfill.py           # M-7 Route A backfill (sibling-imports journal_review)
+│   ├── references/
+│   │   └── execution_lessons.md                      # E1/E2 anchor registry
+│   └── data/                                         # gitignored DXTrade exports + journal outputs (.gitkeep retained)
 │
 ├── tests/                                            # CI-load-bearing
 │   ├── test_mc_anchors.py                            # MC headline pinning (4-strategy 97.88/0.22/4.55)
@@ -316,7 +324,7 @@ This list grows as lessons capture; web Claude consults it during brief authorin
 ---
 
 ## §8 — Cross-references that web Claude routinely needs
-_Last refreshed: 2026-05-07_
+_Last refreshed: 2026-05-08_
 
 - **Notion Command Center page:** `32cdc0b53c1181b8a18cce1401a4f8e8`
 - **INQHIORI ⊕ OODA framework page:** `34ddc0b53c1181479d7bdecc61f47078`
@@ -330,6 +338,9 @@ _Last refreshed: 2026-05-07_
 - **Methodology archive:** `archive/docs/methodology/archive/` (full retired methodology — INQHIORI ⊕ The Algorithm, Pre-Q gates, MVD framing; 90-day review gate 2026-07-29)
 - **Methodology findings (active):** `docs/methodology/findings/`
 - **Gate audits (active):** `docs/methodology/gate_audits/`
+- **Live execution journal scripts:** `live_journal/scripts/journal_review.py`, `live_journal/scripts/m7_anticipation_gap_backfill.py`
+- **Execution lessons registry:** `live_journal/references/execution_lessons.md`
+- **Skill bundle (live-execution-journal):** `~/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/<session-id>/skills/live-execution-journal/` (sandbox path, ephemeral; repo `live_journal/` is the durable runtime)
 
 ---
 

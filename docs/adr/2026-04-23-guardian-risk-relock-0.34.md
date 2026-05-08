@@ -84,7 +84,7 @@ Negative / watched:
   6 bp (at 0.34%). Still clear, but tighter.
 - Conflict overlay was deactivated in a concurrent change on 2026-04-23
   (revert triggers met). Guardian now runs at the 0.34% locked base
-  unqualified. See `docs/overlays/guardian_conflict_risk.md` for the
+  unqualified. See `archive/docs/methodology/archive/overlays/guardian_conflict_risk.md` for the
   deactivation record.
 
 ## Cross-references

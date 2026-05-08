@@ -217,7 +217,7 @@ Three archetypes pass per-cell uniqueness:
 - **No allocation decisions.** Allocation is post-MC, post-Verify. Guardian 0.30–0.34% safe band, dd_protection 1.0%/0.40×, re-MC triggers — all unchanged by this brief.
 - **No dd_protection changes.** Single-tier 1.0% / 0.40× remains canonical (`DD_TRIGGER = 0.010`, `DD_SCALE = 0.40` in [dd_protection.py](dd_protection.py)).
 - **No portfolio MC re-run.** New MC fires only after a strategy passes Verify and is added to the portfolio. Re-MC triggers from CLAUDE.md and user memory: 6mo live, version bump, allocation outside G safe band, any dd_protection constant change.
-- **No overlay reintroduction.** Iran-Hormuz overlay-deactivation lessons hold ([docs/overlays/guardian_conflict_risk.md](docs/overlays/guardian_conflict_risk.md)). Any regime/macro overlay is a separate INQHIORI loop, not a sub-task here.
+- **No overlay reintroduction.** Iran-Hormuz overlay-deactivation lessons hold ([archive/docs/methodology/archive/overlays/guardian_conflict_risk.md](archive/docs/methodology/archive/overlays/guardian_conflict_risk.md)). Any regime/macro overlay is a separate INQHIORI loop, not a sub-task here.
 - **No new strategies in production.** Surviving archetypes flow Notice → Inquire → Verify → Promote. Claude Code may not skip Verify even if all kill criteria pass.
 
 ---
@@ -275,7 +275,7 @@ Three archetypes pass per-cell uniqueness:
 - **Operational rules:** [docs/operational_rules.md](docs/operational_rules.md)
 - **1R estimation:** [docs/methodology/1r_estimation.md](docs/methodology/1r_estimation.md)
 - **Strategy-research-phase methodology archive:** [archive/docs/methodology/archive/README.md](archive/docs/methodology/archive/README.md)
-- **Overlay history (Iran-Hormuz, deactivated 2026-04-23):** [docs/overlays/guardian_conflict_risk.md](docs/overlays/guardian_conflict_risk.md)
+- **Overlay history (Iran-Hormuz, deactivated 2026-04-23):** [archive/docs/methodology/archive/overlays/guardian_conflict_risk.md](archive/docs/methodology/archive/overlays/guardian_conflict_risk.md)
 - **dd_protection production source:** [dd_protection.py](dd_protection.py); MC anchors: [CLAUDE.md](CLAUDE.md), [portfolio_mc.py](portfolio_mc.py), [tests/test_mc_anchors.py](tests/test_mc_anchors.py)
 - **OODA-loop sibling skill:** for tactical / live-trade decisions during the Inquire phase
 - **fxify-challenge skill:** G/S/A operational facts, dd_protection, MC panel

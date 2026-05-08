@@ -39,20 +39,15 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] strategies/guardian/guardian_CHANGELOG.md
 [A] strategies/striker/striker_dj30_v4.5.pine — LOCKED 2026-05-05
 [A] strategies/striker/striker_nas100_v1.pine — LOCKED 2026-05-05
-[A] strategies/striker/striker_nas100_v1_research.pine *** post-lock research file; consider re-classification next pass
 [A] strategies/striker/striker_CHANGELOG.md
 [A] strategies/aegis/aegis_usdjpy_v4.3.pine — LOCKED 2026-04-22
 [A] strategies/aegis/aegis_CHANGELOG.md
-
-## Indicators
-[A] indicators/usoil/usoil_phase2_validation.pine *** USOIL workstream archived; consider re-classification next pass
 
 ## Scripts
 [A] scripts/build_us_releases.py
 [U] scripts/dryrun_aegis_v4_3.py — end-to-end exercise of all 9 lib/mvd helpers; sanity gate (verdict 2026-05-07)
 [A] scripts/fetch_oanda_bars.py — hard-codes USDJPY/XAUUSD/US30USD only; not a general fetcher
 [A] scripts/lock_event_hook.py
-[?] scripts/msee_watchlist.py — MSEE archived 2026-04-29; pending re-classification
 [?] scripts/run_v55_validation.py — open question: template-shape vs one-shot
 
 ## Data — TV exports (canonical MC inputs)
@@ -76,8 +71,7 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 
 ## Analysis
 [A] analysis/Q-DJ30-1/, Q-DJ30-2/, Q-DJ30-3/ *** closed 2026-05-06; cooldown then archive next pass
-[A] analysis/striker_nas100/ — Q-NAS-1 closed (results brief in docs/briefs/), Q-NAS-2 plan open
-[A] analysis/msee/ *** MSEE archived 2026-04-29; pending re-classification
+[A] analysis/striker_nas100/ — placeholder package (__init__.py); Q-NAS-1 archived, Q-NAS-2 plan in docs/striker_nas100/
 [A] analysis/oanda_stage1/ — findings in docs/methodology/findings/2026-05-02_oanda_stage1_*
 [?] analysis/dd_protection_trace.py — open question: reusable forensic tool vs one-shot trace
 [?] analysis/time_to_pass.py — open question: re-MC reporting tool vs one-shot
@@ -93,12 +87,12 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] docs/historical/*.md — IMMUTABLE record
 [A] docs/templates/*.md
 [A] docs/striker_nas100/q_nas_2_capture_plan.md — Q-NAS-2 open
-[A] docs/overlays/guardian_conflict_risk.md *** overlay deactivated 2026-04-23; pending re-classification
 
 ## Archive (consolidated 2026-05-07, Approach D)
-[X] archive/analysis/ — eurusd_lnyo, gbpusd_lon, usdchf_sentinel, usoil
-[X] archive/docs/methodology/archive/ — full methodology archive (inner archive/ nesting preserved per README)
+[X] archive/analysis/ — eurusd_lnyo, gbpusd_lon, usdchf_sentinel, usoil (incl. usoil/indicators/usoil_phase2_validation.pine moved 2026-05-07), striker_nas100/q_nas_1_pyramid_hypothesis.py (closed 2026-05-05)
+[X] archive/docs/methodology/archive/ — full methodology archive (inner archive/ nesting preserved per README); + msee/_active_paths_2026-05-07/ (analysis_msee + msee_watchlist.py, archived 2026-05-07); + overlays/guardian_conflict_risk.md (deactivated 2026-04-23, archived 2026-05-07)
 [X] archive/strategies/striker/striker_dj30_v4.4.pine — kept for OANDA-panel back-compat (open question: retire after OANDA mirror regenerated against v4.5)
+[X] archive/strategies/striker/striker_nas100_v1_research.pine — post-lock research file (archived 2026-05-07; referenced by docs/striker_nas100/q_nas_2_capture_plan.md while Q-NAS-2 is open)
 [X] archive/data/tv_exports/USOIL_pepperstone_m15_*.csv
 
 ## Infrastructure

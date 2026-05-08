@@ -5,7 +5,7 @@
 **Loop:** USOIL 15min behavioral characterization (2026-05-02), Notice/Identify phase
 **Plan:** `~/.claude/plans/usoil-15min-behavioral-composed-tower.md` (Stage D)
 **Phase 1 brief:** `2026-05-02_usoil_15min_characterization.md`
-**Indicator:** `indicators/usoil/usoil_phase2_validation.pine`
+**Indicator:** `archive/analysis/usoil/indicators/usoil_phase2_validation.pine`
 
 ## 1. Pre-registered pass criterion (set BEFORE Pine authored)
 
@@ -24,7 +24,7 @@ OANDA reference (from Phase 1 result brief): `[47, 48, 49]` = NY 11:45 / 12:00 /
 | 2 | 46 | 11:30 | 0.3433 |
 | 3 | 48 | 12:00 | 0.3423 |
 
-Source: `indicators/usoil/usoil_phase2_validation.pine` loaded on Pepperstone USOIL 15min chart, broker-connected via TradingView.
+Source: `archive/analysis/usoil/indicators/usoil_phase2_validation.pine` loaded on Pepperstone USOIL 15min chart, broker-connected via TradingView.
 
 (NB: the indicator's first-render rendered clocks as "12:45 / 12:30 / 12:00" due to a
 Pine `int / int` returning float bug in `bin_to_clock`. The bin-index comparison —
@@ -100,6 +100,6 @@ loop's pattern library.
 - Plan: `~/.claude/plans/usoil-15min-behavioral-composed-tower.md`
 - Stage 0 reconciliation: `2026-05-02_usoil_feed_reconciliation.md` (PASS)
 - Phase 1 result brief: `2026-05-02_usoil_15min_characterization.md` (verdict: vol-gated)
-- Pine indicator: `indicators/usoil/usoil_phase2_validation.pine`
+- Pine indicator: `archive/analysis/usoil/indicators/usoil_phase2_validation.pine`
 - Phase 1 results JSON: `2026-05-02_usoil_phase1_results.json`
 - Observation routing: `docs/methodology/observation_routing.md`

@@ -162,7 +162,7 @@ def main():
     p = argparse.ArgumentParser(prog="mc_explore",
                                 description=("EXPLORATORY portfolio MC. "
                                              "Not for lock decisions."))
-    p.add_argument("--dd-trigger", type=float, default=0.010)
+    p.add_argument("--dd-trigger", type=float, default=0.015)
     p.add_argument("--dd-scale", type=float, default=0.40)
     p.add_argument("--perturb-alloc", nargs="+", default=None,
                    help="Allocation multiplicative perturbation, "

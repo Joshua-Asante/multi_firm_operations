@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 # Single-tier protection (validated 2026-04-17, revalidated 2026-04-23,
-# re-anchored 2026-05-05 under 4-strategy lock):
-#   - 10K-sim MC: pass 97.88% / bust 0.22% / p99 DD 4.55% at current portfolio
-#     (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, Pepperstone 2022→2026
-#     panel, 223 week-blocks)
+# re-anchored 2026-05-05 under 4-strategy lock, relaxed 2026-05-08 to C2 after
+# bust_attribution_flip resolved as broker-feed-confirmed and same-date
+# TradingView Pepperstone+OANDA re-export validated the panel pair):
+#   - DD_TRIGGER 0.010 → 0.015, DD_SCALE held at 0.40
+#   - C2 sweep evidence (per docs/briefs/Q-DDP-1/): pass 98.09% / bust 0.36% /
+#     p99 DD 4.73% on the 4-strategy Pepperstone panel — meets the lock
+#     criteria (bust <1%, p99 DD <5%) and shortens median days-to-pass.
+#   - Q-DDP-1 regime-robustness gate (criterion 5) failed for C2; the
+#     2026-05-08 override accepts that risk on the strength of the broker-feed
+#     resolution + median-pass-time benefit. See override note in
+#     docs/briefs/Q-DDP-1/recommendation.md.
 #   - Equity tier deleted after Claude Code proved it was dead code under min semantics
 #   - Do not change without re-running portfolio_mc
 # See: https://www.notion.so/346dc0b53c11816085bbf2292be934cc
@@ -13,7 +20,7 @@ DD Protection Scaler — FXIFY $200K Challenge
 Morning pre-market tool. Input current DXTrade equity,
 get back the risk_pct to set on each TradingView strategy.
 
-Rule: When portfolio DD from peak >= 1.0%, scale all risk to 0.40x.
+Rule: When portfolio DD from peak >= 1.5%, scale all risk to 0.40x.
       Clears automatically when equity returns to peak.
 
 Usage:
@@ -36,8 +43,10 @@ PROFIT_TARGET = 0.05          # 5% = $10,000
 DAILY_LOSS_LIMIT = 0.05       # 5% = $10,000
 STATIC_DD_LIMIT = 0.05        # 5% = $10,000
 
-# DD protection rule — single tier (retuned 2026-04-17)
-DD_TRIGGER = 0.010            # 1.0% DD from peak triggers scaling
+# DD protection rule — single tier (retuned 2026-04-17, relaxed 2026-05-08
+# from 0.010 to 0.015 after bust_attribution_flip closed broker-feed-confirmed
+# + Q-DDP-1 C2 override on median-pass-time + risk-controls grounds)
+DD_TRIGGER = 0.015            # 1.5% DD from peak triggers scaling
 DD_SCALE = 0.40               # multiply risk by 0.40x when triggered
 
 # Unified allocations (locked 2026-04-17, Guardian re-locked 2026-04-23; challenge = funded)
@@ -108,8 +117,8 @@ def _validate_protection_rule():
        the comparison, wrong multiplier on trigger. Maps to methodology
        family Contract.
 
-    B. **Spec pin** — current constants match the 2026-04-17 locked values
-       (`DD_TRIGGER = 0.010`, `DD_SCALE = 0.40`). The boundary check above
+    B. **Spec pin** — current constants match the 2026-05-08 relocked values
+       (`DD_TRIGGER = 0.015`, `DD_SCALE = 0.40`). The boundary check above
        scales with the constants and so cannot detect a value drift on its
        own. The pin forces any change to be a deliberate joint edit:
        constant + literal in this function + re-MC at the new config (per
@@ -138,15 +147,17 @@ def _validate_protection_rule():
         label=f"dd_protection silent when DD just under DD_TRIGGER={DD_TRIGGER:.2%}",
     )
 
-    # --- B. Spec pin: constants match locked values per 2026-04-17 ADR ---
-    # Re-validated 2026-05-05 by 10K-sim MC at the 4-strategy allocation
-    # (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%):
-    # 97.88% pass / 0.22% bust / p99 DD 4.55%. Any future change to either
-    # constant must update both the constant AND this literal pin in the
-    # same commit, tied to a re-MC run.
-    if DD_TRIGGER != 0.010:
+    # --- B. Spec pin: constants match locked values per 2026-05-08 relock ---
+    # Originally 2026-04-17 ADR at (0.010, 0.40); relaxed 2026-05-08 to
+    # (0.015, 0.40) on the C2 override grounds (Q-DDP-1 sweep + bust-feed
+    # broker confirmation). 4-strategy Pepperstone MC under the relaxed
+    # constants: per Q-DDP-1 sweep_results.csv, C2 = 98.09% pass / 0.36% bust
+    # / p99 DD 4.73% — both lock criteria (bust <1%, p99 DD <5%) clear.
+    # Any future change to either constant must update both the constant AND
+    # this literal pin in the same commit, tied to a re-MC run.
+    if DD_TRIGGER != 0.015:
         raise AssertionError(
-            f"MVD spec drift: DD_TRIGGER moved from locked 0.010 to {DD_TRIGGER}. "
+            f"MVD spec drift: DD_TRIGGER moved from locked 0.015 to {DD_TRIGGER}. "
             f"Re-run portfolio_mc and update the pin literal in the same commit."
         )
     if DD_SCALE != 0.40:

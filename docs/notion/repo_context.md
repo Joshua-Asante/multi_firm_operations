@@ -87,10 +87,11 @@ prop_firm_pipeline/
 │   │   ├── findings/                                 # 2026-05-02 (oanda_stage1, eurusd_lnyo, usoil) + 2026-05-06 (dj30 *)
 │   │   └── gate_audits/                              # 2026-05-06 Q-DJ30-2 + Q-DJ30-3 audits
 │   ├── adr/                                          # IMMUTABLE record (2026-03-01 → 2026-05-03)
-│   ├── briefs/                                       # active: Q-DDP-1, Q-DJ30-3, bust_attribution_flip, NAS100 (×2)
+│   ├── briefs/                                       # closed-with-override: Q-DDP-1 (C2 lock 2026-05-08); closed: Q-DJ30-3 (2026-05-06), bust_attribution_flip (2026-05-08); active: NAS100 (×2)
 │   ├── historical/                                   # IMMUTABLE record
 │   ├── templates/                                    # bust_analysis, calibration_brief, lock_decision
-│   └── striker_nas100/                               # q_nas_2_capture_plan.md (Q-NAS-2 OPEN)
+│   ├── methodology/lessons/                         # methodology_lessons.md (M-class registry; format spec + M-7 CANDIDATE seeded 2026-05-08)
+│   └── striker_nas100/                               # q_nas_2_capture_plan.md (Q-NAS-2 CLOSED 2026-05-08)
 │
 ├── archive/                                          # consolidated 2026-05-07 (Approach D)
 │   ├── analysis/                                     # eurusd_lnyo, gbpusd_lon, usdchf_sentinel, usoil, striker_nas100/q_nas_1
@@ -120,8 +121,8 @@ _Last refreshed: 2026-05-07_
 - **Does NOT contain:** per-strategy fills tracking, active flags, P&L history, broker integration. The `firm_rules.FIRM_RULES` lookup auto-fills DD/target on `add_account`.
 
 ### `dd_protection.py`
-- **Purpose:** portfolio-level risk scaler. When `(peak − equity)/peak ≥ 0.010`, multiplies all strategies' base risk by `0.40×`. Clears at peak.
-- **Key data:** `BASE_RISK = {"Guardian": 0.0034, "Striker": 0.0100, "Aegis": 0.0150, "Striker NAS100": 0.0040}` (**Title-case**, intentional vs `firm_rules` lowercase). `DD_TRIGGER = 0.010`, `DD_SCALE = 0.40` — Q-DDP-1 LOCKED 2026-05-06. State persisted to `dd_protection_state.json` (currently absent).
+- **Purpose:** portfolio-level risk scaler. When `(peak − equity)/peak ≥ 0.015`, multiplies all strategies' base risk by `0.40×`. Clears at peak.
+- **Key data:** `BASE_RISK = {"Guardian": 0.0034, "Striker": 0.0100, "Aegis": 0.0150, "Striker NAS100": 0.0040}` (**Title-case**, intentional vs `firm_rules` lowercase). `DD_TRIGGER = 0.015`, `DD_SCALE = 0.40` — C2 RELOCK 2026-05-08 (was C0 1.0%/0.40× under Q-DDP-1 HOLD recommendation; overridden after bust_attribution_flip closed broker-feed-confirmed). State persisted to `dd_protection_state.json` (currently absent).
 - **MVD self-check at import:** two-layer (boundary + literal pin). Any change to either constant must update both the constant and the literal pin in the same commit, tied to a re-MC run (per 2026-04-24 ADR).
 - **Does NOT contain:** monitored-strategies set (flat scaler over all in `BASE_RISK`), active-day gating, fills tracking, per-strategy DD logic, intraday triggers. Single tier only — equity tier deleted 2026-04-17.
 - **Note:** Windows console emits `cp1252` decode error on `✅` / `📈` / `⚡` print lines — workaround: `PYTHONIOENCODING=utf-8` (live in `.claude/settings.json`). ASCII-replacement is on the queue (§6).
@@ -144,7 +145,7 @@ _Last refreshed: 2026-05-07_
   - `PEPPERSTONE_PANELS` (4 strategies, all v-current) + `OANDA_PANELS` (3 strategies, DJ30 still v4.4)
   - `EXPECTED_VERSIONS_BY_BROKER` — Pepperstone = v5.5/v4.5/v4.3/v1; OANDA = v5.5/v4.4/v4.3
 - **MVD gates:** `assert_tv_export` (filename identity), `assert_min_rows` (≥100 raw rows), `assert_window` (≥4yr panel ±60d), `assert_no_fallback` on aggregated `implied_1r` fallback count.
-- **Anchor pinned by:** `tests/test_mc_anchors.py` (4-strategy 97.88/0.22/4.55, p99 DD 4.55%, attribution DJ30 40.9% / G 25.8% / A 22.7% / NAS 10.6%).
+- **Anchor pinned by:** `tests/test_mc_anchors.py` — Pepperstone C2 (4-strategy at dd_protection 1.5%/0.40×) 98.09/0.36/4.73, attribution striker 44.4% / aegis 24.1% / guardian 21.3% / NAS 10.2%; OANDA C2 (3-strategy) 96.23/0.69/4.91. Relocked 2026-05-08.
 - **Does NOT contain:** per-firm scaling, live-deploy logic, allocation tuning. Read-only simulation against frozen panels.
 
 ---
@@ -209,8 +210,8 @@ BASE_RISK = {
     "Aegis":          0.0150,
     "Striker NAS100": 0.0040,
 }
-DD_TRIGGER = 0.010   # Q-DDP-1 LOCKED 2026-05-06 — joint edit + re-MC required
-DD_SCALE   = 0.40    # Q-DDP-1 LOCKED 2026-05-06 — joint edit + re-MC required
+DD_TRIGGER = 0.015   # C2 RELOCK 2026-05-08 — joint edit + re-MC required
+DD_SCALE   = 0.40    # C2 RELOCK 2026-05-08 — joint edit + re-MC required
 ```
 
 ### `dd_protection.calculate_protection`
@@ -285,12 +286,12 @@ _Last refreshed: 2026-05-08_
 **Time-gated:**
 - **Q-DJ30-1/2/3 archive move** → ~2026-05-20 (2-week cooldown from 2026-05-06 closures). Currently still under `analysis/`.
 
-**Awaiting Joshua's disposition (5 items, REPO_MAP `[?]` flagged):**
-- `archive/strategies/striker/striker_dj30_v4.4.pine` — keep until OANDA mirror regenerates against v4.5, OR regen + delete in one transaction. Currently load-bearing for `OANDA_PANELS["striker"]` filename token.
-- `scripts/run_v55_validation.py` — template-shape (rename to generic) or one-shot (archive).
-- `analysis/dd_protection_trace.py` — reusable forensic tool or one-shot trace.
-- `analysis/time_to_pass.py` — recurring re-MC reporting tool (wire into trigger checklist) or one-shot.
-- `analysis/oanda_stage1/` — closed (archive + clear `data/bar_data/` cache delete) or paused (keep both). Findings already in `docs/methodology/findings/2026-05-02_oanda_stage1_*`.
+**Awaiting Joshua's disposition — RESOLVED 2026-05-08 batch:**
+- `archive/strategies/striker/striker_dj30_v4.4.pine` — **KEEP** at `[X]`. Load-bearing for `OANDA_PANELS["striker"]` filename token. Retirement trigger: regen OANDA against v4.5 + delete in one transaction.
+- `scripts/run_v55_validation.py` — **ARCHIVED** to `archive/scripts/run_v55_validation.py`. One-shot harness with hardcoded v5.5/v5.4 expected metrics; not a template.
+- `analysis/dd_protection_trace.py` — **KEEP** as reusable forensic tool. Reclassified `[?]` → `[A]`. Relevance increased under C2 relock with regime-fragility dissent on record.
+- `analysis/time_to_pass.py` — **KEEP** + EXTENDED with `--regime-check` mode. Reclassified `[?]` → `[A]`. Hosts the quarterly C2 → C0 revert-trigger check per ADR 2026-05-08-dd-trigger-c2-relock.
+- `analysis/oanda_stage1/` — **KEEP** at `[A]` (already classified active in REPO_MAP). `tv_export_loader.py` is referenced by Q-NAS-2 capture plan; findings committed to `docs/methodology/findings/2026-05-02_oanda_stage1_*`.
 
 **Authoring queue (parent-session pending):**
 - Methodology lesson capture — 4 anchors flagged this conversation:
@@ -304,11 +305,19 @@ _Last refreshed: 2026-05-08_
 - Windows console emoji bug (`dd_protection.py:201`) — `PYTHONIOENCODING=utf-8` workaround live; ASCII-replacement is a 5-min task.
 - Multiplier-equal-across-strategies design observation (formula cancels per-strategy risk under unified allocations) — confirm whether per-strategy multiplier divergence is ever expected; if no, document the cancellation and consider simplifying `get_multipliers` to a single value.
 
-**live_journal subtree (added 2026-05-08; closeout 2026-05-08):**
+**live_journal subtree (added 2026-05-08; all decisions closed 2026-05-08):**
 - **CI test policy:** DECIDED option (a) — `tests/test_journal_review.py` with synthetic DXTrade fixtures pinning loader behavior + edge-captured ratio computation. Implementation pending; queue alongside the next `live_journal/` touch (no separate brief required — mechanical).
 - **execution_lessons.md sync direction:** CONFIRMED — repo `live_journal/references/execution_lessons.md` is the durable canon. The skill bundle (session-ephemeral sandbox) is downstream. New E-entry workflow: edit repo, propagate to skill bundle on next session install. (Mirrors the brief-authoring SKILL.md ↔ Notion §7 sync clause shape — repo wins for the live_journal pair.)
-- **m7 backfill first run:** CONFIRMED target 2026-05-11 morning, before live NAS100 first fill at 13:00 UTC. Verdict updates `execution_lessons.md` registry; on-disk M-7 lesson-file capture deferred per §0.C C3 verdict.
-- **Methodology lesson registry on-disk format:** Joshua to author a separate brief migrating M-1..M-6 from memory/Notion to `docs/methodology/lessons/` (or explicitly accept memory-only as canonical). Carry-forward from §0.C C3 verdict — open until brief lands.
+
+**Recently closed (2026-05-08 batch):**
+- **Q-DJ30-3 brief status header** — was stale "PRE-EXECUTION"; brief now reflects CLOSE/null verdict with cross-reference to canonical findings doc at `docs/methodology/findings/2026-05-06_dj30_gap_magnitude.md`. **Forward redirect queue accepted as empty** (Aegis BOJ closed at strategy-CHANGELOG layer; NAS100 v1 live observation = ongoing operational tracking, not a methodology investigation; new strategy candidates = TBD with no concrete target). Q-DJ30-3 fully closed.
+- **M-7 anticipation-gap backfill** — first run scheduled 2026-05-11 morning (before live NAS100 first fill at 13:00 UTC); no remaining decisions, on calendar. Verdict updates `live_journal/references/execution_lessons.md` (E-class) and `docs/methodology/lessons/methodology_lessons.md` M-7 entry (M-class).
+- **bust_attribution_flip** — closed broker-feed-confirmed via same-date Pepperstone+OANDA TV re-export. Outcomes locked: prefer broker feed (Pepperstone) for canonical attribution; OANDA stays reliable for live pattern-spotting; dd_protection re-calibrated C0→C2.
+- **dd_protection C2 relock** — DD_TRIGGER 0.010→0.015, DD_SCALE held at 0.40. Pepperstone C2 anchor 98.09/0.36/4.73 (was 97.88/0.22/4.55); OANDA C2 anchor 96.23/0.69/4.91 (was 96.05/0.48/4.79). **Canonical record: `docs/adr/2026-05-08-dd-trigger-c2-relock.md`** (override of Q-DDP-1 HOLD recommendation on broker-feed + median-pass-time grounds). Revert trigger: rolling 6-month MC pass-rate <95% for two consecutive windows → revert to C0; quarterly check via `python analysis/time_to_pass.py --regime-check` (next dates: 2026-08-08, 2026-11-08, 2027-02-08, 2027-05-08).
+- **Methodology lesson registry on-disk format spec** — DECIDED: `docs/methodology/lessons/methodology_lessons.md` authored as canonical M-class registry, format spec at file head (mirrors E-class `execution_lessons.md`). Migration of M-1..M-6 deferred to first-cite ("grow on evidence"); M-7 seeded as CANDIDATE.
+- **Q-NAS-2 capture plan** — closed without forward capture (Q-NAS-1 (hour × dow) accepted as the answer; pyramid-pathway design thesis doesn't require backfilled feature data for live ops). Indicator may stay loaded as passive monitoring tool.
+- **Regime-marker accumulator memory entry** — closed; framework that produced it (Notice-phase methodology) was retired 2026-04-29 anyway, so the accumulator was doctrine-stale.
+- **5 REPO_MAP `[?]` items resolved** — striker_dj30_v4.4.pine kept; run_v55_validation.py archived; dd_protection_trace.py + time_to_pass.py reclassified `[A]` (the latter extended with `--regime-check`); oanda_stage1/ re-affirmed `[A]`. See "Awaiting Joshua's disposition — RESOLVED 2026-05-08 batch" above.
 
 CC adds new items as they surface; Joshua resolves or graduates them out.
 

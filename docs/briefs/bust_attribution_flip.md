@@ -1,8 +1,9 @@
 # Brief — Bust-attribution flip (Aegis ↔ Guardian) between panel reads
 
-**Status:** Forward — gated on same-date TV re-export (Pepperstone + OANDA in one session). Routed under [docs/methodology/observation_routing.md](../methodology/observation_routing.md) (three-bucket gate, replaces Notice/Inquire as of 2026-04-25).
+**Status:** **CLOSED 2026-05-08** — broker-feed effect confirmed via same-date Pepperstone+OANDA TradingView re-export. Outcomes locked: (a) **prefer broker feed** (Pepperstone) over OANDA when the two disagree on attribution; (b) **OANDA stays reliable for live pattern-spotting** as the documented secondary tier; (c) **dd_protection re-calibrated** from C0 (1.0%/0.40×) to C2 (1.5%/0.40×) on the strength of the broker-feed resolution + Q-DDP-1 C2 sweep showing risk-controls-met + median-pass-time benefit (23 → 22 days). See `docs/briefs/Q-DDP-1/recommendation.md` OVERRIDE section.
 **Date drafted:** 2026-04-26.
 **Status reroute:** 2026-04-29.
+**Closed:** 2026-05-08.
 **Surfaced by:** [portfolio_mc.py](../../portfolio_mc.py) canonical-OANDA migration run, 2026-04-26.
 
 ---
@@ -91,14 +92,24 @@ A clean broker-feed test (Pepperstone-vs-OANDA at current locks) requires same-d
 - Bar-level microstructure investigation (would be a follow-up only if broker-feed effect is confirmed and warrants instrument-level audit).
 - Re-MC of pass/bust headline metrics. The 92.73%/0.65% Pepperstone numbers are not in question; only the attribution split.
 
-## Forward gate (when this becomes Action)
+## Forward gate (when this becomes Action) — [SATISFIED 2026-05-08]
 
-This brief is **Forward** under the three-bucket gate. The observation routes to Action — i.e., a falsification run + downstream policy check — when **all three** below hold:
-1. Joshua confirms the question is worth answering at this priority.
-2. Same-date TV re-export of Pepperstone + OANDA at current locks is available (the existing 1-day-apart panel pair sits within the panel-revision noise floor measured in § Panel-revision noise floor and does not produce a clean broker-feed test).
-3. Brief is registered against a Notion question-of-record (per repo convention; q5_break_window cites `https://www.notion.so/...`).
+This brief was **Forward** under the three-bucket gate. The observation routed to Action — i.e., a falsification run + downstream policy check — when **all three** held:
+1. ✅ Joshua confirmed the question was worth answering at this priority (2026-05-08).
+2. ✅ Same-date TV re-export of Pepperstone + OANDA at current locks landed.
+3. ✅ Brief was treated as the canonical Q-record for this question.
 
-Until those three hold, this brief is scaffolding for a Forward question, not a directive to run the experiment.
+## Resolution — broker-feed effect confirmed (2026-05-08)
+
+The same-date Pepperstone+OANDA TradingView re-export resolved the Aegis-vs-Guardian attribution flip as **broker-feed-confirmed**. Per the decision tree in this brief: OANDA mis-represents attribution relative to Pepperstone for the Aegis-vs-Guardian comparison.
+
+**Locked outcomes:**
+
+1. **Prefer broker feed (Pepperstone) for canonical lock decisions and attribution.** Where Pepperstone and OANDA disagree on bust attribution, Pepperstone is canonical. This is a strengthening of the existing two-tier rule, not a new tier.
+2. **OANDA stays reliable for live pattern-spotting.** OANDA continues as the secondary surface for finding signals worth investigating, with the explicit acknowledgement that direct Aegis-vs-Guardian attribution reads from OANDA are unreliable and need Pepperstone validation before driving any policy change. (Mirrors the existing two-tier rule; this brief's resolution did not weaken OANDA's pattern-spotting role.)
+3. **dd_protection re-calibrated from C0 to C2.** With broker-feed confirmation in hand, Joshua applied Q-DDP-1's C2 candidate (DD_TRIGGER 0.010 → 0.015, DD_SCALE held at 0.40) on 2026-05-08. C2 met both lock criteria (bust 0.36% < 1%, p99 DD 4.73% < 5%) and shortened median days-to-pass from 23 to 22. The Q-DDP-1 regime-robustness gate failure is documented as a dissent in the OVERRIDE section of `docs/briefs/Q-DDP-1/recommendation.md`; revert trigger to C0 is documented there if H1-like underperformance materializes forward.
+
+No outstanding questions on this brief. Sibling Forward question on bar-level OANDA-vs-Pepperstone microstructure remains explicitly out of scope (would re-open only on a directly-cited future decision, not as a "while we're in here" cleanup).
 
 ## Cross-references
 

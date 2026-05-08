@@ -118,16 +118,17 @@ def cmd_lots(args):
         print("No active accounts.")
         return
 
-    print(f"{'Account':<25}| {'G x':>6} | {'S x':>6} | {'A x':>6}")
-    print("-" * 52)
+    print(f"{'Account':<25}| {'G x':>6} | {'S x':>6} | {'A x':>6} | {'N x':>6}")
+    print("-" * 61)
     for a in active:
         m = get_multipliers(a)
         label = a.account_id
         if a.phase != "challenge":
             label += f" ({a.phase})"
-        print(f"{label:<25}| {m['guardian']:>5.2f} | {m['striker']:>5.2f} | {m['aegis']:>5.2f}")
+        print(f"{label:<25}| {m['guardian']:>5.2f} | {m['striker']:>5.2f} | {m['aegis']:>5.2f} | {m['striker_nas100']:>5.2f}")
 
     print(f"\nBaseline: $200K challenge. Multiply indicator lot size by account multiplier.")
+    print("G=Guardian, S=Striker DJ30, A=Aegis, N=Striker NAS100.")
 
 
 def main():

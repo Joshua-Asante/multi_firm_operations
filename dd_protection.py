@@ -41,10 +41,12 @@ DD_TRIGGER = 0.010            # 1.0% DD from peak triggers scaling
 DD_SCALE = 0.40               # multiply risk by 0.40x when triggered
 
 # Unified allocations (locked 2026-04-17, Guardian re-locked 2026-04-23; challenge = funded)
+# Striker NAS100 added 2026-05-07 (DXTrade contractValue=10 broker-verified).
 BASE_RISK = {
-    "Guardian": 0.0034,       # 0.34%
-    "Striker":  0.0100,       # 1.00%
-    "Aegis":    0.0150,       # 1.50%
+    "Guardian":       0.0034,       # 0.34%
+    "Striker":        0.0100,       # 1.00%
+    "Aegis":          0.0150,       # 1.50%
+    "Striker NAS100": 0.0040,       # 0.40%
 }
 
 STATE_FILE = Path(__file__).parent / "dd_protection_state.json"
@@ -200,14 +202,14 @@ def display_status(equity: float, peak: float, result: dict, is_update: bool = F
     print()
 
     # Risk table
-    print("  ┌─────────────┬──────────┬──────────┐")
-    print("  │ Strategy    │   Base   │  Today   │")
-    print("  ├─────────────┼──────────┼──────────┤")
+    print("  ┌────────────────┬──────────┬──────────┐")
+    print("  │ Strategy       │   Base   │  Today   │")
+    print("  ├────────────────┼──────────┼──────────┤")
     for name, base in BASE_RISK.items():
         scaled = result['scaled_risk'][name]
         marker = " ◀" if scaled != base else ""
-        print(f"  │ {name:<11} │  {base:.2%}  │  {scaled:.2%}{marker:>2} │")
-    print("  └─────────────┴──────────┴──────────┘")
+        print(f"  │ {name:<14} │  {base:.2%}  │  {scaled:.2%}{marker:>2} │")
+    print("  └────────────────┴──────────┴──────────┘")
     print()
 
     # TV input helper — show exact values to type

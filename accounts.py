@@ -88,11 +88,12 @@ def calc_multiplier(balance: float, phase: str, strategy: str) -> float:
 
 
 def get_multipliers(account: Account) -> dict:
-    """Return multipliers for all 3 strategies."""
+    """Return multipliers for all 4 strategies."""
     return {
         "guardian": calc_multiplier(account.balance, account.phase, "guardian"),
         "striker": calc_multiplier(account.balance, account.phase, "striker"),
         "aegis": calc_multiplier(account.balance, account.phase, "aegis"),
+        "striker_nas100": calc_multiplier(account.balance, account.phase, "striker_nas100"),
     }
 
 

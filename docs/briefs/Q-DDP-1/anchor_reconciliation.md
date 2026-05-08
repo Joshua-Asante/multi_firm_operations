@@ -46,7 +46,7 @@ Full audit trail: [data/reconciles/2026-05-05_guardian_n_reconcile.md](../../../
 
 **98.13/0.22/4.49 is obsolete.** It was the pre-reconcile anchor that lived as canonical for ~4 hours on 2026-05-05 before being superseded by 97.88/0.22/4.55 the same evening. The Q-DDP-1 brief was authored 2026-05-06; the brief author cited the morning's pre-reconcile numbers, missing the same-day re-anchor.
 
-This is a textbook case of [feedback_per_strategy_pepperstone_baseline_uncommitted.md](../../../../../.claude/projects/C--Users-joshu-prop-firm-pipeline/memory/feedback_per_strategy_pepperstone_baseline_uncommitted.md) — when canonical numbers move within hours, downstream consumers can pick up the stale value.
+This is a textbook case of [feedback_per_strategy_pepperstone_baseline_uncommitted.md](../../../../../.claude/projects/C--Users-joshu-multi-firm-operations/memory/feedback_per_strategy_pepperstone_baseline_uncommitted.md) — when canonical numbers move within hours, downstream consumers can pick up the stale value.
 
 ## Resolution: which baseline does the sweep use?
 

@@ -8,7 +8,7 @@
 
 ## Pattern
 
-Web Claude (the brief-authoring layer) drafts edit prescriptions against a *mental model* of `prop_firm_pipeline` that diverges from the codebase's *actual shape*. CC executes the prescription, treats the brief as authoritative, and does not surface the divergence until the prescribed edit fails or produces wrong work.
+Web Claude (the brief-authoring layer) drafts edit prescriptions against a *mental model* of `multi_firm_operations` that diverges from the codebase's *actual shape*. CC executes the prescription, treats the brief as authoritative, and does not surface the divergence until the prescribed edit fails or produces wrong work.
 
 The pattern is **not** "web Claude is wrong" — web Claude *cannot see* the codebase mid-conversation. The pattern is "the handoff protocol assumed `brief == ground truth`" when the brief is in fact a model that decays as the codebase evolves.
 
@@ -42,7 +42,7 @@ NAS100 v1 was code-locked 2026-05-05 (Pine + manifest + MC anchor). The strategy
 
 ### 5. The structural fix itself (Repo Context section + §9 refresh contract)
 
-The Notion Command Center page now carries a 10-section "Repo Context — prop_firm_pipeline" surface authored by CC, refreshed on triggers in §9. Web Claude reads it during brief authoring; CC's §0 still reads files at execution time as the truth gate. On-disk source [docs/notion/repo_context.md](../../notion/repo_context.md) (PR #42).
+The Notion Command Center page now carries a 10-section "Repo Context — multi_firm_operations" surface authored by CC, refreshed on triggers in §9. Web Claude reads it during brief authoring; CC's §0 still reads files at execution time as the truth gate. On-disk source [docs/notion/repo_context.md](../../notion/repo_context.md) (PR #42).
 
 **Why anchor #5 is unusual:** most methodology lessons document failures-without-fixes — the lesson is the proposal, the fix happens later (or doesn't). This one bundles the lesson and the fix in the same shipping cycle. The structural change exists already; this lesson is documenting what already happened. That makes the capture lower-stakes than usual.
 

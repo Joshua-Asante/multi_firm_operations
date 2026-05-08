@@ -1,10 +1,10 @@
-# Repo Context — prop_firm_pipeline
+# Repo Context — multi_firm_operations
 
 **Maintainer:** Claude Code (refresh authority); Joshua (trigger authority); web Claude (read-only consumer)
 **Initial population:** 2026-05-07
 **Source spec:** authored 2026-05-07 by web Claude (parent session); destination this Notion page (`32cdc0b53c1181b8a18cce1401a4f8e8`).
 
-This section is the canonical architecture-truth surface for web Claude when authoring briefs against `prop_firm_pipeline`. It is **not** a codebase backup, a status dashboard, or a substitute for CC's §0. It primes brief authoring; CC's §0 remains the truth gate at execution.
+This section is the canonical architecture-truth surface for web Claude when authoring briefs against `multi_firm_operations`. It is **not** a codebase backup, a status dashboard, or a substitute for CC's §0. It primes brief authoring; CC's §0 remains the truth gate at execution.
 
 ---
 
@@ -12,7 +12,7 @@ This section is the canonical architecture-truth surface for web Claude when aut
 _Last refreshed: 2026-05-08_
 
 ```
-prop_firm_pipeline/
+multi_firm_operations/
 ├── accounts.py                                       # Account dataclass + multiplier calc
 ├── cli.py                                            # add / update / status / lots / tearsheet
 ├── csv_parser.py                                     # DXTrade CSV → trade-level normaliser

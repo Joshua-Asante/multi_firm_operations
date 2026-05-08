@@ -1,4 +1,4 @@
-# Prop Firm Pipeline
+# Multi-Firm Operations
 
 ## Purpose
 

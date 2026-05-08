@@ -20,7 +20,7 @@ This gate exists because of one structural asymmetry: in any Pareto-relaxation q
 ## When this gate fires
 
 **Mandatory** for:
-- Any brief proposing a change to constants in `prop_firm_pipeline/dd_protection.py`
+- Any brief proposing a change to constants in `multi_firm_operations/dd_protection.py`
 - Any brief proposing a Pareto-relaxation on (pass-rate, drag) or analogous (safety, performance) plane
 - Any brief comparing MC configurations on a single panel where regime distribution materially affects the result
 
@@ -141,7 +141,7 @@ Without this gate, the sweep would have produced a LOCK CANDIDATE recommendation
 
 ## Implementation notes
 
-The procedure above is implementation-agnostic. A reference implementation lives inline in `docs/briefs/Q-DDP-1/_run_regime_robustness.py` (script-form, brief-specific). A canonical reusable implementation should be added to the prop firm pipeline at `prop_firm_pipeline/regime_robustness_gate.py` if/when a second brief invokes this gate — at that point, the implementation graduates from inline to library.
+The procedure above is implementation-agnostic. A reference implementation lives inline in `docs/briefs/Q-DDP-1/_run_regime_robustness.py` (script-form, brief-specific). A canonical reusable implementation should be added to the operations pipeline at `multi_firm_operations/regime_robustness_gate.py` if/when a second brief invokes this gate — at that point, the implementation graduates from inline to library.
 
 Until graduation, briefs invoking this gate should write their own script under their `docs/briefs/Q-XXX/` directory and reference back to the Q-DDP-1 implementation as the structural template.
 
@@ -177,8 +177,8 @@ Steps 4–5 are not part of the brief that ran this gate — they are downstream
 - **Rule 1 (partition-hypothesis permutation gate)**: methodology canon in skill registry, reference implementation deferred until first formal use
 - **Observation routing gate**: `docs/methodology/observation_routing.md`
 - **Q-DDP-1 worked example**: `docs/briefs/Q-DDP-1/recommendation.md`
-- **Locked dd_protection config**: `prop_firm_pipeline/dd_protection.py` (DD_TRIGGER=0.015, DD_SCALE=0.40 — C2 relock 2026-05-08)
-- **MC harness**: `prop_firm_pipeline/portfolio_mc.py`
+- **Locked dd_protection config**: `multi_firm_operations/dd_protection.py` (DD_TRIGGER=0.015, DD_SCALE=0.40 — C2 relock 2026-05-08)
+- **MC harness**: `multi_firm_operations/portfolio_mc.py`
 - **Production-pinned MC anchor**: `tests/test_mc_anchors.py` (98.09% / 0.36% / 4.73% on 52mo Pepperstone, 4-strategy at C2)
 
 ---

@@ -104,7 +104,7 @@ Cross-cell sign pattern is mixed (K=1 / K=4 lean positive at N=20; K=16 leans ne
 
 ## 5. Q-3.4 — DOW gate (NOT FIRED)
 
-Q-3.3 primary did not pass thresholds, so the DOW gate did not fire. Per plan §3 Q-3.4, the gate exists to defend against the OANDA DOW feed-artifact failure mode (provenance: [`feedback_oanda_dow_feed_artifact.md`](../../../../../../.claude/projects/C--Users-joshu-prop-firm-pipeline/memory/feedback_oanda_dow_feed_artifact.md); 2026-05-02 Stage 2 closures of OANDA-only DOW candidates rejected at Pepperstone, commits `93b3c80`, `2de9e2c`). Since no candidate signal exists, no artifact gating is needed.
+Q-3.3 primary did not pass thresholds, so the DOW gate did not fire. Per plan §3 Q-3.4, the gate exists to defend against the OANDA DOW feed-artifact failure mode (provenance: [`feedback_oanda_dow_feed_artifact.md`](../../../../../../.claude/projects/C--Users-joshu-multi-firm-operations/memory/feedback_oanda_dow_feed_artifact.md); 2026-05-02 Stage 2 closures of OANDA-only DOW candidates rejected at Pepperstone, commits `93b3c80`, `2de9e2c`). Since no candidate signal exists, no artifact gating is needed.
 
 **EIA Wednesday confound (named in plan §Risks):** EIA crude inventory release at Wed 10:30 ET is the most likely confound source for any candidate edge in the 11:30–12:15 ET window. The DOW gate is the structural test for it — a Wed-only signal would have failed the ≥3-of-5 same-sign requirement and routed Closed under the DOW feed-artifact branch. Since no aggregate edge appears, the EIA-confound discussion is moot in this loop.
 

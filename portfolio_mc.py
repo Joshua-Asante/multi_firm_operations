@@ -8,7 +8,7 @@ Not in scope: per-strategy diagnostics, allocation tuning, live integration.
 See the FINAL decision page: https://www.notion.so/346dc0b53c11816085bbf2292be934cc
 
 Invocation (top-level module — pyproject declares flat py-modules, no
-`prop_firm_pipeline` package namespace):
+package namespace):
     python portfolio_mc.py                                 # default run (Pepperstone)
     python portfolio_mc.py --historical                    # deterministic
     python portfolio_mc.py --sensitivity                   # DD-trigger grid

@@ -6,7 +6,7 @@ days_to_pass for passing sims and timeout/bust counts). Adds p10/p50/p90
 percentiles and right-censored %.
 
 Run from the main pipeline dir so data/tv_exports/*.csv resolves.
-    python -m prop_firm_pipeline.tools.time_to_pass
+    python analysis/time_to_pass.py
 
 Modes:
     (default)        full-panel time-to-pass distribution + halt gate

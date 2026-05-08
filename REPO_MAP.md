@@ -1,6 +1,6 @@
 # REPO_MAP — active classification
 
-**Updated:** 2026-05-08
+**Updated:** 2026-05-08 (post C2 relock + repo-map disposition pass)
 **Convention:**
 - `[A]` active hot-path (production code, locked strategies, active analyses, immutable record)
 - `[U]` utility — runs on demand, not in CI hot path, retained as load-bearing tool
@@ -23,7 +23,7 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] cli.py
 [A] csv_parser.py
 [A] firm_rules.py
-[A] dd_protection.py — LOCKED single-tier 1.0% / 0.40×
+[A] dd_protection.py — LOCKED single-tier 1.5% / 0.40× (C2 relock 2026-05-08)
 [A] portfolio_mc.py — canonical lock-decision MC
 [A] mc_explore.py — exploratory; explicitly NOT for locks
 
@@ -48,7 +48,6 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [U] scripts/dryrun_aegis_v4_3.py — end-to-end exercise of all 9 lib/mvd helpers; sanity gate (verdict 2026-05-07)
 [A] scripts/fetch_oanda_bars.py — hard-codes USDJPY/XAUUSD/US30USD only; not a general fetcher
 [A] scripts/lock_event_hook.py
-[?] scripts/run_v55_validation.py — open question: template-shape vs one-shot
 
 ## Live execution
 [A] live_journal/scripts/journal_review.py — signal-vs-fill reconciliation pipeline
@@ -79,8 +78,8 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] analysis/Q-DJ30-1/, Q-DJ30-2/, Q-DJ30-3/ *** closed 2026-05-06; cooldown then archive next pass
 [A] analysis/striker_nas100/ — placeholder package (__init__.py); Q-NAS-1 archived, Q-NAS-2 plan in docs/striker_nas100/
 [A] analysis/oanda_stage1/ — findings in docs/methodology/findings/2026-05-02_oanda_stage1_*
-[?] analysis/dd_protection_trace.py — open question: reusable forensic tool vs one-shot trace
-[?] analysis/time_to_pass.py — open question: re-MC reporting tool vs one-shot
+[A] analysis/dd_protection_trace.py — forensic tool, kept reusable (relevance increased post-C2 relock 2026-05-08)
+[A] analysis/time_to_pass.py — re-MC reporting + --regime-check mode (quarterly review per ADR 2026-05-08-dd-trigger-c2-relock)
 
 ## Docs (active)
 [A] docs/rule_0.md
@@ -88,11 +87,12 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] docs/methodology/*.md (active set: 1r_estimation, observation_routing, regime_robustness_gate)
 [A] docs/methodology/findings/*.md
 [A] docs/methodology/gate_audits/*.md
-[A] docs/adr/*.md — IMMUTABLE record
-[A] docs/briefs/*.md — active briefs (Q-DDP-1, Q-DJ30-3, bust_attribution_flip, NAS100)
+[A] docs/methodology/lessons/methodology_lessons.md — M-class lesson registry (format spec + M-7 CANDIDATE seeded 2026-05-08)
+[A] docs/adr/*.md — IMMUTABLE record (latest: 2026-05-08-dd-trigger-c2-relock)
+[A] docs/briefs/*.md — closed-with-override: Q-DDP-1 (C2 lock 2026-05-08); closed: Q-DJ30-3 (2026-05-06), bust_attribution_flip (2026-05-08); active: NAS100 (×2)
 [A] docs/historical/*.md — IMMUTABLE record
 [A] docs/templates/*.md
-[A] docs/striker_nas100/q_nas_2_capture_plan.md — Q-NAS-2 open
+[A] docs/striker_nas100/q_nas_2_capture_plan.md — CLOSED 2026-05-08 (no forward capture; Q-NAS-1 hour×dow accepted as the answer)
 
 ## Archive (consolidated 2026-05-07, Approach D)
 [X] archive/analysis/ — eurusd_lnyo, gbpusd_lon, usdchf_sentinel, usoil (incl. usoil/indicators/usoil_phase2_validation.pine moved 2026-05-07), striker_nas100/q_nas_1_pyramid_hypothesis.py (closed 2026-05-05)
@@ -100,6 +100,7 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [X] archive/strategies/striker/striker_dj30_v4.4.pine — kept for OANDA-panel back-compat (open question: retire after OANDA mirror regenerated against v4.5)
 [X] archive/strategies/striker/striker_nas100_v1_research.pine — post-lock research file (archived 2026-05-07; referenced by docs/striker_nas100/q_nas_2_capture_plan.md while Q-NAS-2 is open)
 [X] archive/data/tv_exports/USOIL_pepperstone_m15_*.csv
+[X] archive/scripts/run_v55_validation.py — Guardian v5.5 lock-validation harness, archived 2026-05-08 (one-shot; hardcoded v5.5/v5.4 expected metrics, future locks need own harness)
 
 ## Infrastructure
 [A] .claude/commands/lock-check.md

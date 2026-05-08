@@ -7,7 +7,29 @@
 
 ---
 
-## Verdict: **AMBIGUOUS — default HOLD**
+## OVERRIDE — 2026-05-08
+
+**Joshua adopted C2 (1.5% / 0.40×) despite the regime-robustness gate failure recorded below.**
+
+Override grounds:
+1. **Broker-feed resolution.** `docs/briefs/bust_attribution_flip.md` closed broker-feed-confirmed via a same-date Pepperstone+OANDA TradingView re-export. The H1↔H2 partition asymmetry that Q-DDP-1 surfaced as the regime-robustness failure for C2 is, in Joshua's read, partially confounded by the broker-feed differential that the same-date re-export was designed to control. The dissent is recorded; the regime-robustness signal is not erased.
+2. **Median-pass-time benefit.** C2 reduces median days-to-pass from 23 to 22 (Pepperstone). Combined with the 25% drag savings already in this brief's scorecard, the operational benefit is concrete.
+3. **Risk controls met.** C2 clears both lock gates (bust 0.36% < 1%, p99 DD 4.73% < 5%) on the full 4-strategy Pepperstone panel.
+4. **OANDA pattern-spotting reliability preserved.** OANDA C2 anchor (96.23% / 0.69% / 4.91%) clears the same lock criteria; OANDA continues as the pattern-spotting proxy for live attribution reads, with the explicit acknowledgement that broker-feed differential makes OANDA Aegis-vs-Guardian attribution unreliable for direct live read.
+
+Production change applied 2026-05-08:
+- `dd_protection.DD_TRIGGER`: 0.010 → 0.015
+- MVD spec pin literal updated in same commit
+- `tests/test_mc_anchors.py` Pepperstone anchor: 0.9788/0.0022/0.0455 → 0.9809/0.0036/0.0473; OANDA: 0.9605/0.0048/0.0479 → 0.9623/0.0069/0.0491
+- CLAUDE.md Protection section + 2026-05-05 lock MC anchor updated to C2 numbers
+
+What this override does NOT erase: the H1 (2022-01 → 2024-04) sub-panel pass-rate of 86.78% under C2 remains a real characterization of the strategy under early-panel conditions. If forward live-PnL or future panel updates show H1-like underperformance, **C2's regime-fragility risk has materialized** — the documented fallback is to revert to C0 (DD_TRIGGER=0.010). The 12.9pp half-panel pass-rate spread is on record as the dissenting evidence.
+
+Falsification trigger (forward watch-item): if rolling 6-month MC pass-rate on the live-extended Pepperstone panel falls below 95% for two consecutive 6-month windows after this override, treat as evidence the regime-fragility risk has materialized and re-open the C0/C2 question with the new panel data.
+
+---
+
+## Original verdict (preserved for record): **AMBIGUOUS — default HOLD**
 
 Per brief §Recommendation:
 > "AMBIGUOUS — A C* dominates on the full panel but fails regime-robustness, OR multiple configs tie within 0.5pp on dominant criteria. Surface to Joshua with full evidence; default recommendation is HOLD."
@@ -100,13 +122,15 @@ Under a permutation gate that shuffled the H1/H2 partition labels, the observed-
 
 ## Recommendation actions
 
-### Production change
-**None.** The locked (DD_TRIGGER=0.010, DD_SCALE=0.40) config in [dd_protection.py](../../../dd_protection.py) is Pareto-undominated under the brief's criteria set. The MVD spec pin at [dd_protection.py:145-154](../../../dd_protection.py:145) remains correctly anchored to the locked values.
+### Production change (original recommendation, superseded by 2026-05-08 override)
+**None recommended at recommendation time.** The locked (DD_TRIGGER=0.010, DD_SCALE=0.40) config in [dd_protection.py](../../../dd_protection.py) was Pareto-undominated under the brief's criteria set. The MVD spec pin at [dd_protection.py](../../../dd_protection.py) was correctly anchored to the locked values.
+
+**Superseded 2026-05-08:** Joshua's override adopted C2 (DD_TRIGGER=0.015, DD_SCALE=0.40). See OVERRIDE section at top of this file.
 
 ### Brief closure
-- Q-DDP-1: **CLOSED**, verdict AMBIGUOUS / default HOLD.
-- Re-MC trigger: **NOT FIRED** (no constant change).
-- ADR draft: **not authored** (would only be authored on LOCK CANDIDATE verdict).
+- Q-DDP-1: **CLOSED**, verdict AMBIGUOUS / default HOLD (recommendation), overridden to C2 by Joshua 2026-05-08.
+- Re-MC trigger: **FIRED on override** (constants changed; new anchors pinned in `tests/test_mc_anchors.py`).
+- ADR draft: not separately authored; the OVERRIDE section at top of this file serves as the decision record.
 
 ### Methodology updates (recommend Joshua review)
 

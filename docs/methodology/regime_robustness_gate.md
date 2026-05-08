@@ -112,9 +112,11 @@ This gate's verdict on C2:
 | H1 (2022-01 → 2024-04) pass-rate | 86.78% | 97.5% | ❌ |
 | H2 (2024-05 → 2026-04) pass-rate | 99.67% | 97.5% | ✅ |
 
-C2 rejected as **regime-fragile**. The H1↔H2 spread of 12.9pp is decisive — C2's apparent full-panel dominance was an H2-driven artifact. Verdict: AMBIGUOUS / default HOLD; (1.0%, 0.40×) confirmed Pareto-undominated.
+C2 rejected as **regime-fragile** by the gate. The H1↔H2 spread of 12.9pp is decisive — C2's apparent full-panel dominance was an H2-driven artifact. Brief verdict: AMBIGUOUS / default HOLD.
 
-Without this gate, the sweep would have produced a LOCK CANDIDATE recommendation on C2 — a production change that wouldn't have generalized. **This gate is the specific reason Q-DDP-1 closed correctly.**
+Without this gate, the sweep would have produced a LOCK CANDIDATE recommendation on C2 with no dissenting evidence. **This gate is the specific reason the regime fragility entered the record.**
+
+**Postscript — 2026-05-08 OVERRIDE.** Joshua subsequently adopted C2 anyway, on broker-feed-resolution + median-pass-time grounds (see `docs/briefs/Q-DDP-1/recommendation.md` OVERRIDE section + `docs/briefs/bust_attribution_flip.md` closure). The gate's regime-fragility signal was preserved as dissent, with a forward revert trigger (rolling 6-month MC pass-rate <95% for two consecutive windows → revert to C0). The methodology value of this worked example is unchanged — the gate **correctly surfaced** fragility evidence; whether to act on that evidence is a separate decision Joshua made on broader information.
 
 ---
 
@@ -175,9 +177,9 @@ Steps 4–5 are not part of the brief that ran this gate — they are downstream
 - **Rule 1 (partition-hypothesis permutation gate)**: methodology canon in skill registry, reference implementation deferred until first formal use
 - **Observation routing gate**: `docs/methodology/observation_routing.md`
 - **Q-DDP-1 worked example**: `docs/briefs/Q-DDP-1/recommendation.md`
-- **Locked dd_protection config**: `prop_firm_pipeline/dd_protection.py` (DD_TRIGGER=0.010, DD_SCALE=0.40)
+- **Locked dd_protection config**: `prop_firm_pipeline/dd_protection.py` (DD_TRIGGER=0.015, DD_SCALE=0.40 — C2 relock 2026-05-08)
 - **MC harness**: `prop_firm_pipeline/portfolio_mc.py`
-- **Production-pinned MC anchor**: `tests/test_mc_anchors.py` (97.88% / 0.22% / 4.55% on 52mo Pepperstone, 4-strategy)
+- **Production-pinned MC anchor**: `tests/test_mc_anchors.py` (98.09% / 0.36% / 4.73% on 52mo Pepperstone, 4-strategy at C2)
 
 ---
 
@@ -185,7 +187,7 @@ Steps 4–5 are not part of the brief that ran this gate — they are downstream
 
 - Any locked strategy parameter (v5.5 / v4.5 / v4.3 / v1)
 - Any locked allocation (G 0.34% / DJ30 1.00% / A 1.50% / NAS 0.40%)
-- The locked dd_protection config (1.0%, 0.40×)
+- The locked dd_protection config (1.5%, 0.40× — C2 since 2026-05-08; was 1.0%, 0.40× until override)
 - The MC harness logic
 - The full-panel acceptance criteria template for Pareto sweeps (this doc adds a layer on top, doesn't replace)
 

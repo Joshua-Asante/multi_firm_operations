@@ -49,11 +49,13 @@ Most recent version locks: Guardian v5.5 (2026-04-23), Aegis v4.3 (2026-04-23), 
 
 Operational tooling scope: `firm_rules.py`, `dd_protection.py`, `accounts.py`, and `cli.py lots` cover all four strategies (NAS100 added 2026-05-07 after DXTrade contractValue=10 broker-verified). `portfolio_mc.py` already covered NAS100 from the 2026-05-05 lock anchor.
 
-2026-05-05 lock MC anchor (4-strategy, current canonical):
-* Pepperstone 4-strategy (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, 10K × 3 seeds): **97.88% pass / 0.22% bust (0.00% daily + 0.22% static) / 1.90% timeout**, p99 DD 4.55%, median days-to-pass 23. **Bust attribution**: DJ30 40.9% / G 25.8% / A 22.7% / NAS 10.6%. NAS comes in as the lowest contributor (10.6%) consistent with the diversification thesis. Reproducible under `python portfolio_mc.py --panel pepperstone`. `tests/test_mc_anchors.py` pins these. Lock criteria (bust <1%, p99 DD <5%) — both pass with comfortable margin. Re-anchored same day after Guardian Pepperstone re-export (87e73 → 33781, 209 → 201 trades; 04-26 export contained 8 phantom v5.5 signals — see `data/reconciles/2026-05-05_guardian_n_reconcile.md`). See `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` for the addition decision audit.
+2026-05-08 lock MC anchor (4-strategy + dd_protection C2, current canonical):
+* Pepperstone 4-strategy (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, dd_protection 1.5%/0.40×, 10K × 3 seeds): **98.09% pass / 0.36% bust (0.00% daily + 0.36% static) / 1.55% timeout**, p99 DD 4.73%, median days-to-pass 22. **Bust attribution**: striker 44.4% / aegis 24.1% / guardian 21.3% / NAS 10.2%. NAS remains the lowest contributor consistent with the diversification thesis. Reproducible under `python portfolio_mc.py --panel pepperstone`. `tests/test_mc_anchors.py` pins these. Lock criteria (bust <1%, p99 DD <5%) — both pass with margin. Relocked 2026-05-08 from prior C0 (1.0%/0.40×) anchor 97.88/0.22/4.55 after `bust_attribution_flip` closed broker-feed-confirmed via same-date Pepperstone+OANDA TV re-export and Q-DDP-1 C2 was adopted (median days-to-pass 23 → 22; risk controls met). See `docs/briefs/Q-DDP-1/recommendation.md` override note + `docs/briefs/bust_attribution_flip.md` closure.
+* OANDA pattern-spotting proxy at C2 (3-strategy, DJ30 still v4.4): **96.23% pass / 0.69% bust / p99 DD 4.91%**, median days-to-pass 25. Both lock criteria clear with thinner margin than Pepperstone, consistent with OANDA's pattern-spotting role. Reproducible under `python portfolio_mc.py --panel oanda`.
 
-Prior 3-strategy anchors (historical):
-* 2026-04-23 lock cohort (G 0.34% / S v4.4 1.00% / A v4.3 1.50%, Pepperstone 04-26 panel): **93.78% pass / 0.58% bust / 4.92% p99 DD** — code-reproducible against pre-2026-05-05 portfolio_mc.py + v4.4 panel. Bust attribution at that lock: A 25.1% / S 43.4% / G 31.4%. The 2026-04-23 in-flight lock-decision used 92.73% pass / 0.65% bust / 4.94% p99 DD against an in-flight panel that was not committed.
+Prior anchors (historical):
+* 2026-05-05 4-strategy at C0 (1.0%/0.40×): **97.88% pass / 0.22% bust / 4.55% p99 DD**, median days-to-pass 23. Bust attribution: DJ30 40.9% / G 25.8% / A 22.7% / NAS 10.6%. Re-anchored same day after Guardian Pepperstone re-export (87e73 → 33781, 209 → 201 trades; 04-26 export contained 8 phantom v5.5 signals — see `data/reconciles/2026-05-05_guardian_n_reconcile.md`). See `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` for the addition decision audit.
+* 2026-04-23 lock cohort (G 0.34% / S v4.4 1.00% / A v4.3 1.50%, Pepperstone 04-26 panel, C0): **93.78% pass / 0.58% bust / 4.92% p99 DD** — code-reproducible against pre-2026-05-05 portfolio_mc.py + v4.4 panel. Bust attribution at that lock: A 25.1% / S 43.4% / G 31.4%. The 2026-04-23 in-flight lock-decision used 92.73% pass / 0.65% bust / 4.94% p99 DD against an in-flight panel that was not committed.
 * Alchemy reference (2026-04-20, Striker v4.4 + Aegis v4.2 era — pre-2026-04-23 lock): **99.21% pass / 0.03% bust**.
 
 No active overlays. Guardian runs at its locked base risk. The Iran-Israel /
@@ -65,14 +67,16 @@ and are NOT duplicated here. See Key Principle.
 
 Source of truth: https://www.notion.so/346dc0b53c1181d1b8d5e12df4bd3810
 
-## Protection (single-tier, production-locked 2026-04-17; revalidated 2026-04-23)
+## Protection (single-tier, production-locked 2026-04-17; revalidated 2026-04-23; relocked C2 2026-05-08)
 
 Single rule in `dd_protection.py`. `portfolio_mc` validates.
 
-* **DD tier**: if `(equity - peak) / peak <= -0.010`, multiply day's sizing by 0.40×.
+* **DD tier**: if `(equity - peak) / peak <= -0.015`, multiply day's sizing by 0.40×.
 * Clears automatically when equity returns to peak.
-* MC at current 4-strategy config (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, Pepperstone 2022→2026, 223 week-blocks, 10K × 3 seeds):
-  **97.88% pass / 0.22% bust (0.00% daily + 0.22% static) / 1.90% timeout**, p99 DD 4.55%, median days-to-pass 23. Both lock gates clear with comfortable margin.
+* MC at current 4-strategy config (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, dd_protection C2 1.5%/0.40×, Pepperstone 2022→2026, 223 week-blocks, 10K × 3 seeds):
+  **98.09% pass / 0.36% bust (0.00% daily + 0.36% static) / 1.55% timeout**, p99 DD 4.73%, median days-to-pass 22. Both lock gates clear with margin.
+* 2026-05-08 relock from C0 (1.0%/0.40×) → C2 (1.5%/0.40×). Override grounds: `bust_attribution_flip` resolved broker-feed-confirmed via same-date Pepperstone+OANDA TV re-export, and Q-DDP-1's C2 sweep showed risk-controls-met + median-pass-time benefit (23 → 22 days). Q-DDP-1's regime-robustness gate (criterion 5) failed for C2; the 2026-05-08 override accepts that risk on the broker-feed + median-pass-time grounds. See `docs/adr/2026-05-08-dd-trigger-c2-relock.md` (canonical ADR) and `docs/briefs/Q-DDP-1/recommendation.md` override note.
+* **Forward revert trigger (quarterly review):** if rolling 6-month MC pass-rate falls below 95% for two consecutive 6-month windows, revert to C0. Run `python analysis/time_to_pass.py --regime-check` quarterly (next dates: 2026-08-08, 2026-11-08, 2027-02-08, 2027-05-08).
 * The prior equity tier was deleted on 2026-04-17 after it was proven to be dead code under the live `min()` combining semantics. Revert triggers for reintroducing a second tier are documented in the FINAL decision page.
 * Constants frozen — do not change without re-running `portfolio_mc`.
 

@@ -1,22 +1,24 @@
 """Locked MC anchor pins.
 
-Pepperstone is the CLAUDE.md canonical lock-anchor source. The 2026-05-05
-4-strategy lock (after Striker DJ30 v4.4 → v4.5 migration + Striker NAS100 v1
-add at 0.40%) reproduces 97.88 / 0.22 / 4.55 deterministically — improvement
-over the 3-strategy 04-26 anchor (93.78 / 0.58 / 4.92) on every gate. The
-98.13 / 0.22 / 4.49 figure that briefly circulated on 2026-05-05 was the
-pre-Guardian-re-export anchor (209-trade panel, before the same-day reconcile
-swapped 87e73 → 33781 to 201 trades — see
-data/reconciles/2026-05-05_guardian_n_reconcile.md). The 201-trade panel is
-canonical; both anchors clear lock criteria. See
-docs/briefs/striker_nas100_q_nas_3_mc_addition.md for the addition decision
-audit trail and CLAUDE.md "Prior 3-strategy anchors (historical)" for prior
-history.
+Pepperstone is the CLAUDE.md canonical lock-anchor source. The 2026-05-08
+relock applied dd_protection C2 (DD_TRIGGER 0.010 → 0.015, DD_SCALE held at
+0.40) on the 4-strategy panel. The relock reproduces 98.09 / 0.36 / 4.73
+deterministically — both lock criteria (bust <1%, p99 DD <5%) clear with
+margin, and median days-to-pass shortens from 23 to 22. Override grounds:
+bust_attribution_flip closed broker-feed-confirmed via same-date
+TradingView Pepperstone+OANDA re-export, and Q-DDP-1's C2 sweep showed
+risk-controls-met + median-pass-time benefit. See override note in
+docs/briefs/Q-DDP-1/recommendation.md. Prior 4-strategy 2026-05-05 anchor
+(97.88 / 0.22 / 4.55 at C0) and 3-strategy 04-26 anchor (93.78 / 0.58 /
+4.92) remain in CLAUDE.md "Prior 3-strategy anchors (historical)" for
+historical comparison.
 
 OANDA is the pattern-spotting proxy per the two-tier canonical rule. OANDA
 NAS100 panel does not exist; OANDA still on DJ30 v4.4 (no v4.5 OANDA fetch
-yet). OANDA anchor stays at the 04-25 3-strategy values until the next OANDA
-fetch lands.
+yet). OANDA C2 anchor (96.23 / 0.69 / 4.91) clears the lock criteria
+(bust <1%, p99 DD <5%) with thinner margin than Pepperstone, consistent
+with OANDA's pattern-spotting role. The same-date Pepperstone+OANDA TV
+re-export validated broker-feed differential.
 
 Both anchors are deterministic given fixed SEEDS = (42, 123, 2026) in
 portfolio_mc.py. Tolerance abs=1e-4 is comfortably tighter than any
@@ -47,23 +49,22 @@ def oanda_result():
 
 
 def test_pepperstone_anchor(pepperstone_result):
-    """2026-05-05 Pepperstone 4-strategy canonical anchor (code-reproducible).
+    """2026-05-08 Pepperstone 4-strategy C2 anchor (code-reproducible).
 
     DJ30 v4.5 + NAS100 v1 (0.40% allocation) added 2026-05-05.
-    Re-anchored same day after Guardian Pepperstone re-export (87e73 → 33781,
-    209 → 201 trades; 04-26 export contained 8 phantom v5.5 signals — see
-    data/reconciles/2026-05-05_guardian_n_reconcile.md).
+    dd_protection relaxed 2026-05-08 from C0 (1.0%/0.40×) to C2 (1.5%/0.40×)
+    after bust_attribution_flip resolved broker-feed-confirmed.
     """
-    assert pepperstone_result["pass_rate"] == pytest.approx(0.9788, abs=1e-4)
-    assert pepperstone_result["bust_rate"] == pytest.approx(0.0022, abs=1e-4)
-    assert pepperstone_result["p99_dd"]    == pytest.approx(0.0455, abs=1e-4)
+    assert pepperstone_result["pass_rate"] == pytest.approx(0.9809, abs=1e-4)
+    assert pepperstone_result["bust_rate"] == pytest.approx(0.0036, abs=1e-4)
+    assert pepperstone_result["p99_dd"]    == pytest.approx(0.0473, abs=1e-4)
 
 
 def test_oanda_anchor(oanda_result):
-    """04-25 OANDA pattern-spotting proxy anchor."""
-    assert oanda_result["pass_rate"] == pytest.approx(0.9605, abs=1e-4)
-    assert oanda_result["bust_rate"] == pytest.approx(0.0048, abs=1e-4)
-    assert oanda_result["p99_dd"]    == pytest.approx(0.0479, abs=1e-4)
+    """2026-05-08 OANDA C2 anchor (pattern-spotting proxy)."""
+    assert oanda_result["pass_rate"] == pytest.approx(0.9623, abs=1e-4)
+    assert oanda_result["bust_rate"] == pytest.approx(0.0069, abs=1e-4)
+    assert oanda_result["p99_dd"]    == pytest.approx(0.0491, abs=1e-4)
 
 
 def test_pepperstone_panel_shape(pepperstone_result):
@@ -89,10 +90,10 @@ def test_default_panel_is_pepperstone():
 
     If a future refactor flips any of these back to "oanda", the anchor
     tests stay green but `python portfolio_mc.py` (no flags) starts
-    producing OANDA numbers (96.05/0.48/4.79) instead of the CLAUDE.md
-    canonical headline (Pepperstone, 93.78/0.58/4.92). This test catches
-    that drift before it reaches the CLAUDE.md / code asymmetry surface
-    we just spent effort closing.
+    producing OANDA numbers (96.23/0.69/4.91 at C2) instead of the CLAUDE.md
+    canonical headline (Pepperstone, 98.09/0.36/4.73 at C2). This test
+    catches that drift before it reaches the CLAUDE.md / code asymmetry
+    surface we just spent effort closing.
     """
     import inspect
 
@@ -110,9 +111,10 @@ def test_lock_criteria_satisfied(pepperstone_result):
     """Lock criteria from CLAUDE.md: bust <1%, p99 DD <5%.
 
     Pepperstone is the lock-decision panel. If either gate is breached, the
-    locked allocation (G 0.34% / S 1.00% / A 1.50%) and dd_protection config
-    (DD_TRIGGER=0.010, DD_SCALE=0.40) need re-evaluation per the 2026-04-17
-    ADR — do NOT bypass this check by tweaking constants.
+    locked allocation (G 0.34% / S 1.00% / A 1.50% / NAS 0.40%) and
+    dd_protection config (DD_TRIGGER=0.015, DD_SCALE=0.40 — C2 relock
+    2026-05-08) need re-evaluation — do NOT bypass this check by tweaking
+    constants.
     """
     assert pepperstone_result["bust_rate"] < 0.01
     assert pepperstone_result["p99_dd"] < 0.05

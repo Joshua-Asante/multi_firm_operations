@@ -1,6 +1,7 @@
 # Q-NAS-2 — 4-week forward gate-state capture plan (Striker NAS100 v1)
 
 **Date authored:** 2026-05-05
+**Status:** CLOSED 2026-05-08 — Joshua's call. Q-NAS-2 closes without forward capture; Q-NAS-1 (hour × dow) is accepted as the answer on the pyramid-spawn-rate question, and the design thesis (pyramid-pathway is the strategy) does not require backfilled (ATR_exp × body × Dist-to-Res) features for live operation. The research indicator can stay loaded as a passive monitoring tool but is no longer gating a downstream brief. This document is retained for archival reference.
 **Indicator file:** [archive/strategies/striker/striker_nas100_v1_research.pine](../../archive/strategies/striker/striker_nas100_v1_research.pine)
 **Brief:** Striker NAS100 v1 — Phase 4C/6 investigation (rev 2)
 

@@ -259,7 +259,7 @@ One paired pre-reg amendment: basis-sanity substituted to internal-consistency c
 
 Per pre-reg §7 commitment: the SNAG tail mechanism on the 2025-02-07 anchor is **exhausted of cheap mechanism candidates on the locked panel**.
 
-Methodology budget on this anchor is closed. Redirected forward queue:
+Methodology budget on this anchor is closed. Redirected forward queue (as authored at closure 2026-05-06):
 1. **Aegis BOJ binary-event pause** — already on forward queue per CLAUDE.md.
 2. **NAS100 v1 live observation** — candidate-not-deployed; live-PnL accumulation gate to validate the +0.40% addition.
 3. **New strategy candidates** — TBD; no specific candidate currently surfaced.
@@ -267,6 +267,16 @@ Methodology budget on this anchor is closed. Redirected forward queue:
 **Re-opening the SNAG tail at Q-DJ30-N (N ≥ 4) would require new evidence**, not just a new mediator hypothesis. Specifically, per pre-reg §7: "if a second −5R-or-worse base-trade event occurs and is also large-gap-proximate, the gap-magnitude thesis advances with n=2 evidence." Until then, single-event diagnostic.
 
 The continuous Spearman-ρ framing on `|gap|` vs loss/R is **not** opened as a fourth Pre-Q on the same anchor. Three Pre-Qs on one signal class is the methodology-budget failure mode; the discipline is to close the budget, not to keep iterating mediator framings.
+
+### Postscript (2026-05-08) — redirect queue accepted as empty
+
+On 2026-05-08 the redirect queue above was reviewed and **accepted as empty**:
+
+1. **Aegis BOJ binary-event pause** — closed at the strategy-CHANGELOG layer. The April 28, 2026 BOJ meeting watch was closed 2026-05-05 with no parameter change required ([strategies/aegis/aegis_CHANGELOG.md:21](../../../strategies/aegis/aegis_CHANGELOG.md:21)). The reference here was doctrine-stale.
+2. **NAS100 v1 live observation** — ongoing operational tracking (live-PnL accumulation), not a methodology investigation requiring its own brief. Removed from this queue; tracked instead via [live_journal/](../../../live_journal/) reconciliation cadence.
+3. **New strategy candidates** — no candidate surfaced 2026-05-06 → 2026-05-08; queue closes empty rather than carrying forward an indefinite TBD.
+
+**Q-DJ30-3 is fully closed.** The methodology-budget exhaustion verdict above stands, and there is no active redirect target. Future strategy-candidate work, if any, opens its own brief without inheriting from this closure.
 
 ---
 

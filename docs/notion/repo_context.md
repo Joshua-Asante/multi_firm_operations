@@ -318,7 +318,7 @@ CC adds new items as they surface; Joshua resolves or graduates them out.
 ---
 
 ## §7 — Methodology canon (Rule 0 sub-rules)
-_Last refreshed: 2026-05-07_
+_Last refreshed: 2026-05-08_
 
 Active sub-rules from prior lesson captures, applied at brief-authoring time AND at CC §0 execution time:
 
@@ -327,6 +327,7 @@ Active sub-rules from prior lesson captures, applied at brief-authoring time AND
 3. **Rule 0 reads must include surrounding context.** When a brief cites a specific line, §0 reads the surrounding section (±20 lines minimum), not the line in isolation. Disambiguating qualifiers often live nearby. _(Anchored: NAS100 drift fix brief CLAUDE.md:48-vs-50 miss, 2026-05-07.)_
 4. **Architecture truth before edit prescription.** For briefs that prescribe edits to production code web Claude has not seen in the current conversation, §0 reads the *actual architecture* (module purposes, schemas, function signatures) and CC proposes the *edit shape* in the §0 report; Joshua confirms before §2 execution. The "web Claude prescribes specific edits, CC executes" pattern is reliable only when web Claude's mental model matches the codebase. _(Anchored: lock-NAS100-live Path A vs Path B, 2026-05-07.)_
 5. **Lock procedures need an operational-tooling integration phase.** Pine + manifest + MC ≠ live. A lock is not complete until operational tooling (`firm_rules / dd_protection / accounts / cli`) reflects the new strategy. Future lock memos include an "operational tooling integrated" checklist item before declaring lock complete. _(Anchored: NAS100 v1 lock 2026-05-05 vs operational integration 2026-05-07 gap.)_
+6. **Live-execution claims require edge-captured citation.** When a brief asserts that a strategy is performing as designed in live trading, or proposes any change motivated by live execution behavior, §0 must cite the most recent `journal_review.py` output (edge-captured ratio + version-mixed flag + the date window the report covers). A claim of "I'm trading the system" without this citation is unverified — see execution lessons E1 (2026-04-07 Guardian skip, $3,752 counterfactual) and E2 (2026-04-15 Aegis decomposition, $6,100 gap). _(Anchored: 2026-04-29 honesty audit; methodology layer was 6× more cited than execution layer in briefs over a 7-week sample.)_
 
 This list grows as lessons capture; web Claude consults it during brief authoring.
 

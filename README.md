@@ -1,4 +1,4 @@
-# prop_firm_pipeline
+# multi_firm_operations
 
 Operational layer for Joshua's multi-firm prop trading. Account tracking,
 multiplier lookup, DD protection, and portfolio-level challenge MC.

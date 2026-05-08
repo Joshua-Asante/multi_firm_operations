@@ -1,5 +1,5 @@
 """
-CLI for the prop firm pipeline.
+CLI for multi-firm operations.
 Usage:
     python cli.py add <account_id> <firm> <balance> [--phase challenge]
     python cli.py update <account_id> <balance>
@@ -132,7 +132,7 @@ def cmd_lots(args):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Prop firm pipeline CLI")
+    parser = argparse.ArgumentParser(description="Multi-firm operations CLI")
     sub = parser.add_subparsers(dest="command", required=True)
 
     # add

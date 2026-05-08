@@ -159,4 +159,4 @@ parameter retry, no broader framework search.** AUDNZD-style closure.
 - Parent brief: 2026-05-03 (chat — Sentinel USDCHF build/no-build gate)
 - AUDNZD precedent (closure-note shape): [2026-04-26_audnzd_REJECTED.md](../archive/findings/2026-04-26_audnzd_REJECTED.md)
 - Iran-Hormuz overlay deactivation (no-overlay rule): [archive/docs/methodology/archive/overlays/guardian_conflict_risk.md](../../../archive/docs/methodology/archive/overlays/guardian_conflict_risk.md)
-- Two-tier canonical (Pepperstone is lock anchor): [feedback memory](../../../../.claude/projects/C--Users-joshu-prop-firm-pipeline/memory/feedback_two_tier_canonical_pepperstone_oanda.md)
+- Two-tier canonical (Pepperstone is lock anchor): [feedback memory](../../../../.claude/projects/C--Users-joshu-multi-firm-operations/memory/feedback_two_tier_canonical_pepperstone_oanda.md)

@@ -55,7 +55,7 @@ Out of scope (no mandatory tax): exploratory scripts, methodology drafts, ad-hoc
 
 ### Assertion library (5 families)
 
-Implemented in `prop_firm_pipeline/lib/mvd.py` as importable helpers:
+Implemented in `multi_firm_operations/lib/mvd.py` as importable helpers:
 
 1. **Cardinality** — row counts, time-window span, page counts. Helpers: `assert_window`, `assert_min_rows`.
 2. **Identity** — symbol, broker, version, instrument suffix verified at top of any script producing a load-bearing number. Helpers: `assert_symbol`, `assert_broker`, `assert_version`.
@@ -88,10 +88,10 @@ This is the defense against library decay (catching the previous war while curre
 ### Artifact homes
 
 **Repo (canonical, runnable):**
-- `prop_firm_pipeline/lib/mvd.py` — assertion helpers
-- `prop_firm_pipeline/docs/methodology/mvd.md` — library reference, worked examples, audit table
-- `prop_firm_pipeline/docs/templates/calibration_brief.md`, `bust_analysis.md`, `lock_decision.md` — brief templates with verification preamble
-- `prop_firm_pipeline/docs/adr/2026-04-24-mvd-discipline.md` — this document
+- `multi_firm_operations/lib/mvd.py` — assertion helpers
+- `multi_firm_operations/docs/methodology/mvd.md` — library reference, worked examples, audit table
+- `multi_firm_operations/docs/templates/calibration_brief.md`, `bust_analysis.md`, `lock_decision.md` — brief templates with verification preamble
+- `multi_firm_operations/docs/adr/2026-04-24-mvd-discipline.md` — this document
 
 **Notion (human-readable index):**
 - New page under FXIFY Command Center linking to the repo files, listing the 5 families with one-line descriptions, referencing the audit table.

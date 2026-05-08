@@ -1,6 +1,6 @@
 # REPO_MAP — active classification
 
-**Updated:** 2026-05-07
+**Updated:** 2026-05-08
 **Convention:**
 - `[A]` active hot-path (production code, locked strategies, active analyses, immutable record)
 - `[U]` utility — runs on demand, not in CI hot path, retained as load-bearing tool
@@ -49,6 +49,12 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] scripts/fetch_oanda_bars.py — hard-codes USDJPY/XAUUSD/US30USD only; not a general fetcher
 [A] scripts/lock_event_hook.py
 [?] scripts/run_v55_validation.py — open question: template-shape vs one-shot
+
+## Live execution
+[A] live_journal/scripts/journal_review.py — signal-vs-fill reconciliation pipeline
+[A] live_journal/scripts/m7_anticipation_gap_backfill.py — M-7 Route A slippage backfill (sibling-imports journal_review)
+[A] live_journal/references/execution_lessons.md — E1/E2 anchor registry (skill ↔ repo runtime mirror)
+[U] live_journal/data/ — runtime DXTrade exports + journal outputs (gitignored except .gitkeep)
 
 ## Data — TV exports (canonical MC inputs)
 [A] data/tv_exports/pepperstone/Guardian_Gold_v5.5_*.csv

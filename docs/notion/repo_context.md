@@ -9,7 +9,7 @@ This section is the canonical architecture-truth surface for web Claude when aut
 ---
 
 ## §1 — Active file tree
-_Last refreshed: 2026-05-07_
+_Last refreshed: 2026-05-08_
 
 ```
 prop_firm_pipeline/
@@ -48,6 +48,14 @@ prop_firm_pipeline/
 │   ├── fetch_oanda_bars.py                           # hard-coded USDJPY/XAUUSD/US30USD only
 │   ├── lock_event_hook.py                            # post-lock hook
 │   └── run_v55_validation.py                         # [?] template-vs-one-shot disposition open
+│
+├── live_journal/                                     # signal-vs-fill reconciliation runtime; skill ↔ repo runtime mirror
+│   ├── scripts/
+│   │   ├── journal_review.py                         # canonical reconciliation pipeline
+│   │   └── m7_anticipation_gap_backfill.py           # M-7 Route A backfill (sibling-imports journal_review)
+│   ├── references/
+│   │   └── execution_lessons.md                      # E1/E2 anchor registry
+│   └── data/                                         # gitignored DXTrade exports + journal outputs (.gitkeep retained)
 │
 ├── tests/                                            # CI-load-bearing
 │   ├── test_mc_anchors.py                            # MC headline pinning (4-strategy 97.88/0.22/4.55)
@@ -272,7 +280,7 @@ _Last refreshed: 2026-05-07_
 ---
 
 ## §6 — Pending decisions queue (carry-forward)
-_Last refreshed: 2026-05-07_
+_Last refreshed: 2026-05-08_
 
 **Time-gated:**
 - **Q-DJ30-1/2/3 archive move** → ~2026-05-20 (2-week cooldown from 2026-05-06 closures). Currently still under `analysis/`.
@@ -296,12 +304,18 @@ _Last refreshed: 2026-05-07_
 - Windows console emoji bug (`dd_protection.py:201`) — `PYTHONIOENCODING=utf-8` workaround live; ASCII-replacement is a 5-min task.
 - Multiplier-equal-across-strategies design observation (formula cancels per-strategy risk under unified allocations) — confirm whether per-strategy multiplier divergence is ever expected; if no, document the cancellation and consider simplifying `get_multipliers` to a single value.
 
+**live_journal subtree (added 2026-05-08; closeout 2026-05-08):**
+- **CI test policy:** DECIDED option (a) — `tests/test_journal_review.py` with synthetic DXTrade fixtures pinning loader behavior + edge-captured ratio computation. Implementation pending; queue alongside the next `live_journal/` touch (no separate brief required — mechanical).
+- **execution_lessons.md sync direction:** CONFIRMED — repo `live_journal/references/execution_lessons.md` is the durable canon. The skill bundle (session-ephemeral sandbox) is downstream. New E-entry workflow: edit repo, propagate to skill bundle on next session install. (Mirrors the brief-authoring SKILL.md ↔ Notion §7 sync clause shape — repo wins for the live_journal pair.)
+- **m7 backfill first run:** CONFIRMED target 2026-05-11 morning, before live NAS100 first fill at 13:00 UTC. Verdict updates `execution_lessons.md` registry; on-disk M-7 lesson-file capture deferred per §0.C C3 verdict.
+- **Methodology lesson registry on-disk format:** Joshua to author a separate brief migrating M-1..M-6 from memory/Notion to `docs/methodology/lessons/` (or explicitly accept memory-only as canonical). Carry-forward from §0.C C3 verdict — open until brief lands.
+
 CC adds new items as they surface; Joshua resolves or graduates them out.
 
 ---
 
 ## §7 — Methodology canon (Rule 0 sub-rules)
-_Last refreshed: 2026-05-07_
+_Last refreshed: 2026-05-08_
 
 Active sub-rules from prior lesson captures, applied at brief-authoring time AND at CC §0 execution time:
 
@@ -310,13 +324,14 @@ Active sub-rules from prior lesson captures, applied at brief-authoring time AND
 3. **Rule 0 reads must include surrounding context.** When a brief cites a specific line, §0 reads the surrounding section (±20 lines minimum), not the line in isolation. Disambiguating qualifiers often live nearby. _(Anchored: NAS100 drift fix brief CLAUDE.md:48-vs-50 miss, 2026-05-07.)_
 4. **Architecture truth before edit prescription.** For briefs that prescribe edits to production code web Claude has not seen in the current conversation, §0 reads the *actual architecture* (module purposes, schemas, function signatures) and CC proposes the *edit shape* in the §0 report; Joshua confirms before §2 execution. The "web Claude prescribes specific edits, CC executes" pattern is reliable only when web Claude's mental model matches the codebase. _(Anchored: lock-NAS100-live Path A vs Path B, 2026-05-07.)_
 5. **Lock procedures need an operational-tooling integration phase.** Pine + manifest + MC ≠ live. A lock is not complete until operational tooling (`firm_rules / dd_protection / accounts / cli`) reflects the new strategy. Future lock memos include an "operational tooling integrated" checklist item before declaring lock complete. _(Anchored: NAS100 v1 lock 2026-05-05 vs operational integration 2026-05-07 gap.)_
+6. **Live-execution claims require edge-captured citation.** When a brief asserts that a strategy is performing as designed in live trading, or proposes any change motivated by live execution behavior, §0 must cite the most recent `journal_review.py` output (edge-captured ratio + version-mixed flag + the date window the report covers). A claim of "I'm trading the system" without this citation is unverified — see execution lessons E1 (2026-04-07 Guardian skip, $3,752 counterfactual) and E2 (2026-04-15 Aegis decomposition, $6,100 gap). _(Anchored: 2026-04-29 honesty audit; methodology layer was 6× more cited than execution layer in briefs over a 7-week sample.)_
 
 This list grows as lessons capture; web Claude consults it during brief authoring.
 
 ---
 
 ## §8 — Cross-references that web Claude routinely needs
-_Last refreshed: 2026-05-07_
+_Last refreshed: 2026-05-08_
 
 - **Notion Command Center page:** `32cdc0b53c1181b8a18cce1401a4f8e8`
 - **INQHIORI ⊕ OODA framework page:** `34ddc0b53c1181479d7bdecc61f47078`
@@ -330,6 +345,9 @@ _Last refreshed: 2026-05-07_
 - **Methodology archive:** `archive/docs/methodology/archive/` (full retired methodology — INQHIORI ⊕ The Algorithm, Pre-Q gates, MVD framing; 90-day review gate 2026-07-29)
 - **Methodology findings (active):** `docs/methodology/findings/`
 - **Gate audits (active):** `docs/methodology/gate_audits/`
+- **Live execution journal scripts:** `live_journal/scripts/journal_review.py`, `live_journal/scripts/m7_anticipation_gap_backfill.py`
+- **Execution lessons registry:** `live_journal/references/execution_lessons.md`
+- **Skill bundle (live-execution-journal):** `~/AppData/Roaming/Claude/local-agent-mode-sessions/skills-plugin/<session-id>/skills/live-execution-journal/` (sandbox path, ephemeral; repo `live_journal/` is the durable runtime)
 
 ---
 

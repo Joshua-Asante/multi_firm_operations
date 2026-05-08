@@ -284,12 +284,12 @@ _Last refreshed: 2026-05-07_
 _Last refreshed: 2026-05-08_
 
 **Time-gated:**
-- **Q-DJ30-1/2/3 archive move** → ~2026-05-20 (2-week cooldown from 2026-05-06 closures). Currently still under `analysis/`.
+- ~~Q-DJ30-1/2/3 archive move → ~2026-05-20 (2-week cooldown from 2026-05-06 closures)~~ — **EXECUTED 2026-05-08** (cooldown overridden by Joshua); now at `archive/analysis/Q-DJ30-{1,2,3}/`. dd_protection_trace.py moved in same batch to `archive/analysis/dd_protection_trace.py`.
 
 **Awaiting Joshua's disposition — RESOLVED 2026-05-08 batch:**
 - `archive/strategies/striker/striker_dj30_v4.4.pine` — **KEEP** at `[X]`. Load-bearing for `OANDA_PANELS["striker"]` filename token. Retirement trigger: regen OANDA against v4.5 + delete in one transaction.
 - `scripts/run_v55_validation.py` — **ARCHIVED** to `archive/scripts/run_v55_validation.py`. One-shot harness with hardcoded v5.5/v5.4 expected metrics; not a template.
-- `analysis/dd_protection_trace.py` — **KEEP** as reusable forensic tool. Reclassified `[?]` → `[A]`. Relevance increased under C2 relock with regime-fragility dissent on record.
+- `archive/analysis/dd_protection_trace.py` — **KEEP** as reusable forensic tool. Reclassified `[?]` → `[A]`. Relevance increased under C2 relock with regime-fragility dissent on record.
 - `analysis/time_to_pass.py` — **KEEP** + EXTENDED with `--regime-check` mode. Reclassified `[?]` → `[A]`. Hosts the quarterly C2 → C0 revert-trigger check per ADR 2026-05-08-dd-trigger-c2-relock.
 - `analysis/oanda_stage1/` — **KEEP** at `[A]` (already classified active in REPO_MAP). `tv_export_loader.py` is referenced by Q-NAS-2 capture plan; findings committed to `docs/methodology/findings/2026-05-02_oanda_stage1_*`.
 

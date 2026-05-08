@@ -2,7 +2,7 @@
 
 **Trigger:** pre-registration commitment that cannot execute as specified
 **Loop context:** Q-DJ30-3 Phase B (reproduction & cardinality re-verification)
-**Pre-registration:** [analysis/Q-DJ30-3/verdict_pre_registration.md](../../../analysis/Q-DJ30-3/verdict_pre_registration.md) §2 (Conditioning variable definition)
+**Pre-registration:** [archive/analysis/Q-DJ30-3/verdict_pre_registration.md](../../../archive/analysis/Q-DJ30-3/verdict_pre_registration.md) §2 (Conditioning variable definition)
 
 ## What the gate did
 
@@ -23,7 +23,7 @@ Joshua authorized "proceed with plan as scoped" (chat record 2026-05-06), which 
 > 5-date spot-check: aggregated daily OHLC vs Yahoo / Stooq DJI cash close. Tolerance < 1.5%. Halt and surface if exceeded — basis is a confound for the gap measurement.
 
 **New gate (substituted, this audit):**
-> Internal consistency check on `analysis/Q-DJ30-3/dj30_daily_gap.csv`:
+> Internal consistency check on `archive/analysis/Q-DJ30-3/dj30_daily_gap.csv`:
 > 1. Daily close range over panel falls within DJ30 envelope 28000-50000 (covers both 2022 lows and 2026 highs).
 > 2. Weekday count: 1075 ± 50 retained (out of ~1117 expected weekdays in 2022-01 → 2026-04).
 > 3. ATR(14) at panel midpoint and end is positive and within 200-1500 points (DJ30 typical daily-range envelope).
@@ -42,9 +42,9 @@ This loss is acceptable for a partition-hypothesis test where the question is wh
 
 ## Cross-references
 
-- Pre-registration: [analysis/Q-DJ30-3/verdict_pre_registration.md](../../../analysis/Q-DJ30-3/verdict_pre_registration.md)
+- Pre-registration: [archive/analysis/Q-DJ30-3/verdict_pre_registration.md](../../../archive/analysis/Q-DJ30-3/verdict_pre_registration.md)
 - Brief: [docs/briefs/Q-DJ30-3/Q-DJ30-3.md](../../briefs/Q-DJ30-3/Q-DJ30-3.md)
-- Aggregation script: [analysis/Q-DJ30-3/aggregate_m15_to_daily.py](../../../analysis/Q-DJ30-3/aggregate_m15_to_daily.py)
+- Aggregation script: [archive/analysis/Q-DJ30-3/aggregate_m15_to_daily.py](../../../archive/analysis/Q-DJ30-3/aggregate_m15_to_daily.py)
 - Worked precedent for substitution: [docs/methodology/gate_audits/2026-05-06_q-dj30-2_pre_reg_amend.md](2026-05-06_q-dj30-2_pre_reg_amend.md)
 - INQHIORI skill §12 audit-trail format: https://www.notion.so/34ddc0b53c1181479d7bdecc61f47078
 

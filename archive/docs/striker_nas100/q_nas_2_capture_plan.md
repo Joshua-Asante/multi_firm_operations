@@ -2,7 +2,7 @@
 
 **Date authored:** 2026-05-05
 **Status:** CLOSED 2026-05-08 — Joshua's call. Q-NAS-2 closes without forward capture; Q-NAS-1 (hour × dow) is accepted as the answer on the pyramid-spawn-rate question, and the design thesis (pyramid-pathway is the strategy) does not require backfilled (ATR_exp × body × Dist-to-Res) features for live operation. The research indicator can stay loaded as a passive monitoring tool but is no longer gating a downstream brief. This document is retained for archival reference.
-**Indicator file:** [archive/strategies/striker/striker_nas100_v1_research.pine](../../archive/strategies/striker/striker_nas100_v1_research.pine)
+**Indicator file:** [archive/strategies/striker/striker_nas100_v1_research.pine](../../strategies/striker/striker_nas100_v1_research.pine)
 **Brief:** Striker NAS100 v1 — Phase 4C/6 investigation (rev 2)
 
 ## Why this capture exists
@@ -35,7 +35,7 @@ For any candidate bar at time T, the **forward** 15-bar window (T..T+15) is reco
 
 1. Right-click chart → **"Export Chart Data"** → format CSV.
 2. The output includes one column per `plot()` series. Bars where `emit` is false (out of session) carry `na` and can be dropped during ingest.
-3. **File naming**: `Striker_NAS100_v1research_PEPPERSTONE_NAS100_<YYYY-MM-DD>_<hash>.csv` — match the TV-export convention so [tv_export_loader.py](../../analysis/oanda_stage1/tv_export_loader.py) MVD-identity gates extend cleanly. (Note `v1research` not `v1` — keeps the research-mode capture distinct from the production trade log.)
+3. **File naming**: `Striker_NAS100_v1research_PEPPERSTONE_NAS100_<YYYY-MM-DD>_<hash>.csv` — match the TV-export convention so [tv_export_loader.py](../../../analysis/oanda_stage1/tv_export_loader.py) MVD-identity gates extend cleanly. (Note `v1research` not `v1` — keeps the research-mode capture distinct from the production trade log.)
 4. Place the file under `data/tv_exports/pepperstone/` and add its SHA256 to `SHA256SUMS`.
 
 ## Downstream analysis (after 4-week capture)
@@ -61,6 +61,6 @@ Author `analysis/striker_nas100/q_nas_2_conditional_spawn.py`. For each row in t
 
 ## Cross-references
 
-- Production strategy (gate-logic source of truth): [strategies/striker/striker_nas100_v1.pine](../../strategies/striker/striker_nas100_v1.pine), entry filter chain at line 197.
-- Q-NAS-1 confirmatory analyses (the partial answer this capture extends): [docs/briefs/striker_nas100_q_nas_1_results.md](../briefs/striker_nas100_q_nas_1_results.md).
-- TV-export loader (will need a small extension when the research CSV format lands): [analysis/oanda_stage1/tv_export_loader.py](../../analysis/oanda_stage1/tv_export_loader.py).
+- Production strategy (gate-logic source of truth): [strategies/striker/striker_nas100_v1.pine](../../../strategies/striker/striker_nas100_v1.pine), entry filter chain at line 197.
+- Q-NAS-1 confirmatory analyses (the partial answer this capture extends): [docs/briefs/striker_nas100_q_nas_1_results.md](../../docs/briefs/striker_nas100_q_nas_1_results.md).
+- TV-export loader (will need a small extension when the research CSV format lands): [analysis/oanda_stage1/tv_export_loader.py](../../../analysis/oanda_stage1/tv_export_loader.py).

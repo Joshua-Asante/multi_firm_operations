@@ -2,7 +2,7 @@
 
 **Trigger:** pre-registration commitment that cannot execute as specified
 **Loop context:** Q-DJ30-3 Phase B (reproduction & cardinality re-verification)
-**Pre-registration:** [archive/analysis/Q-DJ30-3/verdict_pre_registration.md](../../../archive/analysis/Q-DJ30-3/verdict_pre_registration.md) §2 (Conditioning variable definition)
+**Pre-registration:** [archive/analysis/Q-DJ30-3/verdict_pre_registration.md](../../../analysis/Q-DJ30-3/verdict_pre_registration.md) §2 (Conditioning variable definition)
 
 ## What the gate did
 
@@ -42,9 +42,9 @@ This loss is acceptable for a partition-hypothesis test where the question is wh
 
 ## Cross-references
 
-- Pre-registration: [archive/analysis/Q-DJ30-3/verdict_pre_registration.md](../../../archive/analysis/Q-DJ30-3/verdict_pre_registration.md)
+- Pre-registration: [archive/analysis/Q-DJ30-3/verdict_pre_registration.md](../../../analysis/Q-DJ30-3/verdict_pre_registration.md)
 - Brief: [docs/briefs/Q-DJ30-3/Q-DJ30-3.md](../../briefs/Q-DJ30-3/Q-DJ30-3.md)
-- Aggregation script: [archive/analysis/Q-DJ30-3/aggregate_m15_to_daily.py](../../../archive/analysis/Q-DJ30-3/aggregate_m15_to_daily.py)
+- Aggregation script: [archive/analysis/Q-DJ30-3/aggregate_m15_to_daily.py](../../../analysis/Q-DJ30-3/aggregate_m15_to_daily.py)
 - Worked precedent for substitution: [docs/methodology/gate_audits/2026-05-06_q-dj30-2_pre_reg_amend.md](2026-05-06_q-dj30-2_pre_reg_amend.md)
 - INQHIORI skill §12 audit-trail format: https://www.notion.so/34ddc0b53c1181479d7bdecc61f47078
 

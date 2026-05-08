@@ -38,15 +38,16 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] strategies/guardian/guardian_gold_v5.5.pine — LOCKED 2026-04-23
 [A] strategies/guardian/guardian_CHANGELOG.md
 [A] strategies/striker/striker_dj30_v4.5.pine — LOCKED 2026-05-05
-[A] strategies/striker/striker_nas100_v1.pine — LOCKED 2026-05-05
 [A] strategies/striker/striker_CHANGELOG.md
+[A] strategies/nas/striker_nas100_v1.pine — LOCKED 2026-05-05 (split out of strategies/striker/ on 2026-05-08)
+[A] strategies/nas/striker_nas100_CHANGELOG.md
 [A] strategies/aegis/aegis_usdjpy_v4.3.pine — LOCKED 2026-04-22
 [A] strategies/aegis/aegis_CHANGELOG.md
 
 ## Scripts
 [A] scripts/build_us_releases.py
 [U] scripts/dryrun_aegis_v4_3.py — end-to-end exercise of all 9 lib/mvd helpers; sanity gate (verdict 2026-05-07)
-[A] scripts/fetch_oanda_bars.py — hard-codes USDJPY/XAUUSD/US30USD only; not a general fetcher
+[A] scripts/fetch_oanda_bars.py — hard-codes USDJPY/XAUUSD/US30USD/NAS100USD only; not a general fetcher
 [A] scripts/lock_event_hook.py
 
 ## Live execution

@@ -4,7 +4,7 @@
 **Brief:** Striker NAS100 v1 — Phase 4C/6 investigation (rev 2)  
 **Run:** `python -m analysis.striker_nas100.q_nas_1_pyramid_hypothesis`
 
-Strategy header at `strategies/striker/striker_nas100_v1.pine` lines 35-40 documents
+Strategy header at `strategies/nas/striker_nas100_v1.pine` lines 35-40 documents
 pyramid-dependence as DESIGN INTENT. These tests are confirmatory: they quantify
 the pattern at the trade-log level. None falsify the design intent.
 

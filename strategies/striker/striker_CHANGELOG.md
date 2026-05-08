@@ -4,6 +4,8 @@ Long breakout strategy on DJ30 (US30) 15min. Pine Script v6.
 
 **Source of truth:** `striker_dj30_v4.5.pine` holds the authoritative parameter values. This CHANGELOG records decisions, rationale, and known concerns. If the two ever disagree, the Pine file wins — fix the CHANGELOG. Prior locked versions are in `archive/`.
 
+This file covers Striker DJ30 only. Striker NAS100 (architecture-family sibling — separate risk/DOW/pyramid tuning) was split out to `strategies/nas/striker_nas100_v1.pine` on 2026-05-08; see `strategies/nas/striker_nas100_CHANGELOG.md`.
+
 Versioning begins at v4.3 (2026-04-17). Prior development history (v3.1 → v4.1 → v4.2 rejected → v4.3) is archived in Notion.
 
 ---
@@ -17,6 +19,13 @@ _Queued changes. Move to a dated entry on commit._
 ## Outstanding TODO
 
 - **v4.5 lock-decision rationale (open)** — the [v4.5] § Rationale block (~line 38) still carries `[TODO Joshua: confirm/edit lock-decision rationale.]` plus an inferred-from-file-diff placeholder. Replace with the confirmed rationale at next touch.
+
+---
+
+## 2026-05-08 — NAS100 split-out + dd_protection C2 relock (cross-ref)
+
+- **`striker_nas100_v1.pine` moved `strategies/striker/` → `strategies/nas/`.** No DJ30 parameter change; DJ30 v4.5 stays in this folder. The split codifies the architecture-family-but-instrument-tuned distinction (NAS: 0.40% / 1000% pyramid / Mon+Tue; DJ30: 1.00% / 350% pyramid / [DJ30-locked DOW set]). Cross-references repaired in `REPO_MAP.md`, `docs/briefs/striker_nas100_q_nas_1_results.md`, and `docs/briefs/striker_nas100_q_nas_3_mc_addition.md`.
+- **dd_protection C2 relock — 4-strategy MC re-anchored.** Same-day relock from C0 (1.0%/0.40×) → C2 (1.5%/0.40×) after `bust_attribution_flip` closed broker-feed-confirmed (Pepperstone+OANDA TV re-export) and Q-DDP-1's C2 sweep showed risk-controls-met + median-pass-time benefit. New canonical 4-strategy Pepperstone MC: **98.09% pass / 0.36% bust (0.00% daily + 0.36% static) / p99 DD 4.73%**, median days-to-pass 22 (vs 23 under C0). **DJ30 bust attribution 44.4%** — still the marginal bust contributor, share up from 40.9% under C0 (consistent with C2's wider DD-trigger letting more DJ30-driven static DD episodes through to closure rather than truncating early). Both lock criteria still clear with margin. Q-DDP-1's regime-robustness gate failed for C2; the 2026-05-08 override accepts that risk on broker-feed + median-pass-time grounds. Forward C2→C0 revert trigger: rolling 6-month pass-rate <95% for two consecutive 6-month windows. See `docs/adr/2026-05-08-dd-trigger-c2-relock.md` (canonical ADR), `docs/briefs/Q-DDP-1/recommendation.md` override note, and `docs/briefs/bust_attribution_flip.md` closure.
 
 ---
 

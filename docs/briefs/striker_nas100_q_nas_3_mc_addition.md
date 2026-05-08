@@ -72,7 +72,7 @@ The dashboard's headline (Net Return +480%, RF 125.7) is a different metric clas
 
 - **OANDA still on DJ30 v4.4** — no fresh OANDA v4.5 fetch yet. The OANDA pattern-spotting anchor stays at 96.05/0.48/4.79 (3-strategy, v4.4) until that fetch lands. Tracked as a residual.
 - **No NAS allocation sweep** — single-point pin at 0.40% per user decision (the dashboard's "NAS 1.00" was unit allocation = full slot, not 1.00% risk). If a future re-MC exercises a sweep, the indicator-locked 0.40% should remain the anchor.
-- **NAS at v1 strategy file** — `strategy.entry()` native pyramid leg accounting, not the indicator's simplified-form (Q-NAS-1 indicator concern moot for the strategy file at [strategies/striker/striker_nas100_v1.pine:328-332](../../strategies/striker/striker_nas100_v1.pine:328)).
+- **NAS at v1 strategy file** — `strategy.entry()` native pyramid leg accounting, not the indicator's simplified-form (Q-NAS-1 indicator concern moot for the strategy file at [strategies/nas/striker_nas100_v1.pine:328-332](../../strategies/nas/striker_nas100_v1.pine:328)).
 
 ## Test pin
 

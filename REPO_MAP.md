@@ -75,30 +75,30 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] tests/*.py — all CI-load-bearing
 
 ## Analysis
-[A] analysis/Q-DJ30-1/, Q-DJ30-2/, Q-DJ30-3/ *** closed 2026-05-06; cooldown then archive next pass
-[A] analysis/striker_nas100/ — placeholder package (__init__.py); Q-NAS-1 archived, Q-NAS-2 plan in docs/striker_nas100/
 [A] analysis/oanda_stage1/ — findings in docs/methodology/findings/2026-05-02_oanda_stage1_*
-[A] analysis/dd_protection_trace.py — forensic tool, kept reusable (relevance increased post-C2 relock 2026-05-08)
 [A] analysis/time_to_pass.py — re-MC reporting + --regime-check mode (quarterly review per ADR 2026-05-08-dd-trigger-c2-relock)
 
 ## Docs (active)
 [A] docs/rule_0.md
 [A] docs/operational_rules.md
 [A] docs/methodology/*.md (active set: 1r_estimation, observation_routing, regime_robustness_gate)
-[A] docs/methodology/findings/*.md
-[A] docs/methodology/gate_audits/*.md
+[A] docs/methodology/findings/*.md (DJ30 cluster — event_clustering / gap_magnitude / stop_cap — archived 2026-05-08)
+[A] docs/methodology/gate_audits/*.md (Q-DJ30-2/3 audits archived 2026-05-08)
 [A] docs/methodology/lessons/methodology_lessons.md — M-class lesson registry (format spec + M-7 CANDIDATE seeded 2026-05-08)
 [A] docs/adr/*.md — IMMUTABLE record (latest: 2026-05-08-dd-trigger-c2-relock)
-[A] docs/briefs/*.md — closed-with-override: Q-DDP-1 (C2 lock 2026-05-08); closed: Q-DJ30-3 (2026-05-06), bust_attribution_flip (2026-05-08); active: NAS100 (×2)
+[A] docs/briefs/*.md — closed-with-override: Q-DDP-1 (C2 lock 2026-05-08); closed: bust_attribution_flip (2026-05-08); active: NAS100 (×2). Q-DJ30-3 brief archived 2026-05-08.
 [A] docs/historical/*.md — IMMUTABLE record
 [A] docs/templates/*.md
-[A] docs/striker_nas100/q_nas_2_capture_plan.md — CLOSED 2026-05-08 (no forward capture; Q-NAS-1 hour×dow accepted as the answer)
 
 ## Archive (consolidated 2026-05-07, Approach D)
-[X] archive/analysis/ — eurusd_lnyo, gbpusd_lon, usdchf_sentinel, usoil (incl. usoil/indicators/usoil_phase2_validation.pine moved 2026-05-07), striker_nas100/q_nas_1_pyramid_hypothesis.py (closed 2026-05-05)
+[X] archive/analysis/ — eurusd_lnyo, gbpusd_lon, usdchf_sentinel, usoil (incl. usoil/indicators/usoil_phase2_validation.pine moved 2026-05-07), striker_nas100/q_nas_1_pyramid_hypothesis.py (closed 2026-05-05), Q-DJ30-1/2/3 (closed 2026-05-06; archived 2026-05-08, cooldown overridden), dd_protection_trace.py (forensic tool moved with closed Q-DDP-1 cohort 2026-05-08)
 [X] archive/docs/methodology/archive/ — full methodology archive (inner archive/ nesting preserved per README); + msee/_active_paths_2026-05-07/ (analysis_msee + msee_watchlist.py, archived 2026-05-07); + overlays/guardian_conflict_risk.md (deactivated 2026-04-23, archived 2026-05-07)
+[X] archive/docs/methodology/findings/2026-05-06_dj30_{event_clustering,gap_magnitude,stop_cap}.md — closed Q-DJ30-1/2/3 verdict trail (archived 2026-05-08)
+[X] archive/docs/methodology/gate_audits/2026-05-06_q-dj30-{2,3}_*.md — gate audits paired to Q-DJ30-2/3 closures (archived 2026-05-08)
+[X] archive/docs/briefs/Q-DJ30-3/Q-DJ30-3.md — closed brief (archived 2026-05-08)
+[X] archive/docs/striker_nas100/q_nas_2_capture_plan.md — Q-NAS-2 capture plan, closed 2026-05-08 (archived same day)
 [X] archive/strategies/striker/striker_dj30_v4.4.pine — kept for OANDA-panel back-compat (open question: retire after OANDA mirror regenerated against v4.5)
-[X] archive/strategies/striker/striker_nas100_v1_research.pine — post-lock research file (archived 2026-05-07; referenced by docs/striker_nas100/q_nas_2_capture_plan.md while Q-NAS-2 is open)
+[X] archive/strategies/striker/striker_nas100_v1_research.pine — post-lock research file (archived 2026-05-07; the q_nas_2 capture plan it references was archived 2026-05-08)
 [X] archive/data/tv_exports/USOIL_pepperstone_m15_*.csv
 [X] archive/scripts/run_v55_validation.py — Guardian v5.5 lock-validation harness, archived 2026-05-08 (one-shot; hardcoded v5.5/v5.4 expected metrics, future locks need own harness)
 

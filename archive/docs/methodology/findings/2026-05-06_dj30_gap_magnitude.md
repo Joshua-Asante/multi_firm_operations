@@ -3,7 +3,7 @@
 **Loop ID:** Q-DJ30-3
 **Brief:** [docs/briefs/Q-DJ30-3/Q-DJ30-3.md](../../briefs/Q-DJ30-3/Q-DJ30-3.md) (Claude Code, 2026-05-06)
 **Plan:** `C:\Users\joshu\.claude\plans\q-dj30-3-pre-q-fizzy-metcalfe.md` (Claude Code, 2026-05-06)
-**Pre-registration:** [analysis/Q-DJ30-3/verdict_pre_registration.md](../../../analysis/Q-DJ30-3/verdict_pre_registration.md)
+**Pre-registration:** [archive/analysis/Q-DJ30-3/verdict_pre_registration.md](../../../analysis/Q-DJ30-3/verdict_pre_registration.md)
 **Phase:** Inquire (INQHIORI)
 **Date closed:** 2026-05-06
 
@@ -37,12 +37,12 @@ All anchor files read at execution start. None changed since 2026-05-05.
 
 | File | Verified content |
 | --- | --- |
-| [strategies/striker/striker_dj30_v4.5.pine](../../../strategies/striker/striker_dj30_v4.5.pine) | `stopAtr = 1.2` (line 60); active window Tue/Fri 13:00–17:00 UTC (lines 105–109); `riskPerTrade = 1.00` (line 30); entry `rawBreakout = close > highestHigh[1]` is intra-session (not session-open-gated) — **does not invalidate the day-level gap variable** |
-| [data/tv_exports/pepperstone/Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv](../../../data/tv_exports/pepperstone/Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv) | 224 entries (197 base + 27 pyramid); reproduced cardinality + worst-trade #168 / −$11,870.65 in Phase B |
-| [data/bar_data/US30USD.csv](../../../data/bar_data/US30USD.csv) | 101245 M15 OANDA bars, 2022-01-02 → 2026-04-19; aggregated to daily for gap variable |
-| [docs/methodology/regime_robustness_gate.md](../regime_robustness_gate.md) | Canonical gate; out-of-scope at this Q level (partition-hypothesis test, not Pareto-relaxation) |
-| [docs/methodology/observation_routing.md](../observation_routing.md) | Three-bucket Closed/Action/Forward gate |
-| [analysis/Q-DJ30-2/verdict_pre_registration.md](../../../analysis/Q-DJ30-2/verdict_pre_registration.md) | Structural template for pre-reg discipline (Immutability + Halt protocols + Forward-queue commitment) |
+| [strategies/striker/striker_dj30_v4.5.pine](../../../../strategies/striker/striker_dj30_v4.5.pine) | `stopAtr = 1.2` (line 60); active window Tue/Fri 13:00–17:00 UTC (lines 105–109); `riskPerTrade = 1.00` (line 30); entry `rawBreakout = close > highestHigh[1]` is intra-session (not session-open-gated) — **does not invalidate the day-level gap variable** |
+| [data/tv_exports/pepperstone/Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv](../../../../data/tv_exports/pepperstone/Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv) | 224 entries (197 base + 27 pyramid); reproduced cardinality + worst-trade #168 / −$11,870.65 in Phase B |
+| [data/bar_data/US30USD.csv](../../../../data/bar_data/US30USD.csv) | 101245 M15 OANDA bars, 2022-01-02 → 2026-04-19; aggregated to daily for gap variable |
+| [docs/methodology/regime_robustness_gate.md](../../../docs/methodology/regime_robustness_gate.md) | Canonical gate; out-of-scope at this Q level (partition-hypothesis test, not Pareto-relaxation) |
+| [docs/methodology/observation_routing.md](../../../docs/methodology/observation_routing.md) | Three-bucket Closed/Action/Forward gate |
+| [archive/analysis/Q-DJ30-2/verdict_pre_registration.md](../../../analysis/Q-DJ30-2/verdict_pre_registration.md) | Structural template for pre-reg discipline (Immutability + Halt protocols + Forward-queue commitment) |
 
 ---
 
@@ -77,13 +77,13 @@ D-test on the §5 permitted list (mechanism scope). No forbidden tests applied.
 | `n_pyramid (Signal=Long Add)` | 27 | 27 | ✓ |
 | Worst single trade | #168 / 2025-02-07 / −$11,870.65 | #168 / 2025-02-07 09:45 / −$11,870.65 | ✓ |
 
-Reproducer: `python analysis/Q-DJ30-3/corpus_check.py`.
+Reproducer: `python archive/analysis/Q-DJ30-3/corpus_check.py`.
 
 ### Step 2 — daily OHLC aggregation from M15 OANDA (PC3 path)
 
 Aggregation rule: per-trading-day gap measured between **prior-weekday 21:00 UTC close** (futures RTH close ~ 17:00 ET) and **trade-day 13:00 UTC open** (Pine v4.5 active-window start). Holiday walkback handles cases like Black Friday (prior = Thanksgiving Thursday, market closed) and post-MLK Tuesday by stepping further back to the most recent weekday with a 21:00 UTC bar.
 
-Output: 1108 weekday rows in [analysis/Q-DJ30-3/dj30_daily_gap.csv](../../../analysis/Q-DJ30-3/dj30_daily_gap.csv) (9 skipped at panel boundaries / consecutive-holiday cases).
+Output: 1108 weekday rows in [archive/analysis/Q-DJ30-3/dj30_daily_gap.csv](../../../analysis/Q-DJ30-3/dj30_daily_gap.csv) (9 skipped at panel boundaries / consecutive-holiday cases).
 
 Panel `|gap_atr_normalized|` quantiles (the binning thresholds for Phase C):
 
@@ -209,7 +209,7 @@ Also not run: full canonical regime-robustness gate. Reserved for downstream Pin
 
 ## Verdict mechanics
 
-Mapping to the pre-registered verdict table ([analysis/Q-DJ30-3/verdict_pre_registration.md](../../../analysis/Q-DJ30-3/verdict_pre_registration.md) §4.4):
+Mapping to the pre-registered verdict table ([archive/analysis/Q-DJ30-3/verdict_pre_registration.md](../../../analysis/Q-DJ30-3/verdict_pre_registration.md) §4.4):
 
 | Verdict | Pre-registered trigger | Observed | Verdict |
 |---|---|---|:---:|
@@ -217,7 +217,7 @@ Mapping to the pre-registered verdict table ([analysis/Q-DJ30-3/verdict_pre_regi
 | **NULL** | Fisher p ≥ 0.10 OR permutation p ≥ 0.10 OR Rule-1 lift < 5pp | All three Phase C gates fail independently | **YES** |
 | **AMBIGUOUS** | Phase C clears but Phase D fails; OR 2-of-3 at Phase C | Phase C 0/3 (not 2/3); not applicable | NO |
 
-**Verdict: CLOSE — null result.** Routing per [docs/methodology/observation_routing.md](../observation_routing.md): the gap-magnitude question is closed (Phase C answers it decisively); the SNAG-tail observation routes to **Forward** as a watchlist item — but per pre-reg §7, the methodology-budget commitment is that Q-DJ30-3 closes the budget on this anchor; no fourth Pre-Q on the same anchor.
+**Verdict: CLOSE — null result.** Routing per [docs/methodology/observation_routing.md](../../../docs/methodology/observation_routing.md): the gap-magnitude question is closed (Phase C answers it decisively); the SNAG-tail observation routes to **Forward** as a watchlist item — but per pre-reg §7, the methodology-budget commitment is that Q-DJ30-3 closes the budget on this anchor; no fourth Pre-Q on the same anchor.
 
 No `docs/briefs/Q-DJ30-3/recommendation.md` is created (NULL track per pre-reg). No Pine v4.6, no re-MC, no lock memo.
 
@@ -247,7 +247,7 @@ Per INQHIORI SKILL §5, the pre-Q gate's only D-test was permitted (mechanism sc
 Per pre-reg §5 commitments (5 forbidden-D-tests pre-committed in advance):
 1. Did NOT delete H1 trades for "lacking" the pattern. ✓ H1 retained as sanity-relevant in Phase D.
 2. Did NOT condition gap definition on the anchor's specific shape. ✓ Definition is panel-quantile-based.
-3. Did NOT delete trades on undefined-gap days. ✓ Halt fired on 7 missing trades; cause identified (prior-day-was-holiday cases) and fixed in aggregation by walkback through holidays — no deletion. Reproducer: [analysis/Q-DJ30-3/diagnose_missing.py](../../../analysis/Q-DJ30-3/diagnose_missing.py) → fix in [aggregate_m15_to_daily.py](../../../analysis/Q-DJ30-3/aggregate_m15_to_daily.py).
+3. Did NOT delete trades on undefined-gap days. ✓ Halt fired on 7 missing trades; cause identified (prior-day-was-holiday cases) and fixed in aggregation by walkback through holidays — no deletion. Reproducer: [archive/analysis/Q-DJ30-3/diagnose_missing.py](../../../analysis/Q-DJ30-3/diagnose_missing.py) → fix in [aggregate_m15_to_daily.py](../../../analysis/Q-DJ30-3/aggregate_m15_to_daily.py).
 4. Did NOT change bin thresholds mid-sweep. ✓ Sweep ran on pre-committed {p80, p85, p90, p95}.
 5. Did NOT swap the 5pp Rule-1 gate. ✓ Gate failed at −5.6 pp; verdict respected.
 
@@ -272,8 +272,8 @@ The continuous Spearman-ρ framing on `|gap|` vs loss/R is **not** opened as a f
 
 On 2026-05-08 the redirect queue above was reviewed and **accepted as empty**:
 
-1. **Aegis BOJ binary-event pause** — closed at the strategy-CHANGELOG layer. The April 28, 2026 BOJ meeting watch was closed 2026-05-05 with no parameter change required ([strategies/aegis/aegis_CHANGELOG.md:21](../../../strategies/aegis/aegis_CHANGELOG.md:21)). The reference here was doctrine-stale.
-2. **NAS100 v1 live observation** — ongoing operational tracking (live-PnL accumulation), not a methodology investigation requiring its own brief. Removed from this queue; tracked instead via [live_journal/](../../../live_journal/) reconciliation cadence.
+1. **Aegis BOJ binary-event pause** — closed at the strategy-CHANGELOG layer. The April 28, 2026 BOJ meeting watch was closed 2026-05-05 with no parameter change required ([strategies/aegis/aegis_CHANGELOG.md:21](../../../../strategies/aegis/aegis_CHANGELOG.md:21)). The reference here was doctrine-stale.
+2. **NAS100 v1 live observation** — ongoing operational tracking (live-PnL accumulation), not a methodology investigation requiring its own brief. Removed from this queue; tracked instead via [live_journal/](../../../../live_journal/) reconciliation cadence.
 3. **New strategy candidates** — no candidate surfaced 2026-05-06 → 2026-05-08; queue closes empty rather than carrying forward an indefinite TBD.
 
 **Q-DJ30-3 is fully closed.** The methodology-budget exhaustion verdict above stands, and there is no active redirect target. Future strategy-candidate work, if any, opens its own brief without inheriting from this closure.
@@ -295,12 +295,12 @@ On 2026-05-08 the redirect queue above was reviewed and **accepted as empty**:
 
 - Plan: `C:\Users\joshu\.claude\plans\q-dj30-3-pre-q-fizzy-metcalfe.md` (Claude Code, 2026-05-06)
 - Brief: [docs/briefs/Q-DJ30-3/Q-DJ30-3.md](../../briefs/Q-DJ30-3/Q-DJ30-3.md)
-- Pre-registration: [analysis/Q-DJ30-3/verdict_pre_registration.md](../../../analysis/Q-DJ30-3/verdict_pre_registration.md)
+- Pre-registration: [archive/analysis/Q-DJ30-3/verdict_pre_registration.md](../../../analysis/Q-DJ30-3/verdict_pre_registration.md)
 - Basis-sanity substitution audit: [docs/methodology/gate_audits/2026-05-06_q-dj30-3_basis_sanity_substitution.md](../gate_audits/2026-05-06_q-dj30-3_basis_sanity_substitution.md)
 - Sibling closures: [Q-DJ30-1 / 2026-05-06_dj30_event_clustering.md](2026-05-06_dj30_event_clustering.md) (CLOSE/null), [Q-DJ30-2 / 2026-05-06_dj30_stop_cap.md](2026-05-06_dj30_stop_cap.md) (AMBIGUOUS/HOLD)
-- Methodology canon: [regime_robustness_gate.md](../regime_robustness_gate.md), [observation_routing.md](../observation_routing.md), [rule_0.md](../../rule_0.md)
-- Q-DDP-1 false-positive worked example: [docs/briefs/Q-DDP-1/recommendation.md](../../briefs/Q-DDP-1/recommendation.md)
-- Locked DJ30 v4.5 source: [strategies/striker/striker_dj30_v4.5.pine](../../../strategies/striker/striker_dj30_v4.5.pine)
+- Methodology canon: [regime_robustness_gate.md](../../../docs/methodology/regime_robustness_gate.md), [observation_routing.md](../../../docs/methodology/observation_routing.md), [rule_0.md](../../../docs/rule_0.md)
+- Q-DDP-1 false-positive worked example: [docs/briefs/Q-DDP-1/recommendation.md](../../../docs/briefs/Q-DDP-1/recommendation.md)
+- Locked DJ30 v4.5 source: [strategies/striker/striker_dj30_v4.5.pine](../../../../strategies/striker/striker_dj30_v4.5.pine)
 - INQHIORI canon: https://www.notion.so/34ddc0b53c1181479d7bdecc61f47078
 
 ---
@@ -308,11 +308,11 @@ On 2026-05-08 the redirect queue above was reviewed and **accepted as empty**:
 ## Reproducers
 
 ```bash
-python analysis/Q-DJ30-3/corpus_check.py          # Phase B Step 1: cardinality + anchor
-python analysis/Q-DJ30-3/aggregate_m15_to_daily.py  # Phase B Step 2: M15 -> daily gap panel
-python analysis/Q-DJ30-3/tag_trades.py            # Phase C Step 1: per-trade gap tagging
-python analysis/Q-DJ30-3/run_tests.py             # Phase C Steps 2-4: Fisher / perm / Rule-1 + sensitivity
-python analysis/Q-DJ30-3/half_panel_sanity.py     # Phase D diagnostic: H1/H2 split at trade_num 98
+python archive/analysis/Q-DJ30-3/corpus_check.py          # Phase B Step 1: cardinality + anchor
+python archive/analysis/Q-DJ30-3/aggregate_m15_to_daily.py  # Phase B Step 2: M15 -> daily gap panel
+python archive/analysis/Q-DJ30-3/tag_trades.py            # Phase C Step 1: per-trade gap tagging
+python archive/analysis/Q-DJ30-3/run_tests.py             # Phase C Steps 2-4: Fisher / perm / Rule-1 + sensitivity
+python archive/analysis/Q-DJ30-3/half_panel_sanity.py     # Phase D diagnostic: H1/H2 split at trade_num 98
 ```
 
 Time accounting: ~3h active. One paired pre-reg amendment under Immutability clause (basis-sanity substitution at Phase B start). One halt-and-fix during Phase C tag (7 missing trades on prior-day-holiday dates) — fixed in aggregation by holiday-walkback; no methodology violation.

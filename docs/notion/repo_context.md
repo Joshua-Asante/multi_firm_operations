@@ -84,20 +84,19 @@ prop_firm_pipeline/
 │   ├── rule_0.md                                     # Rule 0 — audit-first methodology
 │   ├── operational_rules.md                          # incl. doc/code skew audit trigger
 │   ├── methodology/                                  # 1r_estimation, observation_routing, regime_robustness_gate
-│   │   ├── findings/                                 # 2026-05-02 (oanda_stage1, eurusd_lnyo, usoil) + 2026-05-06 (dj30 *)
-│   │   └── gate_audits/                              # 2026-05-06 Q-DJ30-2 + Q-DJ30-3 audits
-│   ├── adr/                                          # IMMUTABLE record (2026-03-01 → 2026-05-03)
-│   ├── briefs/                                       # closed-with-override: Q-DDP-1 (C2 lock 2026-05-08); closed: Q-DJ30-3 (2026-05-06), bust_attribution_flip (2026-05-08); active: NAS100 (×2)
+│   │   ├── findings/                                 # 2026-05-02 (oanda_stage1, eurusd_lnyo, usoil) — DJ30 cluster archived 2026-05-08
+│   │   └── gate_audits/                              # (Q-DJ30-2/3 audits archived 2026-05-08)
+│   ├── adr/                                          # IMMUTABLE record (2026-03-01 → 2026-05-08)
+│   ├── briefs/                                       # closed-with-override: Q-DDP-1 (C2 lock 2026-05-08); closed: bust_attribution_flip (2026-05-08); active: NAS100 (×2). Q-DJ30-3 brief archived 2026-05-08.
 │   ├── historical/                                   # IMMUTABLE record
 │   ├── templates/                                    # bust_analysis, calibration_brief, lock_decision
-│   ├── methodology/lessons/                         # methodology_lessons.md (M-class registry; format spec + M-7 CANDIDATE seeded 2026-05-08)
-│   └── striker_nas100/                               # q_nas_2_capture_plan.md (Q-NAS-2 CLOSED 2026-05-08)
+│   └── methodology/lessons/                          # methodology_lessons.md (M-class registry; format spec + M-7 CANDIDATE seeded 2026-05-08)
 │
-├── archive/                                          # consolidated 2026-05-07 (Approach D)
-│   ├── analysis/                                     # eurusd_lnyo, gbpusd_lon, usdchf_sentinel, usoil, striker_nas100/q_nas_1
+├── archive/                                          # consolidated 2026-05-07 (Approach D); +DJ30 docs cluster + Q-NAS-2 plan 2026-05-08
+│   ├── analysis/                                     # eurusd_lnyo, gbpusd_lon, usdchf_sentinel, usoil, striker_nas100/q_nas_1, Q-DJ30-1/2/3, dd_protection_trace.py
 │   ├── strategies/striker/                           # striker_dj30_v4.4.pine, striker_nas100_v1_research.pine
 │   ├── data/tv_exports/                              # USOIL_pepperstone_*.csv
-│   └── docs/methodology/archive/                     # full retired methodology + msee/_active_paths_2026-05-07/ + overlays/guardian_conflict_risk.md
+│   └── docs/                                         # methodology/archive/ (retired methodology + msee + overlays); methodology/findings/2026-05-06_dj30_*.md; methodology/gate_audits/2026-05-06_q-dj30-{2,3}_*.md; briefs/Q-DJ30-3/; striker_nas100/q_nas_2_capture_plan.md
 │
 └── .claude/, .github/                                # commands (lock-check, mc-anchors, skew-audit) + CI workflows (pylint, tests)
 ```
@@ -284,12 +283,12 @@ _Last refreshed: 2026-05-07_
 _Last refreshed: 2026-05-08_
 
 **Time-gated:**
-- **Q-DJ30-1/2/3 archive move** → ~2026-05-20 (2-week cooldown from 2026-05-06 closures). Currently still under `analysis/`.
+- ~~Q-DJ30-1/2/3 archive move → ~2026-05-20 (2-week cooldown from 2026-05-06 closures)~~ — **EXECUTED 2026-05-08** (cooldown overridden by Joshua); now at `archive/analysis/Q-DJ30-{1,2,3}/`. dd_protection_trace.py moved in same batch to `archive/analysis/dd_protection_trace.py`.
 
 **Awaiting Joshua's disposition — RESOLVED 2026-05-08 batch:**
 - `archive/strategies/striker/striker_dj30_v4.4.pine` — **KEEP** at `[X]`. Load-bearing for `OANDA_PANELS["striker"]` filename token. Retirement trigger: regen OANDA against v4.5 + delete in one transaction.
 - `scripts/run_v55_validation.py` — **ARCHIVED** to `archive/scripts/run_v55_validation.py`. One-shot harness with hardcoded v5.5/v5.4 expected metrics; not a template.
-- `analysis/dd_protection_trace.py` — **KEEP** as reusable forensic tool. Reclassified `[?]` → `[A]`. Relevance increased under C2 relock with regime-fragility dissent on record.
+- `archive/analysis/dd_protection_trace.py` — **KEEP** as reusable forensic tool. Reclassified `[?]` → `[A]`. Relevance increased under C2 relock with regime-fragility dissent on record.
 - `analysis/time_to_pass.py` — **KEEP** + EXTENDED with `--regime-check` mode. Reclassified `[?]` → `[A]`. Hosts the quarterly C2 → C0 revert-trigger check per ADR 2026-05-08-dd-trigger-c2-relock.
 - `analysis/oanda_stage1/` — **KEEP** at `[A]` (already classified active in REPO_MAP). `tv_export_loader.py` is referenced by Q-NAS-2 capture plan; findings committed to `docs/methodology/findings/2026-05-02_oanda_stage1_*`.
 
@@ -310,7 +309,7 @@ _Last refreshed: 2026-05-08_
 - **execution_lessons.md sync direction:** CONFIRMED — repo `live_journal/references/execution_lessons.md` is the durable canon. The skill bundle (session-ephemeral sandbox) is downstream. New E-entry workflow: edit repo, propagate to skill bundle on next session install. (Mirrors the brief-authoring SKILL.md ↔ Notion §7 sync clause shape — repo wins for the live_journal pair.)
 
 **Recently closed (2026-05-08 batch):**
-- **Q-DJ30-3 brief status header** — was stale "PRE-EXECUTION"; brief now reflects CLOSE/null verdict with cross-reference to canonical findings doc at `docs/methodology/findings/2026-05-06_dj30_gap_magnitude.md`. **Forward redirect queue accepted as empty** (Aegis BOJ closed at strategy-CHANGELOG layer; NAS100 v1 live observation = ongoing operational tracking, not a methodology investigation; new strategy candidates = TBD with no concrete target). Q-DJ30-3 fully closed.
+- **Q-DJ30-3 brief status header** — was stale "PRE-EXECUTION"; brief now reflects CLOSE/null verdict with cross-reference to canonical findings doc at `archive/docs/methodology/findings/2026-05-06_dj30_gap_magnitude.md` (DJ30 findings/audits/brief archived 2026-05-08; Joshua "honor convention but archive DJ30 findings"). **Forward redirect queue accepted as empty** (Aegis BOJ closed at strategy-CHANGELOG layer; NAS100 v1 live observation = ongoing operational tracking, not a methodology investigation; new strategy candidates = TBD with no concrete target). Q-DJ30-3 fully closed.
 - **M-7 anticipation-gap backfill** — first run scheduled 2026-05-11 morning (before live NAS100 first fill at 13:00 UTC); no remaining decisions, on calendar. Verdict updates `live_journal/references/execution_lessons.md` (E-class) and `docs/methodology/lessons/methodology_lessons.md` M-7 entry (M-class).
 - **bust_attribution_flip** — closed broker-feed-confirmed via same-date Pepperstone+OANDA TV re-export. Outcomes locked: prefer broker feed (Pepperstone) for canonical attribution; OANDA stays reliable for live pattern-spotting; dd_protection re-calibrated C0→C2.
 - **dd_protection C2 relock** — DD_TRIGGER 0.010→0.015, DD_SCALE held at 0.40. Pepperstone C2 anchor 98.09/0.36/4.73 (was 97.88/0.22/4.55); OANDA C2 anchor 96.23/0.69/4.91 (was 96.05/0.48/4.79). **Canonical record: `docs/adr/2026-05-08-dd-trigger-c2-relock.md`** (override of Q-DDP-1 HOLD recommendation on broker-feed + median-pass-time grounds). Revert trigger: rolling 6-month MC pass-rate <95% for two consecutive windows → revert to C0; quarterly check via `python analysis/time_to_pass.py --regime-check` (next dates: 2026-08-08, 2026-11-08, 2027-02-08, 2027-05-08).

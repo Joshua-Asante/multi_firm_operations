@@ -46,13 +46,13 @@ All anchor files read at execution start. None changed since 2026-05-05.
 | First entry datetime | 2022-01-04 | 2022-01-04 10:15 ET | yes |
 | Last entry month | 2026-04-2X | 2026-04-17 11:45 ET | yes |
 
-Reproducer: `python analysis/Q-DJ30-1/corpus_check.py`.
+Reproducer: `python archive/analysis/Q-DJ30-1/corpus_check.py`.
 
 ### Step 0b — timezone anchor
 
 CSV `Date and time` confirmed as **chart time / America/New_York**, not UTC. After ET → UTC conversion all 197 base entries fall in DJ30's locked active window [13, 17) UTC; the 27 pyramid-leg entries (Signal=`Long Add`) are profit-trigger driven and not session-gated, so 14 of them appear in hours 17–19 UTC by design (Pine line 274: pyramid trigger does not include `sessionOK`). Anchor verification on the 2025-02-07 worst-loss trade: raw 09:45 ET → 14:45 UTC; NFP that day 13:30 UTC; signed distance +75 min; in_window_90 = True.
 
-Reproducer: `python analysis/Q-DJ30-1/tz_check.py`.
+Reproducer: `python archive/analysis/Q-DJ30-1/tz_check.py`.
 
 This pyramid-leg discovery prompted the primary/sensitivity split of the analysis (see §"Pre-Q gate" below).
 
@@ -69,7 +69,7 @@ D: events outside US instrument scope (DJ30 is US-only index) — test: instrume
 
 S: collapse to one row per Trade #, columns: trade_num, signal, entry_dt_utc, net_pnl_usd, n_entries_that_day, nearest_event_minutes_signed, nearest_event_type, in_window_{30,60,90,120,180}.
 
-A: index event calendar by datetime (linear scan over 385 events × 224 trades = ~86k comparisons; trivial). Cache per-trade tagging output to analysis/Q-DJ30-1/per_trade_proximity.csv.
+A: index event calendar by datetime (linear scan over 385 events × 224 trades = ~86k comparisons; trivial). Cache per-trade tagging output to archive/analysis/Q-DJ30-1/per_trade_proximity.csv.
 ```
 
 The pyramid-leg mechanism scope (S, not D) was added at execution time after Step 0b surfaced that 27 of 224 "trades" are pyramid legs. Primary analysis runs on n=197 base; sensitivity on n=224 all entries.
@@ -82,7 +82,7 @@ The pyramid-leg mechanism scope (S, not D) was added at execution time after Ste
 
 Surfaced to Joshua at execution time. Joshua authorized **option 2: one-time, declared substitution to a single authoritative-adjacent source** (chat record 2026-05-06).
 
-**Substitution declared:** rule-derivation from canonical BLS / BEA / Census / ISM release patterns (publicly-documented release schedules), implemented in [analysis/Q-DJ30-1/build_calendar.py](analysis/Q-DJ30-1/build_calendar.py). Extends [archive/analysis/eurusd_lnyo/event_calendar.py](archive/analysis/eurusd_lnyo/event_calendar.py) with PPI, ISM Manufacturing, ISM Services and adds 08:30 ET / 10:00 ET timestamps.
+**Substitution declared:** rule-derivation from canonical BLS / BEA / Census / ISM release patterns (publicly-documented release schedules), implemented in [archive/analysis/Q-DJ30-1/build_calendar.py](archive/analysis/Q-DJ30-1/build_calendar.py). Extends [archive/analysis/eurusd_lnyo/event_calendar.py](archive/analysis/eurusd_lnyo/event_calendar.py) with PPI, ISM Manufacturing, ISM Services and adds 08:30 ET / 10:00 ET timestamps.
 
 Rules used:
 
@@ -197,7 +197,7 @@ Mapping to the pre-registered table from the plan:
 | Null | ≥ 0.10 OR < 5 pp diff | — | — | p=1.0 ≥ 0.10 AND diff=−2.5 pp < 5 pp | **YES** |
 | Ambiguous | anything else | — | — | — | NO |
 
-**Verdict: CLOSE — null result.** Routing per [docs/methodology/observation_routing.md](docs/methodology/observation_routing.md) is the **Closed** bucket: investigated and closed, no standing artefacts beyond the regenerable scripts under `analysis/Q-DJ30-1/`. No decision artefact (`docs/briefs/Q-DJ30-1/recommendation.md`) is created — matches 2026-05-03 sentinel precedent for null/reject results.
+**Verdict: CLOSE — null result.** Routing per [docs/methodology/observation_routing.md](docs/methodology/observation_routing.md) is the **Closed** bucket: investigated and closed, no standing artefacts beyond the regenerable scripts under `archive/analysis/Q-DJ30-1/`. No decision artefact (`docs/briefs/Q-DJ30-1/recommendation.md`) is created — matches 2026-05-03 sentinel precedent for null/reject results.
 
 ---
 
@@ -252,11 +252,11 @@ The 2025-02-07 anchor trade (in-window, NFP +75 min, −5.94R) is consistent wit
 ## Reproducers
 
 ```bash
-python analysis/Q-DJ30-1/corpus_check.py        # Step 0a
-python analysis/Q-DJ30-1/tz_check.py            # Step 0b
-python analysis/Q-DJ30-1/build_calendar.py      # Step 1 → event_calendar.csv
-python analysis/Q-DJ30-1/tag_trades.py          # Step 2 → per_trade_proximity.csv
-python analysis/Q-DJ30-1/run_tests.py           # Steps 3-4 → results.json
+python archive/analysis/Q-DJ30-1/corpus_check.py        # Step 0a
+python archive/analysis/Q-DJ30-1/tz_check.py            # Step 0b
+python archive/analysis/Q-DJ30-1/build_calendar.py      # Step 1 → event_calendar.csv
+python archive/analysis/Q-DJ30-1/tag_trades.py          # Step 2 → per_trade_proximity.csv
+python archive/analysis/Q-DJ30-1/run_tests.py           # Steps 3-4 → results.json
 ```
 
 Time accounting: ~2.5h active. Inside 3h budget; no hand-back triggers fired post-execution-start except #1 (source-coverage gap in Step 1, resolved by user-authorized substitution per option 2).

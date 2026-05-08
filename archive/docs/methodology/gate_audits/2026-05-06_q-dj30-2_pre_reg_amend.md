@@ -4,13 +4,13 @@
 **Brief:** Q-DJ30-2 — DJ30 base-stop hard dollar cap
 **Discovered in:** Phase B (reproduction gate)
 **Resolution chosen:** Option 1 (amend pre-registration, paired with this audit entry)
-**Pre-registration commit (pre-amend):** `eb5310b` — `analysis/Q-DJ30-2/verdict_pre_registration.md`
+**Pre-registration commit (pre-amend):** `eb5310b` — `archive/analysis/Q-DJ30-2/verdict_pre_registration.md`
 
 ---
 
 ## What changed
 
-Two corrections to `analysis/Q-DJ30-2/verdict_pre_registration.md`:
+Two corrections to `archive/analysis/Q-DJ30-2/verdict_pre_registration.md`:
 
 ### Change 1 — PF anchor cardinality
 
@@ -95,7 +95,7 @@ Two reusable lessons surface from this amendment:
 ## Audit chain
 
 - Pre-registration original: commit `eb5310b`
-- Discrepancy surfaced: `analysis/Q-DJ30-2/PHASE_B_HALT.md` (this run, 2026-05-06)
+- Discrepancy surfaced: `archive/analysis/Q-DJ30-2/PHASE_B_HALT.md` (this run, 2026-05-06)
 - Pre-registration amended: commit (TBD, alongside this entry)
 - Phase B re-run after amendment: pending in same commit; expected PASS
 

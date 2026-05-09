@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "weekly_review_feeder"
+version = "0.1.0"
+description = "Auto-fill the Notion Weekly Review numeric block"
+requires-python = ">=3.10"
+dependencies = [
+    "pandas>=2.0",
+    "requests>=2.30",
+]
+
+[project.scripts]
+weekly-review-feeder = "weekly_review_feeder.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["weekly_review_feeder*"]

@@ -1,0 +1,562 @@
+//@version=6
+indicator("Aegis USDJPY v4.3 Indicator", shorttitle="Aegis43", overlay=true, max_labels_count=500, max_lines_count=500)
+
+// ==========================================
+// AEGIS USDJPY v4.3 — UNIFIED SIGNAL + ANTICIPATION + POSITION SIM
+// Mirrors Aegis USDJPY v4.3 strategy signal logic exactly
+// Execution-ready: entry / SL / TP / lot size in labels + alerts
+// (matches Striker v4.4 / Guardian v5.4 alert conventions)
+// ==========================================
+// Non-executing — no strategy.* calls, no real orders
+// For execution, use Aegis USDJPY v4.3 strategy script
+// ==========================================
+//
+// 2026-04-27 NON-STRATEGY PATCH (no version bump):
+//   Added alert() calls for anticipation states (NEAR + APPROACH first-bar
+//   transitions). Previously these states only had alertcondition() bindings,
+//   which require manual per-alert setup in TradingView and do not fire from
+//   the universal "Any alert() function call" subscription. Strategy logic
+//   (parameters, locks, signal definitions) UNCHANGED. Visual markers and
+//   plot logic UNCHANGED. Only push-alert delivery added.
+//
+//   Per Core Principle #3 (fxify-challenge): SETUP and PROXIMITY are
+//   INFORMATIONAL ONLY — wait for FIRE entry alert before trading.
+//
+// CHANGES vs v4.2 indicator:
+//   [1] Added eom_block filter (dayofmonth >= 29) → filters_pass
+//       Blocks last ~3 trading days of month (days 29/30/31)
+//       Mechanism: month-end JPY flow (portfolio rebalancing, 4pm fix,
+//       hedging) produces trending — not mean-reverting — price action
+//   [2] Dashboard row added: "EOM BLK" state indicator
+//   [3] Background color added for EOM block state
+//   [4] Version strings updated (v4.2 → v4.3)
+// All other parameters preserved byte-for-byte from v4.2 — zero retunes.
+// ==========================================
+// SIGNAL (mirrors strategy):
+//   longSignal     = (close < lower) AND filters_pass
+//   filters_pass   = in_session AND hour_ok AND day_ok AND vol_ok
+//                    AND NOT tue_h10_block AND NOT eom_block
+//   in_session     = chart-TZ minutes ∈ [600, 825) = 10:00-13:45
+//   hour_ok        = hour != 11 AND next_hour != 11
+//                    (blocks H11 + 10:45 bar which executes at 11:00)
+//   day_ok         = Mon OR Tue OR Wed
+//   vol_ok         = ATR(19) ≥ 0.07
+//   tue_h10_block  = Tuesday AND hour == 10
+//   eom_block      = dayofmonth >= 29           ← v4.3 new
+//
+// ANTICIPATION (inverted vs Guardian/Striker — approach FROM ABOVE):
+//   APPROACH       = filters_pass AND close >= lower
+//                    AND (close - lower) <= proximityAtr × ATR
+//   STRICT         = filters_pass AND close >= lower
+//                    AND (close - lower) <= strictProximity × ATR
+//                    (typically 1-2 bars before cross)
+//
+// POSITION SIM (mirrors strategy execution):
+//   SL          = entry - 1.42×ATR at entry bar
+//   TP          = basis + 0.8×ATR — captured at entry, RE-captured at BE
+//                 (strategy.exit re-issue; TP is locked between BE events)
+//   BE trigger  = high >= entry + 0.3×entry_ATR
+//   BE stop     = entry + 0.15×entry_ATR (positive pad — small-profit BE)
+//   Max hold    = 40 bars
+//
+// NOTE: Aegis is max 1 trade/day. Signals_today counter shown for context.
+// CRITICAL (INQHIORI): BE logic IS the edge — 41% of winners are BE-manufactured.
+// v4.3 INQHIORI pass: EOM mechanism validated — full-stop share 14% (days 1-28)
+// vs 71% (days 29-31); avg loss -$1,122 vs -$2,746; hold 2.1 bars vs 0.9.
+// ==========================================
+
+
+// ============================================================================
+// ACCOUNT & RISK
+// ============================================================================
+group_acct     = "═══ ACCOUNT & RISK ═══"
+accountSize    = input.float(200000, "Account Size ($)",
+     minval=1000, step=1000, group=group_acct,
+     tooltip="FXIFY challenge balance.")
+
+riskPerTrade   = input.float(1.50, "Risk Per Trade (%)",
+     minval=0.05, maxval=3.0, step=0.05, group=group_acct,
+     tooltip="Aegis v4.3 locked: 1.50% (fractional-Kelly optimum per INQHIORI). OVERRIDE when dd_protection.py scales down (e.g. 0.60% in DD mode at 0.40x scaling).")
+
+lotSizeUnits   = input.float(100000, "Lot Size (units)",
+     minval=1000, maxval=1000000, step=1000, group=group_acct,
+     tooltip="Forex lot size in base-currency units. Standard lot = 100000, mini = 10000, micro = 1000. FXIFY DXTrade USDJPY default: 100000.")
+
+
+// ============================================================================
+// DATE RANGE
+// ============================================================================
+group_range = "═══ DATE RANGE ═══"
+startDate   = input.time(timestamp("2022-01-01"), "Start Date", group=group_range)
+endDate     = input.time(timestamp("2026-12-31"), "End Date",   group=group_range)
+inDateRange = time >= startDate and time <= endDate
+
+
+// ============================================================================
+// STRATEGY PARAMS (LOCKED v4.3 — identical to v4.2 except added EOM filter)
+// ============================================================================
+group_params = "═══ BB / ATR (LOCKED) ═══"
+bb_length    = input.int(19, "BB Length", minval=5, maxval=50, group=group_params,
+     tooltip="LOCKED: 19.")
+bb_mult      = input.float(1.9, "BB Mult", minval=1.0, maxval=4.0, step=0.1, group=group_params,
+     tooltip="LOCKED: 1.9.")
+atr_period   = input.int(19, "ATR Period", minval=5, maxval=30, group=group_params,
+     tooltip="LOCKED: 19.")
+min_atr_val  = input.float(0.07, "Min ATR (vol_ok)", minval=0.001, maxval=1.0, step=0.005, group=group_params,
+     tooltip="LOCKED: 0.07 (v4.2, inherited unchanged in v4.3). Cuts BB-compression false signals. Plateau: 0.06/0.07/0.08 all outperform 0.05.")
+
+group_exit   = "═══ SL / TP / BE (LOCKED) ═══"
+atr_sl_mult  = input.float(1.42, "Stop Loss (× ATR)", minval=0.5, maxval=4.0, step=0.01, group=group_exit,
+     tooltip="LOCKED: 1.42.")
+tp_offset    = input.float(0.8, "TP Offset (× ATR from basis)", minval=0.1, maxval=3.0, step=0.1, group=group_exit,
+     tooltip="LOCKED: 0.8. TP = basis + 0.8×ATR. Dynamic pre-entry; locked at entry bar and re-locked at BE activation.")
+be_trigger   = input.float(0.30, "BE Trigger (× entry ATR)", minval=0.05, maxval=2.0, step=0.05, group=group_exit,
+     tooltip="LOCKED: 0.30. When high >= entry + 0.30×ATR, BE activates.")
+be_pad       = input.float(0.15, "BE Pad (× entry ATR)", minval=0.0, maxval=0.5, step=0.01, group=group_exit,
+     tooltip="LOCKED: 0.15. BE stop moves to entry + 0.15×ATR (small-profit BE — positive pad). Per INQHIORI: BE is 41% of the edge.")
+max_hold     = input.int(40, "Max Hold (bars)", minval=5, maxval=200, group=group_exit,
+     tooltip="LOCKED: 40.")
+max_daily    = input.int(1, "Max Trades Per Day", minval=1, maxval=3, group=group_exit,
+     tooltip="LOCKED: 1.")
+
+
+// ============================================================================
+// PROXIMITY (ANTICIPATION — inverted direction vs Guardian/Striker)
+// ============================================================================
+group_prox      = "═══ PROXIMITY (× ATR) ═══"
+proximityAtr    = input.float(0.50, "Approach Zone (× ATR)",
+     minval=0.05, maxval=2.0, step=0.05, group=group_prox,
+     tooltip="Max distance ABOVE lower BB (ATR units) for loose approach marker.")
+strictProximity = input.float(0.15, "Strict Approach (× ATR)",
+     minval=0.02, maxval=1.0, step=0.01, group=group_prox,
+     tooltip="Tight threshold — typically 1-2 bars before cross.")
+
+
+// ============================================================================
+// VISUALS
+// ============================================================================
+group_visual      = "═══ VISUALS ═══"
+showBB            = input.bool(true, "Show Bollinger Bands",       group=group_visual)
+showDynamicTP     = input.bool(true, "Show Dynamic TP Target",     group=group_visual,
+     tooltip="Live basis + 0.8×ATR circles — the moving reversion target before/between entries.")
+showZone          = input.bool(true, "Show Approach Zone",         group=group_visual)
+showSignals       = input.bool(true, "Show Signal Arrows",         group=group_visual)
+showApproach      = input.bool(true, "Show Approach Circles",      group=group_visual)
+showFilteredCross = input.bool(true, "Show Filtered Crosses",      group=group_visual,
+     tooltip="Raw lower-BB cross blocked by session/day/hour/vol/TueH10/EOM filters.")
+showExits         = input.bool(true, "Show Exit Markers",          group=group_visual)
+showBgColor       = input.bool(true, "Show Background State",      group=group_visual)
+showDashboard     = input.bool(true, "Show Dashboard",             group=group_visual)
+showEntryLevels   = input.bool(true, "Show Entry/SL/TP Lines",     group=group_visual,
+     tooltip="Horizontal lines at entry/SL/TP (locked). SL recolors yellow when BE activates. Cleared on exit.")
+showEntryLabel    = input.bool(true, "Show Entry/BE Labels",       group=group_visual,
+     tooltip="Rich labels with E/SL/TP/Lots. Persistent across all historical trades.")
+showBELevels      = input.bool(true, "Show BE Trigger/Stop Plots", group=group_visual,
+     tooltip="Orange circles = BE trigger level. Blue stepline = BE stop after activation.")
+
+
+// ============================================================================
+// ALERTS
+// ============================================================================
+group_alerts        = "═══ ALERTS ═══"
+alertOnAnticipation = input.bool(true, "Anticipation Alerts (NEAR / APPROACH)",
+     group=group_alerts,
+     tooltip="Fires push-able alert() when price first enters APPROACH proximity (≤ 0.50 ATR above lower BB) or NEAR/STRICT zone (≤ 0.15 ATR — typically 1-2 bars before cross). SETUP ONLY — informational, not a trade signal. Use \"Any alert() function call\" subscription to receive on phone/watch.")
+
+
+// ============================================================================
+// CALCULATIONS
+// ============================================================================
+atr = ta.atr(atr_period)
+[basis, upper, lower] = ta.bb(close, bb_length, bb_mult)
+tp_target_live = basis + (tp_offset * atr)  // dynamic — moves each bar
+
+
+// ============================================================================
+// SESSION / HOUR / DAY (CHART TZ — matches strategy)
+// ============================================================================
+int bar_minutes = hour * 60 + minute
+int sess_start  = 10
+int sess_end_h  = 13
+int sess_end_m  = 45
+int end_minutes = sess_end_h * 60 + sess_end_m
+in_session = bar_minutes >= (sess_start * 60) and bar_minutes < end_minutes
+
+int next_hour = minute == 45 ? hour + 1 : hour
+bool hour_ok  = hour != 11 and next_hour != 11
+
+dow = dayofweek
+bool day_ok = dow == dayofweek.monday or dow == dayofweek.tuesday or dow == dayofweek.wednesday
+
+bool vol_ok = atr >= min_atr_val
+
+// v4.2: Tuesday H10 block
+bool tue_h10_block = dow == dayofweek.tuesday and hour == 10
+
+// v4.3: End-of-month block — last ~3 trading days of any month
+// (catches days 29, 30, 31; covers EOM/EOM-1/EOM-2 signature identified in INQHIORI)
+bool eom_block = dayofmonth >= 29
+
+filters_pass = in_session and hour_ok and day_ok and vol_ok and not tue_h10_block and not eom_block and inDateRange
+
+
+// ============================================================================
+// POSITION SIZING (forex formula — mirrors strategy exactly)
+// ============================================================================
+// units = risk$ × price / stop_dist       (strategy uses math.round here)
+// lots  = units / lotSizeUnits
+calcLots(slDist) =>
+    riskDollars = accountSize * (riskPerTrade / 100)
+    units       = slDist > 0 ? riskDollars * close / slDist : 0.0
+    lotSizeUnits > 0 ? units / lotSizeUnits : 0.0
+
+
+// ============================================================================
+// PROXIMITY (above lower BB — inverted vs Guardian/Striker)
+// ============================================================================
+aboveLower = close >= lower
+distAbove  = close - lower
+atrSafe    = not na(atr) and atr > 0
+distAtr    = atrSafe ? distAbove / atr : 999.0
+
+
+// ============================================================================
+// DAILY TRADE COUNTER
+// ============================================================================
+int today = year * 10000 + month * 100 + dayofmonth
+var int last_date   = 0
+var int daily_count = 0
+if today != last_date
+    daily_count := 0
+    last_date   := today
+
+
+// ============================================================================
+// SIGNAL + POSITION SIMULATION
+// ============================================================================
+rawCross      = close < lower
+longSignalRaw = rawCross and filters_pass
+filteredCross = rawCross and not filters_pass and inDateRange
+
+var bool  inPosition     = false
+var float entryPriceSim  = na
+var float entryAtrSim    = na
+var float slInitialSim   = na
+var float tpLockedSim    = na          // captured at entry, re-captured at BE
+var float currentStopSim = na
+var float lotSizeSim     = na
+var bool  beActiveSim    = false
+var int   barsSinceEntry = 0
+
+// Entry visualization handles (var for line management; labels are permanent — no var)
+var line entryLine = na
+var line slLine    = na
+var line tpLine    = na
+
+// --- EXIT DETECTION ---
+prevInPos = inPosition[1]
+prevStop  = currentStopSim[1]
+prevTP    = tpLockedSim[1]
+prevBars  = nz(barsSinceEntry[1], 0)
+
+exitByTP      = prevInPos and not na(prevTP)   and high >= prevTP
+exitByStop    = prevInPos and not na(prevStop) and low  <= prevStop
+exitByMaxHold = prevInPos and (prevBars + 1) >= max_hold
+positionExit  = exitByTP or exitByStop or exitByMaxHold
+
+if positionExit
+    inPosition     := false
+    entryPriceSim  := na
+    entryAtrSim    := na
+    slInitialSim   := na
+    tpLockedSim    := na
+    currentStopSim := na
+    lotSizeSim     := na
+    beActiveSim    := false
+    barsSinceEntry := 0
+    if showEntryLevels
+        line.delete(entryLine)
+        line.delete(slLine)
+        line.delete(tpLine)
+
+// --- PRIMARY ENTRY (long, max 1/day, mean-reversion) ---
+dailyOK          = daily_count < max_daily
+wasNotInPosition = not inPosition
+primaryEntry     = longSignalRaw and wasNotInPosition and dailyOK
+
+if primaryEntry
+    slDist    = atr * atr_sl_mult
+    slPrice   = close - slDist
+    tpCapture = tp_target_live
+    lots      = calcLots(slDist)
+
+    inPosition     := true
+    entryPriceSim  := close
+    entryAtrSim    := atr
+    slInitialSim   := slPrice
+    tpLockedSim    := tpCapture
+    currentStopSim := slPrice
+    lotSizeSim     := lots
+    beActiveSim    := false
+    barsSinceEntry := 0
+    daily_count    := daily_count + 1
+
+    // --- Entry/SL/TP lines ---
+    if showEntryLevels
+        line.delete(entryLine)
+        line.delete(slLine)
+        line.delete(tpLine)
+        entryLine := line.new(bar_index, close,     bar_index + 1, close,     extend=extend.right, color=color.new(color.blue, 30), width=1, style=line.style_dashed)
+        slLine    := line.new(bar_index, slPrice,   bar_index + 1, slPrice,   extend=extend.right, color=color.red,   width=2, style=line.style_solid)
+        tpLine    := line.new(bar_index, tpCapture, bar_index + 1, tpCapture, extend=extend.right, color=color.green, width=2, style=line.style_solid)
+
+    // --- Rich entry label ---
+    if showEntryLabel
+        entryInfo = "🔵 AEGIS LONG\nLots: " + str.tostring(lots, "#.##") + "\nEntry: " + str.tostring(close, format.mintick) + "\nSL: " + str.tostring(slPrice, format.mintick) + "\nTP: " + str.tostring(tpCapture, format.mintick) + "\nRisk: " + str.tostring(riskPerTrade, "#.##") + "%"
+        label.new(bar_index, low, entryInfo, style=label.style_label_up, color=color.new(#00BFFF, 20), textcolor=color.white, size=size.small)
+
+    // --- Rich entry alert ---
+    entryMsg = "🔵 AEGIS USDJPY LONG\n━━━━━━━━━━━━━━━━━━━━\n📍 ENTRY: " + str.tostring(close, format.mintick) + "\n📊 LOTS: " + str.tostring(lots, "#.##") + "\n🛑 SL: " + str.tostring(slPrice, format.mintick) + "\n🎯 TP: " + str.tostring(tpCapture, format.mintick) + "\n━━━━━━━━━━━━━━━━━━━━\nRisk: " + str.tostring(riskPerTrade, "#.##") + "% | ATR: " + str.tostring(atr, "#.###")
+    alert(entryMsg, alert.freq_once_per_bar_close)
+
+
+// --- POSITION MANAGEMENT (BE activation + TP re-capture) ---
+if inPosition and not primaryEntry
+    barsSinceEntry := barsSinceEntry + 1
+    wasBE = beActiveSim
+
+    // BE trigger check — high must tag trigger price
+    if not beActiveSim and not na(entryPriceSim) and not na(entryAtrSim)
+        triggerPrice = entryPriceSim + (be_trigger * entryAtrSim)
+        if high >= triggerPrice
+            beStopPrice    = entryPriceSim + (be_pad * entryAtrSim)
+            currentStopSim := math.max(currentStopSim, beStopPrice)
+            tpLockedSim    := tp_target_live  // re-capture TP at BE (mirrors strategy.exit re-issue)
+            beActiveSim    := true
+
+    // Update SL line (position + color)
+    if showEntryLevels and not na(slLine)
+        line.set_y1(slLine, currentStopSim)
+        line.set_y2(slLine, currentStopSim)
+        line.set_color(slLine, beActiveSim ? color.yellow : color.red)
+
+    // Update TP line (re-captured at BE)
+    if showEntryLevels and not na(tpLine) and not na(tpLockedSim)
+        line.set_y1(tpLine, tpLockedSim)
+        line.set_y2(tpLine, tpLockedSim)
+
+    // --- BE activation label ---
+    if beActiveSim and not wasBE and showEntryLabel
+        beInfo = "🟡 BE ACTIVE\nStop → " + str.tostring(currentStopSim, format.mintick) + "\nTP → " + str.tostring(tpLockedSim, format.mintick) + "\n(Position risk-free +)"
+        label.new(bar_index, high, beInfo, style=label.style_label_down, color=color.new(color.yellow, 30), textcolor=color.black, size=size.small)
+
+    // --- BE activation alert ---
+    if beActiveSim and not wasBE
+        beMsg = "🟡 AEGIS USDJPY — BE ACTIVE\n━━━━━━━━━━━━━━━━━━━━\nMove stop to: " + str.tostring(currentStopSim, format.mintick) + "\nEntry was: " + str.tostring(entryPriceSim, format.mintick) + "\nTP (re-locked): " + str.tostring(tpLockedSim, format.mintick) + "\nPosition is now risk-free +"
+        alert(beMsg, alert.freq_once_per_bar_close)
+
+
+// --- DERIVED SIGNALS FOR MARKERS ---
+longSignal       = primaryEntry
+blockedSignal    = longSignalRaw and wasNotInPosition and not dailyOK
+approachZone     = filters_pass and aboveLower and atrSafe and distAtr <= proximityAtr
+strictApproach   = filters_pass and aboveLower and atrSafe and distAtr <= strictProximity
+strictFirstBar   = strictApproach and not strictApproach[1]
+approachFirstBar = approachZone and not approachZone[1]
+
+
+// --- EXIT ALERT ---
+if positionExit
+    string exitReason = exitByTP ? "TP HIT" : exitByStop ? (beActiveSim[1] ? "BE STOP" : "SL HIT") : "MAX HOLD"
+    string exitIcon   = exitByTP ? "🎯" : exitByStop ? (beActiveSim[1] ? "🟡" : "🛑") : "⏱"
+    exitMsg = exitIcon + " AEGIS USDJPY — EXIT (" + exitReason + ")\n━━━━━━━━━━━━━━━━━━━━\nPrice: " + str.tostring(close, format.mintick)
+    alert(exitMsg, alert.freq_once_per_bar_close)
+
+
+// --- ANTICIPATION ALERTS (SETUP only — informational; NOT a trade signal) ---
+// Fires on first-bar entry into proximity zones. Both gated on filters_pass
+// (matches the visual approachZone / strictApproach plot logic), so an alert
+// only fires when the trade COULD actually trigger if price crosses.
+//
+// Per Core Principle #3 (fxify-challenge): SETUP and PROXIMITY are
+// informational only. Wait for the FIRE entry alert before trading.
+//
+// Approximate levels (SL/TP/Lots) are computed assuming a near-immediate
+// cross at the lower BB. Actual entry-bar values will differ slightly
+// (the strategy locks them on the close of the cross bar, not now).
+if alertOnAnticipation and strictFirstBar
+    slDistAnt   = atr * atr_sl_mult
+    slApprox    = lower - slDistAnt
+    tpApprox    = basis + (tp_offset * atr)
+    lotsAnt     = calcLots(slDistAnt)
+    nearMsg     = "🟠 AEGIS USDJPY — NEAR (cross imminent)\n━━━━━━━━━━━━━━━━━━━━\n⚠️ SETUP ONLY — not a trade signal\nWait for FIRE entry alert before entering.\n━━━━━━━━━━━━━━━━━━━━\n📍 Price: " + str.tostring(close, format.mintick) + "\n📏 Above Lower BB: " + str.tostring(distAtr, "#.##") + " ATR\n🟢 Lower BB: " + str.tostring(lower, format.mintick) + "\n━━━━━━━━━━━━━━━━━━━━\nApprox levels if cross fires:\n🛑 SL ~ " + str.tostring(slApprox, format.mintick) + "\n🎯 TP ~ " + str.tostring(tpApprox, format.mintick) + "\n📊 Lots ~ " + str.tostring(lotsAnt, "#.##") + "\nATR: " + str.tostring(atr, "#.###")
+    alert(nearMsg, alert.freq_once_per_bar_close)
+
+if alertOnAnticipation and approachFirstBar and not strictApproach
+    appMsg = "🟡 AEGIS USDJPY — APPROACH\n━━━━━━━━━━━━━━━━━━━━\n⚠️ SETUP ONLY — not a trade signal\nWatch for cross. Wait for FIRE alert.\n━━━━━━━━━━━━━━━━━━━━\n📍 Price: " + str.tostring(close, format.mintick) + "\n📏 Above Lower BB: " + str.tostring(distAtr, "#.##") + " ATR\n🟢 Lower BB: " + str.tostring(lower, format.mintick) + "\nATR: " + str.tostring(atr, "#.###")
+    alert(appMsg, alert.freq_once_per_bar_close)
+
+
+// ============================================================================
+// PLOTS
+// ============================================================================
+plot(showBB ? upper : na, "Upper BB", color.new(color.red,  60))
+plot(showBB ? basis : na, "Basis",    color.new(color.gray, 60))
+plot(showBB ? lower : na, "Lower BB", color.green)
+plot(showDynamicTP ? tp_target_live : na, "TP Target (live)", color.new(color.gray, 30), style=plot.style_circles)
+
+// Approach zone — shaded band ABOVE lower BB up to proximityAtr × ATR (INVERTED vs Guardian/Striker)
+zoneTop       = showZone ? lower + (atr * proximityAtr) : na
+zoneBottom    = showZone ? lower : na
+tpz_line      = plot(zoneTop,    "Zone Top",    color.new(color.yellow, 100), editable=false)
+bpz_line      = plot(zoneBottom, "Zone Bottom", color.new(color.yellow, 100), editable=false)
+zoneFillColor = filters_pass ? color.new(color.yellow, 85) : color.new(color.gray, 92)
+fill(tpz_line, bpz_line, color=zoneFillColor, title="Approach Zone")
+
+// BE trigger/stop plots (live during position)
+be_trigger_lvl = inPosition  and not na(entryPriceSim) and not na(entryAtrSim) ? entryPriceSim + (be_trigger * entryAtrSim) : na
+be_stop_lvl    = beActiveSim and not na(entryPriceSim) and not na(entryAtrSim) ? entryPriceSim + (be_pad * entryAtrSim)     : na
+plot(showBELevels ? be_trigger_lvl : na, "BE Trigger", color.new(color.orange, 40), style=plot.style_circles)
+plot(showBELevels ? be_stop_lvl    : na, "BE Stop",    color.new(color.blue,    0), style=plot.style_stepline_diamond, linewidth=2)
+
+plotshape(showApproach and approachZone and not strictApproach, "Approach",
+     shape.circle, location.abovebar, color.new(color.orange, 20), size=size.tiny)
+
+plotshape(showApproach and strictFirstBar, "Strict Approach (first)",
+     shape.circle, location.abovebar, color.orange, size=size.small,
+     text="NEAR", textcolor=color.orange)
+
+plotshape(showApproach and strictApproach and not strictFirstBar, "Strict Approach (sustained)",
+     shape.circle, location.abovebar, color.orange, size=size.small)
+
+plotshape(showFilteredCross and filteredCross, "Filtered Cross",
+     shape.arrowup, location.belowbar, color.new(color.lime, 75), size=size.tiny,
+     text="FILT", textcolor=color.new(color.gray, 30))
+
+// Long signal marker — no text (label carries it); avoids visual conflict with label
+plotshape(showSignals and longSignal, "Long Signal",
+     shape.arrowup, location.belowbar, color.lime, size=size.small)
+
+// Blocked (daily cap) marker
+plotshape(blockedSignal, "Blocked Signal",
+     shape.xcross, location.belowbar, color.new(color.blue, 40), size=size.small,
+     text="BLK", textcolor=color.new(color.blue, 30))
+
+// Exit markers
+plotshape(showExits and exitByTP, "Exit (TP)",
+     shape.flag, location.abovebar, color.new(color.lime, 0), size=size.small,
+     text="TP", textcolor=color.white)
+
+plotshape(showExits and exitByStop, "Exit (Stop)",
+     shape.flag, location.abovebar, color.new(color.red, 0), size=size.small,
+     text="STOP", textcolor=color.white)
+
+plotshape(showExits and exitByMaxHold and not exitByTP and not exitByStop, "Exit (Max Hold)",
+     shape.flag, location.abovebar, color.new(color.purple, 0), size=size.small,
+     text="HOLD", textcolor=color.white)
+
+// Background state
+bgcolor(showBgColor and filters_pass ? color.new(color.yellow, 95) : na, title="Active Session")
+bgcolor(showBgColor and not day_ok   ? color.new(color.gray,   95) : na, title="Day Blocked")
+bgcolor(showBgColor and day_ok and not in_session ? color.new(color.blue, 97) : na, title="Outside Session")
+bgcolor(showBgColor and tue_h10_block and in_session and day_ok and hour_ok ? color.new(color.orange, 90) : na, title="Tue H10 Blocked")
+bgcolor(showBgColor and eom_block     and in_session and day_ok and hour_ok and not tue_h10_block ? color.new(color.fuchsia, 90) : na, title="EOM Blocked")
+
+
+// ============================================================================
+// DASHBOARD
+// ============================================================================
+if showDashboard and barstate.islast
+    var table dash = table.new(position.top_right, 2, 16,
+         bgcolor=color.new(color.black, 85), border_width=1)
+
+    table.cell(dash, 0, 0, "AEGIS USDJPY", text_color=color.white, bgcolor=#00BFFF, text_size=size.small)
+    table.cell(dash, 1, 0, "v4.3",         text_color=color.white, bgcolor=#00BFFF, text_size=size.small)
+
+    sessText  = in_session ? "10-13:45 ✓" : "OUTSIDE ✗"
+    sessColor = in_session ? color.green : color.red
+    table.cell(dash, 0, 1, "Session", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 1, sessText, text_color=sessColor, text_size=size.tiny)
+
+    hrText  = hour_ok ? "OK ✓" : (hour == 11 ? "H11 ✗" : "10:45 ✗")
+    hrColor = hour_ok ? color.green : color.red
+    table.cell(dash, 0, 2, "Hour", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 2, hrText, text_color=hrColor, text_size=size.tiny)
+
+    dayStr   = dow == dayofweek.monday ? "MON" : dow == dayofweek.tuesday ? "TUE" : dow == dayofweek.wednesday ? "WED" : dow == dayofweek.thursday ? "THU" : dow == dayofweek.friday ? "FRI" : "WKND"
+    dayLbl   = dayStr + (day_ok ? " ✓" : " ✗")
+    dayColor = day_ok ? color.green : color.red
+    table.cell(dash, 0, 3, "Day", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 3, dayLbl, text_color=dayColor, text_size=size.tiny)
+
+    // v4.2: Tue H10 block row
+    tueBlkText  = tue_h10_block ? "TUE H10 ✗" : "OK ✓"
+    tueBlkColor = tue_h10_block ? color.red : color.green
+    table.cell(dash, 0, 4, "Tue H10", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 4, tueBlkText, text_color=tueBlkColor, text_size=size.tiny)
+
+    // v4.3: EOM block row
+    eomBlkText  = eom_block ? "DAY " + str.tostring(dayofmonth) + " ✗" : "OK ✓"
+    eomBlkColor = eom_block ? color.red : color.green
+    table.cell(dash, 0, 5, "EOM (day≥29)", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 5, eomBlkText, text_color=eomBlkColor, text_size=size.tiny)
+
+    volLbl   = str.tostring(atr, "#.###") + (vol_ok ? " ✓" : " ✗")
+    volColor = vol_ok ? color.green : color.red
+    table.cell(dash, 0, 6, "Vol (ATR ≥ 0.07)", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 6, volLbl, text_color=volColor, text_size=size.tiny)
+
+    aboveText  = aboveLower ? "ABOVE" : "BELOW"
+    aboveColor = aboveLower ? color.orange : color.lime
+    table.cell(dash, 0, 7, "vs Lower BB", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 7, aboveText, text_color=aboveColor, text_size=size.tiny)
+
+    distText  = aboveLower and atrSafe ? str.tostring(distAtr, "#.##") + " ATR" : "—"
+    distColor = strictApproach ? color.orange : approachZone ? color.yellow : not aboveLower ? color.lime : color.gray
+    table.cell(dash, 0, 8, "Dist above", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 8, distText, text_color=distColor, text_size=size.tiny)
+
+    tradesLbl = str.tostring(daily_count) + "/" + str.tostring(max_daily)
+    tradesClr = dailyOK ? color.green : color.red
+    table.cell(dash, 0, 9, "Trades Today", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 9, tradesLbl, text_color=tradesClr, text_size=size.tiny)
+
+    posText  = inPosition ? (beActiveSim ? "IN POS (BE)" : "IN POS") : "FLAT"
+    posColor = inPosition ? (beActiveSim ? color.yellow : color.green) : color.gray
+    table.cell(dash, 0, 10, "Position", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 10, posText, text_color=posColor, text_size=size.tiny)
+
+    lotsText = inPosition and not na(lotSizeSim) ? str.tostring(lotSizeSim, "#.##") : "—"
+    table.cell(dash, 0, 11, "Lots", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 11, lotsText, text_color=color.white, text_size=size.tiny)
+
+    slDashLbl = beActiveSim ? "BE Stop" : "Stop"
+    slDashClr = beActiveSim ? color.yellow : color.red
+    slDashVal = inPosition and not na(currentStopSim) ? str.tostring(currentStopSim, format.mintick) : "—"
+    table.cell(dash, 0, 12, slDashLbl, text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 12, slDashVal, text_color=slDashClr, text_size=size.tiny)
+
+    tpDashVal = inPosition and not na(tpLockedSim) ? str.tostring(tpLockedSim, format.mintick) : "—"
+    table.cell(dash, 0, 13, "Take Profit", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 13, tpDashVal, text_color=color.green, text_size=size.tiny)
+
+    barsText = inPosition ? str.tostring(barsSinceEntry) + "/" + str.tostring(max_hold) : "—"
+    table.cell(dash, 0, 14, "Bars Held", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 14, barsText, text_color=color.white, text_size=size.tiny)
+
+    acctText = "$" + str.tostring(accountSize, "#,###") + " @ " + str.tostring(riskPerTrade, "#.##") + "%"
+    table.cell(dash, 0, 15, "Account", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 15, acctText, text_color=color.white, text_size=size.tiny)
+
+
+// ============================================================================
+// ALERT CONDITIONS (named fallback — use alert() fn for rich messages)
+// ============================================================================
+alertcondition(longSignal,       title="Aegis v4.3 LONG Signal",      message="AEGIS: Long Entry")
+alertcondition(exitByTP,         title="Aegis v4.3 Exit (TP)",        message="AEGIS: Exit — TP")
+alertcondition(exitByStop,       title="Aegis v4.3 Exit (Stop)",      message="AEGIS: Exit — Stop")
+alertcondition(exitByMaxHold and not exitByTP and not exitByStop, title="Aegis v4.3 Exit (Max Hold)", message="AEGIS: Exit — Max Hold")
+alertcondition(strictApproach,   title="Aegis v4.3 Strict Approach",  message="AEGIS: Cross imminent")
+alertcondition(approachZone,     title="Aegis v4.3 Approach",         message="AEGIS: Within proximity")
+alertcondition(filteredCross,    title="Aegis v4.3 Filtered Cross",   message="AEGIS: Raw lower-BB cross filtered")
+alertcondition(blockedSignal,    title="Aegis v4.3 Blocked (cap)",    message="AEGIS: Signal blocked by daily cap")

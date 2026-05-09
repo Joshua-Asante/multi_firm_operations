@@ -1,0 +1,521 @@
+//@version=6
+indicator("Guardian Gold v5.5 Indicator", shorttitle="Guardian55", overlay=true, max_labels_count=500, max_lines_count=500)
+
+// ==========================================
+// GUARDIAN GOLD v5.5 — UNIFIED SIGNAL + ANTICIPATION + POSITION SIM
+// Mirrors Guardian Gold v5.5 strategy signal logic.
+// Execution-ready: entry / SL / TP / lot size in labels + alerts.
+// Non-executing — no strategy.* calls, no real orders.
+// ==========================================
+// v5.5 CHANGES vs v5.4 (locked filter set):
+//   • blockMonH08 = ON   (new — Pepperstone 4yr fast-fail cohort)
+//   • blockThuH08 = OFF  (new input, disabled in locked config)
+//   • blockMonH09 = ON   (re-enabled from v5.4's OFF)
+//   All other parameters unchanged from v5.4:
+//     EMA 385/25 | SL 1.55×ATR | TP 29×ATR | grace 1b/2.0×ATR
+//     maxHold 850 | maxDaily 2 | Mon/Tue/Thu | 0800–1600 UTC
+//     H12 entry block + H12 day-gate | Tue H08 block | risk 0.30%
+// ==========================================
+// 2026-05-07 NON-STRATEGY PATCH (no version bump):
+//   Added alert() calls for anticipation states (NEAR + APPROACH first-bar
+//   transitions). Previously these states only had alertcondition() bindings,
+//   which require manual per-alert setup in TradingView and do not fire from
+//   the universal "Any alert() function call" subscription. Strategy logic
+//   (parameters, locks, signal definitions) UNCHANGED. Visual markers and
+//   plot logic UNCHANGED. Only push-alert delivery added.
+//
+//   Per Core Principle #3 (fxify-challenge): SETUP and PROXIMITY are
+//   INFORMATIONAL ONLY — wait for FIRE entry alert before trading.
+//
+//   Symmetric with Aegis v4.3 2026-04-27 patch.
+// ==========================================
+
+// ============================================================================
+// ACCOUNT & RISK
+// ============================================================================
+group_acct    = "═══ ACCOUNT & RISK ═══"
+accountSize   = input.float(200000, "Account Size ($)", minval=1000, step=1000, group=group_acct,
+     tooltip="FXIFY challenge balance.")
+riskPerTrade  = input.float(0.34, "Risk Per Trade (%)", minval=0.05, maxval=3.0, step=0.05, group=group_acct,
+     tooltip="Guardian locked: 0.30% (RF-optimal, no ramp). Override when dd_protection.py scales down (e.g. 0.12% at 0.40× scaling).")
+contractValue = input.float(100.0, "Contract Value ($/pip)", minval=0.01, maxval=1000, step=0.01, group=group_acct,
+     tooltip="XAUUSD: 100 per 1.0 price move (1 lot = 100 oz). FXIFY DXTrade default.")
+
+// ============================================================================
+// DATE RANGE
+// ============================================================================
+group_range = "═══ DATE RANGE ═══"
+startDate   = input.time(timestamp("2022-01-01"), "Start Date", group=group_range)
+endDate     = input.time(timestamp("2026-12-31"), "End Date",   group=group_range)
+inDateRange = time >= startDate and time <= endDate
+
+// ============================================================================
+// TREND / ENTRY / ATR
+// ============================================================================
+group_trend = "═══ TREND / ENTRY / ATR (LOCKED) ═══"
+emaSlowLen  = input.int(385, "EMA Slow", minval=100, maxval=600, group=group_trend)
+entryEmaLen = input.int(25,  "Entry EMA", minval=5, maxval=100, group=group_trend)
+atrLength   = input.int(14,  "ATR Length", minval=5, maxval=30, group=group_trend)
+stopAtr     = input.float(1.55, "Stop Loss (× ATR)", minval=0.5, maxval=4.0, step=0.05, group=group_trend)
+tpAtr       = input.float(29.0, "Take Profit (× ATR)", minval=1.0, maxval=50.0, step=0.5, group=group_trend)
+
+// ============================================================================
+// GRACE STOP / MAX HOLD
+// ============================================================================
+group_hold   = "═══ GRACE STOP / MAX HOLD ═══"
+graceBars    = input.int(1, "Grace Bars", minval=0, maxval=20, group=group_hold,
+     tooltip="Grace window = bar 1 only. Bar 2+ uses normal 1.55× SL.")
+graceAtr     = input.float(2.0, "Grace Stop (× ATR)", minval=1.0, maxval=10.0, step=0.1, group=group_hold,
+     tooltip="Wide emergency stop during bar 1 only.")
+maxHoldBars  = input.int(850, "Max Hold (bars)", minval=50, maxval=2000, group=group_hold)
+maxTradesDay = input.int(2, "Max Trades Per Day", minval=1, maxval=5, group=group_hold)
+
+// ============================================================================
+// SESSION
+// ============================================================================
+group_session = "═══ SESSION ═══"
+useSession    = input.bool(true, "Use Session Filter?", group=group_session)
+sessionChoice = input.string("NY Extended", "Session",
+     options=["London-NY Overlap", "London", "New York", "NY Extended", "Asian", "24H"],
+     group=group_session,
+     tooltip="LOCKED: NY Extended (08:00–16:00 UTC).")
+blockH14    = input.bool(false, "Block Hour 14 (UTC)", group=group_session)
+blockTueH08 = input.bool(true,  "Block Tuesday H08", group=group_session,
+     tooltip="LOCKED: Tue H08 = −$7,190 over 22t (WR 36%) 4yr.")
+blockMonH08 = input.bool(true,  "Block Monday H08", group=group_session,
+     tooltip="v5.5 LOCKED: ON. Pepperstone 4yr fast-fail cohort on Mon H08.")
+blockThuH08 = input.bool(false, "Block Thursday H08", group=group_session,
+     tooltip="v5.5: OFF in locked config.")
+blockMonH09 = input.bool(true,  "Block Monday H09", group=group_session,
+     tooltip="v5.5 LOCKED: ON. Mon H09 = −$16,622 over 30t (WR 50%) 4yr.")
+blockH12    = input.bool(true,  "Block Hour 12 (entry)", group=group_session,
+     tooltip="LOCKED: 0/19 WR at H12 across 4yr (p=0.018).")
+blockH12Day = input.bool(true,  "H12 Day-Gate (lock day after H12 signal)", group=group_session,
+     tooltip="LOCKED: If a long signal WOULD fire at H12, block all subsequent entries that day.")
+
+// ============================================================================
+// DAY FILTER
+// ============================================================================
+group_days = "═══ DAY FILTER ═══"
+tradeMon = input.bool(true,  "Monday",    group=group_days)
+tradeTue = input.bool(true,  "Tuesday",   group=group_days)
+tradeWed = input.bool(false, "Wednesday", group=group_days,
+     tooltip="PF 0.554 over 4yr (67t, 47.8% WR). −$10K net.")
+tradeThu = input.bool(true,  "Thursday",  group=group_days)
+tradeFri = input.bool(false, "Friday",    group=group_days,
+     tooltip="PF 0.17 over 3yr sample (81t, 38% WR).")
+
+// ============================================================================
+// PROXIMITY (ANTICIPATION)
+// ============================================================================
+group_prox      = "═══ PROXIMITY (× ATR) ═══"
+proximityAtr    = input.float(0.50, "Approach Zone (× ATR)",   minval=0.05, maxval=2.0, step=0.05, group=group_prox)
+strictProximity = input.float(0.15, "Strict Approach (× ATR)", minval=0.02, maxval=1.0, step=0.01, group=group_prox)
+
+// ============================================================================
+// ALERTS
+// ============================================================================
+group_alerts        = "═══ ALERTS ═══"
+alertOnAnticipation = input.bool(true, "Anticipation Alerts (NEAR / APPROACH)",
+     group=group_alerts,
+     tooltip="Fires push-able alert() when price first enters APPROACH proximity (≤ 0.50 ATR below EMA(25)) or NEAR/STRICT zone (≤ 0.15 ATR — typically 1-2 bars before cross). SETUP ONLY — informational, not a trade signal. Use \"Any alert() function call\" subscription to receive on phone/watch.")
+
+// ============================================================================
+// VISUALS
+// ============================================================================
+group_visual    = "═══ VISUALS ═══"
+showEmas        = input.bool(true, "Show EMAs",                group=group_visual)
+showZone        = input.bool(true, "Show Approach Zone",       group=group_visual)
+showSignals     = input.bool(true, "Show Signal Triangles",    group=group_visual)
+showApproach    = input.bool(true, "Show Approach Circles",    group=group_visual)
+showRawCross    = input.bool(true, "Show Filtered Crosses",    group=group_visual)
+showExits       = input.bool(true, "Show Exit Markers",        group=group_visual)
+showBgColor     = input.bool(true, "Show Background State",    group=group_visual)
+showDashboard   = input.bool(true, "Show Dashboard",           group=group_visual)
+showEntryLevels = input.bool(true, "Show Entry/SL/TP Lines",   group=group_visual)
+showEntryLabel  = input.bool(true, "Show Entry Labels",        group=group_visual)
+
+// ============================================================================
+// SESSION FUNCTIONS
+// ============================================================================
+getLondonNY() => not na(time(timeframe.period, "1300-1700:23456"))
+getLondon()   => not na(time(timeframe.period, "0800-1600:23456"))
+getNewYork()  => not na(time(timeframe.period, "1300-2100:23456"))
+getNYExt()    => not na(time(timeframe.period, "0800-1600:23456"))
+getAsian()    => not na(time(timeframe.period, "0000-0800:23456"))
+
+sessionActive = switch sessionChoice
+    "London-NY Overlap" => getLondonNY()
+    "London"            => getLondon()
+    "New York"          => getNewYork()
+    "NY Extended"       => getNYExt()
+    "Asian"             => getAsian()
+    => true
+
+sessionOK = useSession ? sessionActive : true
+
+// HOUR BLOCKS
+hourH14Blocked    = blockH14    and hour == 14
+hourTueH08Blocked = blockTueH08 and hour ==  8 and dayofweek == dayofweek.tuesday
+hourMonH08Blocked = blockMonH08 and hour ==  8 and dayofweek == dayofweek.monday
+hourThuH08Blocked = blockThuH08 and hour ==  8 and dayofweek == dayofweek.thursday
+hourMonH09Blocked = blockMonH09 and hour ==  9 and dayofweek == dayofweek.monday
+hourH12Blocked    = blockH12    and hour == 12
+hourAllowed = not hourH14Blocked and not hourTueH08Blocked and
+     not hourMonH08Blocked and not hourThuH08Blocked and
+     not hourMonH09Blocked and not hourH12Blocked
+
+// DAY FILTER
+dayAllowed = switch dayofweek
+    dayofweek.monday    => tradeMon
+    dayofweek.tuesday   => tradeTue
+    dayofweek.wednesday => tradeWed
+    dayofweek.thursday  => tradeThu
+    dayofweek.friday    => tradeFri
+    => false
+
+// ============================================================================
+// CALCULATIONS
+// ============================================================================
+atrVal   = ta.atr(atrLength)
+emaSlow  = ta.ema(close, emaSlowLen)
+entryEma = ta.ema(close, entryEmaLen)
+
+bullTrendOK  = close > emaSlow
+recoveryLong = close > entryEma and close[1] <= entryEma[1]
+
+// ============================================================================
+// H12 DAY-GATE
+// Tracks whether a full long signal WOULD have fired at H12 today. Once
+// latched, blocks all subsequent entries that day. Resets at new day.
+// ============================================================================
+var bool h12SignalToday = false
+if ta.change(time("D")) != 0
+    h12SignalToday := false
+
+h12WouldFire = bullTrendOK and recoveryLong and sessionOK and dayAllowed and inDateRange and hour == 12
+if h12WouldFire
+    h12SignalToday := true
+
+h12DayGateActive = blockH12Day and h12SignalToday
+
+// ============================================================================
+// MASTER FILTER STATE
+// ============================================================================
+filtersOK = bullTrendOK and sessionOK and hourAllowed and dayAllowed and inDateRange and not h12DayGateActive
+
+belowEntry = close <= entryEma
+distBelow  = entryEma - close
+atrSafe    = not na(atrVal) and atrVal > 0
+distAtr    = atrSafe ? distBelow / atrVal : 999.0
+
+// ============================================================================
+// POSITION SIZING
+// ============================================================================
+calcLots(slDist) =>
+    riskDollars = accountSize * (riskPerTrade / 100)
+    slDist > 0 and contractValue > 0 ? riskDollars / (slDist * contractValue) : 0.0
+
+// ============================================================================
+// SIGNAL + POSITION SIMULATION
+// ============================================================================
+longSignalRaw = bullTrendOK and recoveryLong and sessionOK and hourAllowed and dayAllowed and inDateRange and not h12DayGateActive
+rawCross      = bullTrendOK and recoveryLong and not longSignalRaw
+
+var bool  inPosition     = false
+var float entryPriceSim  = na
+var float entryAtrSim    = na
+var float tpPriceSim     = na
+var float slRegularSim   = na
+var float slGraceSim     = na
+var float currentStopSim = na
+var float lotSizeSim     = na
+var int   barsSinceEntry = 0
+var bool  graceActive    = false
+
+var line entryLine = na
+var line slLine    = na
+var line tpLine    = na
+
+var int tradesToday = 0
+if ta.change(time("D")) != 0
+    tradesToday := 0
+
+// --- EXIT DETECTION ---
+prevInPos = inPosition[1]
+prevStop  = currentStopSim[1]
+prevTP    = tpPriceSim[1]
+prevBars  = nz(barsSinceEntry[1], 0)
+
+exitByTP      = prevInPos and not na(prevTP)   and high >= prevTP
+exitByStop    = prevInPos and not na(prevStop) and low  <= prevStop
+exitByMaxHold = prevInPos and (prevBars + 1) >= maxHoldBars
+positionExit  = exitByTP or exitByStop or exitByMaxHold
+
+if positionExit
+    inPosition     := false
+    entryPriceSim  := na
+    entryAtrSim    := na
+    tpPriceSim     := na
+    slRegularSim   := na
+    slGraceSim     := na
+    currentStopSim := na
+    lotSizeSim     := na
+    barsSinceEntry := 0
+    graceActive    := false
+    if showEntryLevels
+        line.delete(entryLine)
+        line.delete(slLine)
+        line.delete(tpLine)
+
+// --- PRIMARY ENTRY ---
+dailyCapOK       = tradesToday < maxTradesDay
+wasNotInPosition = not inPosition
+primaryEntry     = longSignalRaw and wasNotInPosition and dailyCapOK
+
+if primaryEntry
+    slDistRegular = atrVal * stopAtr
+    slDistGrace   = atrVal * graceAtr
+    slPriceReg    = close - slDistRegular
+    slPriceGrace  = close - slDistGrace
+    tpPrice       = close + atrVal * tpAtr
+    lots          = calcLots(slDistRegular)
+    graceOn       = graceBars > 0
+
+    inPosition     := true
+    entryPriceSim  := close
+    entryAtrSim    := atrVal
+    tpPriceSim     := tpPrice
+    slRegularSim   := slPriceReg
+    slGraceSim     := slPriceGrace
+    currentStopSim := graceOn ? slPriceGrace : slPriceReg
+    lotSizeSim     := lots
+    barsSinceEntry := 0
+    graceActive    := graceOn
+    tradesToday    := tradesToday + 1
+
+    if showEntryLevels
+        line.delete(entryLine)
+        line.delete(slLine)
+        line.delete(tpLine)
+        entryLine := line.new(bar_index, close, bar_index + 1, close, extend=extend.right, color=color.new(color.blue, 30), width=1, style=line.style_dashed)
+        slLine    := line.new(bar_index, currentStopSim, bar_index + 1, currentStopSim, extend=extend.right, color=graceActive ? color.orange : color.red, width=2, style=line.style_solid)
+        tpLine    := line.new(bar_index, tpPrice, bar_index + 1, tpPrice, extend=extend.right, color=color.green, width=2, style=line.style_solid)
+
+    if showEntryLabel
+        stopShown = graceActive ? slPriceGrace : slPriceReg
+        entryInfo = "🟡 GOLD LONG\nLots: " + str.tostring(lots, "#.##") + "\nEntry: " + str.tostring(close, format.mintick) + "\nSL: " + str.tostring(stopShown, format.mintick) + (graceActive ? " (grace)" : "") + "\nTP: " + str.tostring(tpPrice, format.mintick) + "\nRisk: " + str.tostring(riskPerTrade, "#.##") + "%"
+        label.new(bar_index, low, entryInfo, style=label.style_label_up, color=color.new(color.yellow, 20), textcolor=color.white, size=size.small)
+
+    stopForAlert = graceActive ? slPriceGrace : slPriceReg
+    graceTag     = graceActive ? " (grace " + str.tostring(graceBars) + "b)" : ""
+    entryMsg = "🟡 GUARDIAN GOLD LONG\n━━━━━━━━━━━━━━━━━━━━\n📍 ENTRY: " + str.tostring(close, format.mintick) + "\n📊 LOTS: " + str.tostring(lots, "#.##") + "\n🛑 SL: " + str.tostring(stopForAlert, format.mintick) + graceTag + "\n🎯 TP: " + str.tostring(tpPrice, format.mintick) + "\n━━━━━━━━━━━━━━━━━━━━\nRisk: " + str.tostring(riskPerTrade, "#.##") + "% | ATR: " + str.tostring(atrVal, "#.##")
+    alert(entryMsg, alert.freq_once_per_bar_close)
+
+// --- POSITION MANAGEMENT (grace → regular SL transition) ---
+if inPosition and not primaryEntry
+    barsSinceEntry := barsSinceEntry + 1
+    wasGrace = graceActive
+
+    if graceActive and barsSinceEntry >= graceBars
+        currentStopSim := slRegularSim
+        graceActive    := false
+
+    if showEntryLevels and not na(slLine)
+        line.set_y1(slLine, currentStopSim)
+        line.set_y2(slLine, currentStopSim)
+        line.set_color(slLine, graceActive ? color.orange : color.red)
+
+    if wasGrace and not graceActive
+        graceMsg = "🟠 GUARDIAN GOLD — GRACE EXPIRED\n━━━━━━━━━━━━━━━━━━━━\nMove stop to: " + str.tostring(currentStopSim, format.mintick) + "\nBars since entry: " + str.tostring(barsSinceEntry)
+        alert(graceMsg, alert.freq_once_per_bar_close)
+
+// --- DERIVED SIGNALS FOR MARKERS ---
+longSignal       = primaryEntry
+blockedSignal    = longSignalRaw and wasNotInPosition and not dailyCapOK
+approachZone     = filtersOK and belowEntry and atrSafe and distAtr <= proximityAtr
+strictApproach   = filtersOK and belowEntry and atrSafe and distAtr <= strictProximity
+strictFirstBar   = strictApproach and not strictApproach[1]
+approachFirstBar = approachZone and not approachZone[1]
+h12GateLatched   = h12DayGateActive and not h12DayGateActive[1]
+
+// --- EXIT ALERT ---
+if positionExit
+    exitReason = exitByTP ? "TP HIT" : exitByStop ? "STOP HIT" : "MAX HOLD"
+    exitIcon   = exitByTP ? "🎯" : exitByStop ? "🛑" : "⏱"
+    exitMsg = exitIcon + " GUARDIAN GOLD — EXIT (" + exitReason + ")\n━━━━━━━━━━━━━━━━━━━━\nPrice: " + str.tostring(close, format.mintick)
+    alert(exitMsg, alert.freq_once_per_bar_close)
+
+if h12GateLatched
+    alert("🔒 GUARDIAN GOLD — H12 DAY-GATE LATCHED\n━━━━━━━━━━━━━━━━━━━━\nH12 signal detected — no more entries today.", alert.freq_once_per_bar_close)
+
+// --- ANTICIPATION ALERTS (SETUP only — informational; NOT a trade signal) ---
+// Fires on first-bar entry into proximity zones. Both gated on filtersOK
+// (matches the visual approachZone / strictApproach plot logic), so an alert
+// only fires when the trade COULD actually trigger if price crosses.
+//
+// Per Core Principle #3 (fxify-challenge): SETUP and PROXIMITY are
+// informational only. Wait for the FIRE entry alert before trading.
+//
+// Approximate levels (SL/TP/Lots) are computed assuming a near-immediate
+// cross at entryEma. Actual entry-bar values will differ slightly
+// (the strategy locks them on the close of the cross bar, not now).
+if alertOnAnticipation and strictFirstBar
+    slDistAnt = atrVal * stopAtr
+    slApprox  = entryEma - slDistAnt
+    tpApprox  = entryEma + atrVal * tpAtr
+    lotsAnt   = calcLots(slDistAnt)
+    nearMsg   = "🟠 GUARDIAN GOLD — NEAR (cross imminent)\n━━━━━━━━━━━━━━━━━━━━\n⚠️ SETUP ONLY — not a trade signal\nWait for FIRE entry alert before entering.\n━━━━━━━━━━━━━━━━━━━━\n📍 Price: " + str.tostring(close, format.mintick) + "\n📏 Below EMA(25): " + str.tostring(distAtr, "#.##") + " ATR\n🟡 EMA(25): " + str.tostring(entryEma, format.mintick) + "\n━━━━━━━━━━━━━━━━━━━━\nApprox levels if cross fires:\n🛑 SL ~ " + str.tostring(slApprox, format.mintick) + "\n🎯 TP ~ " + str.tostring(tpApprox, format.mintick) + "\n📊 Lots ~ " + str.tostring(lotsAnt, "#.##") + "\nATR: " + str.tostring(atrVal, "#.##")
+    alert(nearMsg, alert.freq_once_per_bar_close)
+
+if alertOnAnticipation and approachFirstBar and not strictApproach
+    appMsg = "🟡 GUARDIAN GOLD — APPROACH\n━━━━━━━━━━━━━━━━━━━━\n⚠️ SETUP ONLY — not a trade signal\nWatch for cross. Wait for FIRE alert.\n━━━━━━━━━━━━━━━━━━━━\n📍 Price: " + str.tostring(close, format.mintick) + "\n📏 Below EMA(25): " + str.tostring(distAtr, "#.##") + " ATR\n🟡 EMA(25): " + str.tostring(entryEma, format.mintick) + "\nATR: " + str.tostring(atrVal, "#.##")
+    alert(appMsg, alert.freq_once_per_bar_close)
+
+// ============================================================================
+// PLOTS
+// ============================================================================
+plot(showEmas ? emaSlow  : na, "EMA Slow (385)", color.red,    2)
+plot(showEmas ? entryEma : na, "Entry EMA (25)", color.yellow, 1)
+
+zoneTop       = showZone ? entryEma : na
+zoneBottom    = showZone ? entryEma - (atrVal * proximityAtr) : na
+tp_line       = plot(zoneTop,    "Zone Top",    color.new(color.yellow, 100), editable=false)
+bp_line       = plot(zoneBottom, "Zone Bottom", color.new(color.yellow, 100), editable=false)
+zoneFillColor = filtersOK ? color.new(color.yellow, 85) : color.new(color.gray, 92)
+fill(tp_line, bp_line, color=zoneFillColor, title="Approach Zone")
+
+plotshape(showApproach and approachZone and not strictApproach, "Approach",
+     shape.circle, location.belowbar, color.new(color.orange, 20), size=size.tiny)
+plotshape(showApproach and strictFirstBar, "Strict Approach (first)",
+     shape.circle, location.belowbar, color.orange, size=size.small,
+     text="NEAR", textcolor=color.orange)
+plotshape(showApproach and strictApproach and not strictFirstBar, "Strict Approach (sustained)",
+     shape.circle, location.belowbar, color.orange, size=size.small)
+plotshape(showRawCross and rawCross, "Filtered Cross",
+     shape.triangleup, location.belowbar, color.new(color.green, 75), size=size.tiny,
+     text="FILT", textcolor=color.new(color.gray, 30))
+plotshape(showSignals and longSignal, "Long Signal",
+     shape.triangleup, location.belowbar, color.green, size=size.small)
+plotshape(blockedSignal, "Blocked Signal",
+     shape.xcross, location.belowbar, color.new(color.blue, 40), size=size.small,
+     text="BLK", textcolor=color.new(color.blue, 30))
+plotshape(h12GateLatched, "H12 Day-Gate",
+     shape.square, location.abovebar, color.new(color.maroon, 20), size=size.tiny,
+     text="H12", textcolor=color.white)
+plotshape(showExits and exitByTP, "Exit (TP)",
+     shape.flag, location.abovebar, color.new(color.lime, 0), size=size.small,
+     text="TP", textcolor=color.white)
+plotshape(showExits and exitByStop, "Exit (Stop)",
+     shape.flag, location.abovebar, color.new(color.red, 0), size=size.small,
+     text="STOP", textcolor=color.white)
+plotshape(showExits and exitByMaxHold and not exitByTP and not exitByStop, "Exit (Max Hold)",
+     shape.flag, location.abovebar, color.new(color.purple, 0), size=size.small,
+     text="HOLD", textcolor=color.white)
+
+// Background state shading for blocked periods
+bgcolor(showBgColor and not dayAllowed              ? color.new(color.gray,    95) : na, title="Day Blocked")
+bgcolor(showBgColor and hourH14Blocked              ? color.new(color.purple,  95) : na, title="H14 Blocked")
+bgcolor(showBgColor and hourTueH08Blocked           ? color.new(color.fuchsia, 95) : na, title="Tue H08 Blocked")
+bgcolor(showBgColor and hourMonH08Blocked           ? color.new(color.olive,   95) : na, title="Mon H08 Blocked")
+bgcolor(showBgColor and hourThuH08Blocked           ? color.new(color.teal,    95) : na, title="Thu H08 Blocked")
+bgcolor(showBgColor and hourMonH09Blocked           ? color.new(color.red,     95) : na, title="Mon H09 Blocked")
+bgcolor(showBgColor and hourH12Blocked              ? color.new(color.maroon,  95) : na, title="H12 Blocked")
+bgcolor(showBgColor and h12DayGateActive            ? color.new(color.maroon,  92) : na, title="H12 Day-Gate Active")
+bgcolor(showBgColor and useSession and not sessionActive ? color.new(color.blue, 97) : na, title="Session Closed")
+
+// ============================================================================
+// DASHBOARD
+// ============================================================================
+if showDashboard and barstate.islast
+    var table dash = table.new(position.top_right, 2, 15,
+         bgcolor=color.new(color.black, 85), border_width=1)
+
+    table.cell(dash, 0, 0, "GUARDIAN GOLD", text_color=color.black, bgcolor=#FFD700, text_size=size.small)
+    table.cell(dash, 1, 0, "v5.5",          text_color=color.black, bgcolor=#FFD700, text_size=size.small)
+
+    trendText  = bullTrendOK ? "BULL ✓" : "BEAR ✗"
+    trendColor = bullTrendOK ? color.green : color.red
+    table.cell(dash, 0, 1, "Trend", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 1, trendText, text_color=trendColor, text_size=size.tiny)
+
+    sessText  = sessionOK ? "ACTIVE ✓" : "CLOSED ✗"
+    sessColor = sessionOK ? color.green : color.gray
+    table.cell(dash, 0, 2, "Session", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 2, sessText, text_color=sessColor, text_size=size.tiny)
+
+    dayText  = dayAllowed ? "ALLOWED ✓" : "BLOCKED ✗"
+    dayColor = dayAllowed ? color.green : color.red
+    table.cell(dash, 0, 3, "Day", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 3, dayText, text_color=dayColor, text_size=size.tiny)
+
+    hourText = hourTueH08Blocked ? "TUE H08 ✗" :
+     hourMonH08Blocked ? "MON H08 ✗" :
+     hourThuH08Blocked ? "THU H08 ✗" :
+     hourMonH09Blocked ? "MON H09 ✗" :
+     hourH12Blocked    ? "H12 ✗"     :
+     hourH14Blocked    ? "H14 ✗"     :
+     "OK ✓"
+    hourColor = hourAllowed ? color.green : color.red
+    table.cell(dash, 0, 4, "Hour", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 4, hourText, text_color=hourColor, text_size=size.tiny)
+
+    gateText  = h12DayGateActive ? "LOCKED ✗" : "OPEN ✓"
+    gateColor = h12DayGateActive ? color.red : color.green
+    table.cell(dash, 0, 5, "H12 Day-Gate", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 5, gateText, text_color=gateColor, text_size=size.tiny)
+
+    belowText  = belowEntry ? "BELOW" : "ABOVE"
+    belowColor = belowEntry ? color.orange : color.aqua
+    table.cell(dash, 0, 6, "vs EMA(25)", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 6, belowText, text_color=belowColor, text_size=size.tiny)
+
+    distText  = belowEntry and atrSafe ? str.tostring(distAtr, "#.##") + " ATR" : "—"
+    distColor = strictApproach ? color.orange : approachZone ? color.yellow : not belowEntry ? color.lime : color.gray
+    table.cell(dash, 0, 7, "Dist below", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 7, distText, text_color=distColor, text_size=size.tiny)
+
+    tradesLbl = str.tostring(tradesToday) + "/" + str.tostring(maxTradesDay)
+    tradesClr = dailyCapOK ? color.green : color.red
+    table.cell(dash, 0, 8, "Trades Today", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 8, tradesLbl, text_color=tradesClr, text_size=size.tiny)
+
+    posText  = inPosition ? (graceActive ? "IN POS (grace)" : "IN POS") : "FLAT"
+    posColor = inPosition ? (graceActive ? color.orange : color.green) : color.gray
+    table.cell(dash, 0, 9, "Position", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 9, posText, text_color=posColor, text_size=size.tiny)
+
+    lotsText = inPosition and not na(lotSizeSim) ? str.tostring(lotSizeSim, "#.##") : "—"
+    table.cell(dash, 0, 10, "Lots", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 10, lotsText, text_color=color.white, text_size=size.tiny)
+
+    slDashLbl = graceActive ? "Stop (grace)" : "Stop"
+    slDashClr = graceActive ? color.orange : color.red
+    slDashVal = inPosition and not na(currentStopSim) ? str.tostring(currentStopSim, format.mintick) : "—"
+    table.cell(dash, 0, 11, slDashLbl, text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 11, slDashVal, text_color=slDashClr, text_size=size.tiny)
+
+    tpDashVal = inPosition and not na(tpPriceSim) ? str.tostring(tpPriceSim, format.mintick) : "—"
+    table.cell(dash, 0, 12, "Take Profit", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 12, tpDashVal, text_color=color.green, text_size=size.tiny)
+
+    barsText = inPosition ? str.tostring(barsSinceEntry) + "/" + str.tostring(maxHoldBars) : "—"
+    table.cell(dash, 0, 13, "Bars Held", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 13, barsText, text_color=color.white, text_size=size.tiny)
+
+    acctText = "$" + str.tostring(accountSize, "#,###") + " @ " + str.tostring(riskPerTrade, "#.##") + "%"
+    table.cell(dash, 0, 14, "Account", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 14, acctText, text_color=color.white, text_size=size.tiny)
+
+// ============================================================================
+// ALERT CONDITIONS (named fallback)
+// ============================================================================
+alertcondition(longSignal,       title="Guardian v5.5 LONG Signal",     message="GUARDIAN: Long Entry")
+alertcondition(exitByTP,         title="Guardian v5.5 Exit (TP)",       message="GUARDIAN: Exit — TP")
+alertcondition(exitByStop,       title="Guardian v5.5 Exit (Stop)",     message="GUARDIAN: Exit — Stop")
+alertcondition(exitByMaxHold and not exitByTP and not exitByStop, title="Guardian v5.5 Exit (Max Hold)", message="GUARDIAN: Exit — Max Hold")
+alertcondition(strictApproach,   title="Guardian v5.5 Strict Approach", message="GUARDIAN: Cross imminent")
+alertcondition(approachZone,     title="Guardian v5.5 Approach",        message="GUARDIAN: Within proximity")
+alertcondition(rawCross,         title="Guardian v5.5 Filtered Cross",  message="GUARDIAN: Raw 25-EMA cross filtered")
+alertcondition(blockedSignal,    title="Guardian v5.5 Blocked (cap)",   message="GUARDIAN: Signal blocked by daily cap")
+alertcondition(h12GateLatched,   title="Guardian v5.5 H12 Day-Gate",    message="GUARDIAN: H12 signal — day locked")

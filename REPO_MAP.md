@@ -1,6 +1,6 @@
 # REPO_MAP — active classification
 
-**Updated:** 2026-05-08 (post C2 relock + repo-map disposition pass)
+**Updated:** 2026-05-08 (post C2 relock + repo-map disposition pass; indicator-with-strategy convention added 2026-05-08)
 **Convention:**
 - `[A]` active hot-path (production code, locked strategies, active analyses, immutable record)
 - `[U]` utility — runs on demand, not in CI hot path, retained as load-bearing tool
@@ -36,12 +36,17 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 
 ## Strategies (Pine v6, locked)
 [A] strategies/guardian/guardian_gold_v5.5.pine — LOCKED 2026-04-23
+[A] strategies/guardian/guardian_gold_v5.5_indicator.pine — combined FIRE+anticipation indicator (2026-05-08)
+[A] strategies/guardian/LOCK.md — v5.5 lock provenance
 [A] strategies/guardian/guardian_CHANGELOG.md
 [A] strategies/striker/striker_dj30_v4.5.pine — LOCKED 2026-05-05
+[A] strategies/striker/striker_dj30_v4.5_indicator.pine — combined FIRE+anticipation+pyramid indicator (2026-05-08)
 [A] strategies/striker/striker_CHANGELOG.md
 [A] strategies/nas/striker_nas100_v1.pine — LOCKED 2026-05-05 (split out of strategies/striker/ on 2026-05-08)
+[A] strategies/nas/striker_nas100_v1_indicator.pine — combined FIRE+anticipation+pyramid indicator (2026-05-08)
 [A] strategies/nas/striker_nas100_CHANGELOG.md
 [A] strategies/aegis/aegis_usdjpy_v4.3.pine — LOCKED 2026-04-22
+[A] strategies/aegis/aegis_usdjpy_v4.3_indicator.pine — combined FIRE+anticipation indicator (2026-05-08)
 [A] strategies/aegis/aegis_CHANGELOG.md
 
 ## Scripts
@@ -90,6 +95,7 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] docs/briefs/*.md — closed-with-override: Q-DDP-1 (C2 lock 2026-05-08); closed: bust_attribution_flip (2026-05-08); active: NAS100 (×2). Q-DJ30-3 brief archived 2026-05-08.
 [A] docs/historical/*.md — IMMUTABLE record
 [A] docs/templates/*.md
+[A] docs/audits/*.md — indicator-vs-strategy diff audits (Guardian v5.5 inaugural 2026-05-08, paired with strategies/guardian/LOCK.md)
 
 ## Archive (consolidated 2026-05-07, Approach D)
 [X] archive/analysis/ — eurusd_lnyo, gbpusd_lon, usdchf_sentinel, usoil (incl. usoil/indicators/usoil_phase2_validation.pine moved 2026-05-07), striker_nas100/q_nas_1_pyramid_hypothesis.py (closed 2026-05-05), Q-DJ30-1/2/3 (closed 2026-05-06; archived 2026-05-08, cooldown overridden), dd_protection_trace.py (forensic tool moved with closed Q-DDP-1 cohort 2026-05-08)

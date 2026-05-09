@@ -1,0 +1,546 @@
+//@version=6
+indicator("Striker DJ30 v4.5", shorttitle="Striker45", overlay=true, max_labels_count=500, max_lines_count=500)
+
+// ==========================================
+// STRIKER DJ30 v4.5 — UNIFIED SIGNAL + ANTICIPATION + POSITION SIM
+// v4.5 parameter shifts vs v4.4 lock (defaults; not yet memory-locked):
+//   SL 1.25→1.2, TP 8.0→8.5, trailDistTight 0.85→0.80, trailTightenAt 1.5→1.0
+// Pyramid lot sizing derived from saved base lot (matches strategy's
+//   initialSize * 3.5), not recalc'd on current ATR.
+// NOTE: sizing basis differs from strategy by design — indicator uses
+//   STATIC accountSize input; strategy compounds off strategy.equity.
+//   Mirror manually by bumping accountSize as equity drifts.
+// ==========================================
+// 2026-05-07 NON-STRATEGY PATCH (no version bump):
+//   Added alert() calls for anticipation states (NEAR + APPROACH first-bar
+//   transitions). Previously these states only had alertcondition() bindings,
+//   which require manual per-alert setup in TradingView and do not fire from
+//   the universal "Any alert() function call" subscription. Strategy logic
+//   (parameters, locks, signal definitions) UNCHANGED. Visual markers and
+//   plot logic UNCHANGED. Only push-alert delivery added.
+//
+//   Per Core Principle #3 (fxify-challenge): SETUP and PROXIMITY are
+//   INFORMATIONAL ONLY — wait for FIRE entry alert before trading.
+//
+//   Symmetric with Aegis v4.3 2026-04-27 patch and same-batch Guardian v5.5
+//   and NAS100 v1.0 patches. See methodology lesson M-7.
+// ==========================================
+
+// ============================================================================
+// ACCOUNT & RISK
+// ============================================================================
+group_acct    = "═══ ACCOUNT & RISK ═══"
+accountSize   = input.float(200000, "Account Size ($)", minval=1000, step=1000, group=group_acct,
+     tooltip="FXIFY challenge balance.")
+riskPerTrade  = input.float(1.00, "Risk Per Trade (%)", minval=0.1, maxval=3.0, step=0.05, group=group_acct,
+     tooltip="Striker v4.5 locked: 1.00%. OVERRIDE when dd_protection.py scales down (e.g. 0.40% in DD mode).")
+contractValue = input.float(10.0, "Contract Value ($/pt)", minval=0.01, maxval=100, step=0.01, group=group_acct,
+     tooltip="LOCKED for DXTrade DJ30: 10. Dollar value per point per contract.")
+strikerDayStopPct = input.float(-2, "Day Soft-Stop (% init eq)", minval=-10.0, maxval=-0.5, step=0.1, group=group_acct,
+     tooltip="PRIMARY bust-risk guardrail. Halts new Striker entries for the rest of the day once realized day P&L drops to this % of account size. At $200K, -3.5% = -$7K. Must match strategy script.")
+
+// ============================================================================
+// DATE RANGE
+// ============================================================================
+group_range = "═══ DATE RANGE ═══"
+startDate   = input.time(timestamp("2022-01-01"), "Start Date", group=group_range)
+endDate     = input.time(timestamp("2026-12-31"), "End Date",   group=group_range)
+inDateRange = time >= startDate and time <= endDate
+
+// ============================================================================
+// STRATEGY PARAMS
+// ============================================================================
+group_breakout = "═══ BREAKOUT ═══"
+breakoutBars = input.int(15,     "Lookback Bars",       minval=5,    maxval=40,  group=group_breakout)
+atrLength    = input.int(11,     "ATR Length",          minval=5,    maxval=30,  group=group_breakout)
+atrMaLength  = input.int(85,     "ATR MA Length",       minval=20,   maxval=100, group=group_breakout)
+atrExpansion = input.float(0.28, "ATR Expansion Ratio", minval=0.05, maxval=1.5, step=0.01, group=group_breakout)
+
+group_entry  = "═══ ENTRY QUALITY ═══"
+minBodyRatio = input.float(0.38, "Min Body Ratio", minval=0.0, maxval=0.9, step=0.05, group=group_entry)
+
+group_gating = "═══ EXECUTION GATING ═══"
+maxTradesDay = input.int(3, "Max Trades Per Day", minval=1, maxval=10, group=group_gating,
+     tooltip="LOCKED: 3. Pyramid adds do NOT count.")
+showBlocked  = input.bool(false, "Show Blocked Signals (debug)", group=group_gating)
+
+group_strat    = "═══ STRATEGY PARAMS (LOCKED) ═══"
+stopAtr        = input.float(1.2, "Stop Loss (ATR)",       minval=0.5, maxval=4.0,  step=0.05, group=group_strat, tooltip="LOCKED: 1.2")
+tpAtr          = input.float(8.5,  "Take Profit (ATR)",     minval=1.5, maxval=30.0, step=0.5,  group=group_strat, tooltip="LOCKED: 8.5")
+beTriggerAtr   = input.float(0.15, "BE Trigger (ATR)",      minval=0.05, maxval=2.0, step=0.05, group=group_strat, tooltip="LOCKED: 0.15")
+bePadAtr       = input.float(0.05, "BE Pad (ATR)",          minval=0.0,  maxval=0.3, step=0.01, group=group_strat, tooltip="LOCKED: 0.05")
+trailTrigger   = input.float(0.15, "Trail Trigger (ATR)",   minval=0.1, maxval=4.0,  step=0.01, group=group_strat, tooltip="LOCKED: 0.15")
+trailDistWide  = input.float(0.90, "Trail Wide (ATR)",      minval=0.5, maxval=3.0,  step=0.01, group=group_strat, tooltip="LOCKED: 0.90")
+trailDistTight = input.float(0.80, "Trail Tight (ATR)",     minval=0.25, maxval=2.0, step=0.01, group=group_strat, tooltip="LOCKED: 0.80")
+trailTightenAt = input.float(1,  "Tighten After (ATR)",   minval=0.5, maxval=5.0,  step=0.01, group=group_strat, tooltip="LOCKED: 1")
+maxHoldBars    = input.int(55,     "Max Hold (bars)",       minval=5,   maxval=100,  group=group_strat, tooltip="LOCKED: 55")
+pyramidTrigger = input.float(1.29, "Pyramid Trigger (ATR)", minval=0.5, maxval=3.0,  step=0.01, group=group_strat, tooltip="LOCKED: 1.29")
+pyramidMinBars = input.int(6,      "Pyramid Min Bars",      minval=1,   maxval=12,   group=group_strat, tooltip="LOCKED: 6")
+pyramidSize    = input.float(350,  "Pyramid Size (% of base)", minval=50, maxval=500, step=10, group=group_strat, tooltip="LOCKED: 350%")
+
+group_prox      = "═══ PROXIMITY (ATR) ═══"
+proximityAtr    = input.float(0.50, "Approach Zone (× ATR)",   minval=0.05, maxval=2.0, step=0.05, group=group_prox)
+strictProximity = input.float(0.15, "Strict Approach (× ATR)", minval=0.02, maxval=1.0, step=0.01, group=group_prox)
+
+group_alerts        = "═══ ALERTS ═══"
+alertOnAnticipation = input.bool(true, "Anticipation Alerts (NEAR / APPROACH)",
+     group=group_alerts,
+     tooltip="Fires push-able alert() when price first enters APPROACH proximity (≤ 0.50 ATR below resistance) or NEAR/STRICT zone (≤ 0.15 ATR — typically 1-2 bars before breakout). SETUP ONLY — informational, not a trade signal. Use \"Any alert() function call\" subscription to receive on phone/watch.")
+
+group_visual      = "═══ VISUALS ═══"
+showLevels        = input.bool(true,  "Show Breakout Levels",        group=group_visual)
+showZone          = input.bool(true,  "Show Approach Zone",          group=group_visual)
+showSignals       = input.bool(true,  "Show Signal Diamonds",        group=group_visual)
+showApproach      = input.bool(true,  "Show Approach Circles",       group=group_visual)
+showFilteredBreak = input.bool(true,  "Show Filtered Breakouts",     group=group_visual)
+showExits         = input.bool(true,  "Show Exit Markers",           group=group_visual)
+showBgColor       = input.bool(true,  "Show Background State",       group=group_visual)
+showDashboard     = input.bool(true,  "Show Dashboard",              group=group_visual)
+showEntryLevels   = input.bool(true,  "Show Entry/SL/TP Lines",      group=group_visual,
+     tooltip="Horizontal lines at entry/SL/TP. SL line updates as BE/trail fires. Cleared on exit.")
+showEntryLabel    = input.bool(true,  "Show Entry/Pyramid Labels",   group=group_visual,
+     tooltip="Rich labels with E/SL/TP/Lots. Persistent across all historical trades.")
+
+// ============================================================================
+// CALCULATIONS
+// ============================================================================
+
+currentHourUTC = hour(time, "UTC")
+sessionOK      = currentHourUTC >= 13 and currentHourUTC < 17
+
+currentDow = dayofweek(time, "UTC")
+dowOK      = currentDow == dayofweek.tuesday or currentDow == dayofweek.friday
+
+var int barsSinceSessionStart = 0
+sessionJustOpened = sessionOK and not (currentHourUTC[1] >= 13 and currentHourUTC[1] < 17)
+if sessionJustOpened
+    barsSinceSessionStart := 0
+if sessionOK
+    barsSinceSessionStart := barsSinceSessionStart + 1
+
+warmupOK = barsSinceSessionStart > 3
+
+atrVal       = ta.atr(atrLength)
+atrMa        = ta.sma(atrVal, atrMaLength)
+atrExpanding = atrVal > atrMa * (1 + atrExpansion)
+
+highestHigh   = ta.highest(high, breakoutBars)
+lowestLow     = ta.lowest(low,  breakoutBars)
+resistanceLvl = highestHigh[1]
+
+candleRange    = high - low
+candleBody     = math.abs(close - open)
+bodyRatio      = candleRange > 0 ? candleBody / candleRange : 0.0
+bodyOK         = bodyRatio >= minBodyRatio
+prevBarBullish = close[1] > open[1]
+
+filtersOK = atrExpanding and sessionOK and warmupOK and dowOK and inDateRange and prevBarBullish
+
+belowRes = close <= resistanceLvl
+distRes  = resistanceLvl - close
+atrSafe  = not na(atrVal) and atrVal > 0
+distAtr  = atrSafe ? distRes / atrVal : 999.0
+
+// ============================================================================
+// POSITION SIZING
+// ============================================================================
+calcLots(slDist) =>
+    riskDollars = accountSize * (riskPerTrade / 100)
+    slDist > 0 and contractValue > 0 ? riskDollars / (slDist * contractValue) : 0.0
+
+// ============================================================================
+// SIGNAL + POSITION SIMULATION
+// ============================================================================
+
+rawBreakout      = close > resistanceLvl
+longSignalRaw    = rawBreakout and atrExpanding and sessionOK and warmupOK and dowOK and inDateRange and bodyOK and prevBarBullish
+
+var bool  inPosition       = false
+var float entryPriceSim    = na
+var float entryAtrSim      = na
+var float tpPriceSim       = na
+var float currentStopSim   = na
+var float trailStopSim     = na
+var float lotSizeSim       = na
+var float pyrLotSizeSim    = na
+var float pyrEntryPriceSim = na
+var bool  beTriggeredSim   = false
+var bool  trailTightSim    = false
+var bool  pyramidFiredSim  = false
+var int   barsSinceEntry   = 0
+
+// Entry visualization handles (var for line mgmt; labels are permanent — no var)
+var line entryLine = na
+var line slLine    = na
+var line tpLine    = na
+
+var int   tradesToday         = 0
+var float strikerDayPnlSim    = 0.0
+var bool  strikerHaltedToday  = false
+if ta.change(time("D")) != 0
+    tradesToday         := 0
+    strikerDayPnlSim    := 0.0
+    strikerHaltedToday  := false
+
+// --- EXIT DETECTION ---
+prevInPos  = inPosition[1]
+prevStop   = currentStopSim[1]
+prevTP     = tpPriceSim[1]
+prevBars   = nz(barsSinceEntry[1], 0)
+
+exitByTP      = prevInPos and not na(prevTP)   and high >= prevTP
+exitByStop    = prevInPos and not na(prevStop) and low  <= prevStop
+exitByMaxHold = prevInPos and (prevBars + 1) >= maxHoldBars
+positionExit  = exitByTP or exitByStop or exitByMaxHold
+
+if positionExit
+    // Compute realized P&L for this trade BEFORE resetting state vars.
+    // Base and pyramid legs share the same exit price (stop/TP, or close on max-hold)
+    // but have different entry prices — both are accumulated into the day total.
+    exitPrice = exitByTP ? prevTP : exitByStop ? prevStop : close
+    basePnl   = not na(lotSizeSim) and not na(entryPriceSim) ? lotSizeSim * (exitPrice - entryPriceSim) * contractValue : 0.0
+    pyrPnl    = pyramidFiredSim and not na(pyrLotSizeSim) and not na(pyrEntryPriceSim) ? pyrLotSizeSim * (exitPrice - pyrEntryPriceSim) * contractValue : 0.0
+    strikerDayPnlSim := strikerDayPnlSim + basePnl + pyrPnl
+
+    // Latch halt if day P&L crossed the soft-stop threshold
+    if not strikerHaltedToday and strikerDayPnlSim <= accountSize * strikerDayStopPct / 100
+        strikerHaltedToday := true
+
+    inPosition        := false
+    entryPriceSim     := na
+    entryAtrSim       := na
+    tpPriceSim        := na
+    currentStopSim    := na
+    trailStopSim      := na
+    lotSizeSim        := na
+    pyrLotSizeSim     := na
+    pyrEntryPriceSim  := na
+    beTriggeredSim    := false
+    trailTightSim     := false
+    pyramidFiredSim   := false
+    barsSinceEntry    := 0
+    if showEntryLevels
+        line.delete(entryLine)
+        line.delete(slLine)
+        line.delete(tpLine)
+
+// --- PRIMARY ENTRY ---
+dailyCapOK       = tradesToday < maxTradesDay
+wasNotInPosition = not inPosition
+primaryEntry     = longSignalRaw and wasNotInPosition and dailyCapOK and not strikerHaltedToday
+
+if primaryEntry
+    slDist  = atrVal * stopAtr
+    slPrice = close - slDist
+    tpPrice = close + atrVal * tpAtr
+    lots    = calcLots(slDist)
+
+    inPosition      := true
+    entryPriceSim   := close
+    entryAtrSim     := atrVal
+    tpPriceSim      := tpPrice
+    currentStopSim  := slPrice
+    trailStopSim    := na
+    lotSizeSim      := lots
+    pyrLotSizeSim   := na
+    beTriggeredSim  := false
+    trailTightSim   := false
+    pyramidFiredSim := false
+    barsSinceEntry  := 0
+    tradesToday     := tradesToday + 1
+
+    // --- Entry/SL/TP lines ---
+    if showEntryLevels
+        line.delete(entryLine)
+        line.delete(slLine)
+        line.delete(tpLine)
+        entryLine := line.new(bar_index, close, bar_index + 1, close,
+             extend=extend.right, color=color.new(color.blue, 30), width=1, style=line.style_dashed)
+        slLine    := line.new(bar_index, slPrice, bar_index + 1, slPrice,
+             extend=extend.right, color=color.red, width=2, style=line.style_solid)
+        tpLine    := line.new(bar_index, tpPrice, bar_index + 1, tpPrice,
+             extend=extend.right, color=color.green, width=2, style=line.style_solid)
+
+    // --- Rich entry label (persistent, not var — all historical labels stay) ---
+    if showEntryLabel
+        entryInfo = "🟢 LONG\nLots: " + str.tostring(lots, "#.##") + "\nEntry: " + str.tostring(close, format.mintick) + "\nSL: " + str.tostring(slPrice, format.mintick) + "\nTP: " + str.tostring(tpPrice, format.mintick) + "\nRisk: " + str.tostring(riskPerTrade, "#.##") + "%"
+        label.new(bar_index, low, entryInfo,
+             style=label.style_label_up, color=color.new(color.green, 20),
+             textcolor=color.white, size=size.small)
+
+    // --- Rich entry alert (alert() fn — auto-fires on "Any alert() function call") ---
+    entryMsg = "🟢 STRIKER DJ30 LONG\n━━━━━━━━━━━━━━━━━━━━\n📍 ENTRY: " + str.tostring(close, format.mintick) + "\n📊 LOTS: " + str.tostring(lots, "#.##") + "\n🛑 SL: " + str.tostring(slPrice, format.mintick) + "\n🎯 TP: " + str.tostring(tpPrice, format.mintick) + "\n━━━━━━━━━━━━━━━━━━━━\nRisk: " + str.tostring(riskPerTrade, "#.##") + "% | ATR: " + str.tostring(atrVal, "#.#")
+    alert(entryMsg, alert.freq_once_per_bar_close)
+
+// --- POSITION MANAGEMENT ---
+pyramidSignal = false
+
+if inPosition and not primaryEntry
+    barsSinceEntry := barsSinceEntry + 1
+    profitAtrSim = entryAtrSim > 0 ? (close - entryPriceSim) / entryAtrSim : 0.0
+
+    // BE ratchet
+    wasBE = beTriggeredSim
+    if not beTriggeredSim and profitAtrSim >= beTriggerAtr
+        beStop = entryPriceSim + entryAtrSim * bePadAtr
+        currentStopSim := math.max(currentStopSim, beStop)
+        beTriggeredSim := true
+
+    // Trail tighten flag
+    wasTight = trailTightSim
+    if profitAtrSim >= trailTightenAt and not trailTightSim
+        trailTightSim := true
+
+    // Pyramid check
+    if not pyramidFiredSim and profitAtrSim >= pyramidTrigger and barsSinceEntry >= pyramidMinBars
+        pyramidSignal     := true
+        pyramidFiredSim   := true
+        // Match strategy: addSize = initialSize * (pyramidSize / 100).
+        // Must use saved lotSizeSim, NOT recalc at current ATR — otherwise
+        // the pyramid FIRE alert prescribes a different lot count than the
+        // v4.5 backtest whenever ATR has drifted over the 6+ bars since entry.
+        pyrLotSizeSim     := lotSizeSim * (pyramidSize / 100)
+        // Capture pyramid entry price so exit-time P&L can split base vs. add legs.
+        pyrEntryPriceSim  := close
+
+    // Trail update
+    if profitAtrSim >= trailTrigger
+        trailDist = trailTightSim ? trailDistTight : trailDistWide
+        newTrail  = close - entryAtrSim * trailDist
+        trailStopSim   := na(trailStopSim) ? newTrail : math.max(trailStopSim, newTrail)
+        currentStopSim := math.max(currentStopSim, trailStopSim)
+
+    // Update SL line to reflect current stop
+    if showEntryLevels and not na(slLine)
+        line.set_y1(slLine, currentStopSim)
+        line.set_y2(slLine, currentStopSim)
+        line.set_color(slLine, beTriggeredSim ? color.yellow : color.red)
+
+    // --- Pyramid label ---
+    if pyramidSignal and showEntryLabel
+        pyrInfo = "🔵 PYR ADD\nLots: +" + str.tostring(pyrLotSizeSim, "#.##") + "\n@ " + str.tostring(close, format.mintick) + "\nStop: " + str.tostring(currentStopSim, format.mintick) + "\nTP: " + str.tostring(tpPriceSim, format.mintick)
+        label.new(bar_index, low, pyrInfo,
+             style=label.style_label_up, color=color.new(color.aqua, 20),
+             textcolor=color.white, size=size.small)
+
+    // --- Pyramid alert ---
+    if pyramidSignal
+        pyrMsg = "🔵 STRIKER DJ30 PYRAMID ADD\n━━━━━━━━━━━━━━━━━━━━\n📍 ADD @ " + str.tostring(close, format.mintick) + "\n📊 LOTS: +" + str.tostring(pyrLotSizeSim, "#.##") + "\n🛑 STOP: " + str.tostring(currentStopSim, format.mintick) + "\n🎯 TP: " + str.tostring(tpPriceSim, format.mintick) + "\n━━━━━━━━━━━━━━━━━━━━\nProfit trigger (+" + str.tostring(profitAtrSim, "#.##") + " ATR)"
+        alert(pyrMsg, alert.freq_once_per_bar_close)
+
+    // --- BE activation alert (fires once, when crossing the trigger) ---
+    if beTriggeredSim and not wasBE
+        beMsg = "🟡 STRIKER DJ30 — BE ACTIVE\n━━━━━━━━━━━━━━━━━━━━\nMove stop to: " + str.tostring(currentStopSim, format.mintick) + "\nEntry was: " + str.tostring(entryPriceSim, format.mintick) + "\nPosition is now risk-free"
+        alert(beMsg, alert.freq_once_per_bar_close)
+
+    // --- Trail tightened alert (informational) ---
+    if trailTightSim and not wasTight
+        trailMsg = "🟠 STRIKER DJ30 — TRAIL TIGHTENED\n━━━━━━━━━━━━━━━━━━━━\nProfit: +" + str.tostring(profitAtrSim, "#.##") + " ATR\nTrail distance: " + str.tostring(trailDistTight, "#.##") + " ATR (was " + str.tostring(trailDistWide, "#.##") + ")"
+        alert(trailMsg, alert.freq_once_per_bar_close)
+
+// --- DERIVED SIGNALS FOR MARKERS ---
+longSignal       = primaryEntry
+blockedSignal    = longSignalRaw and wasNotInPosition and not dailyCapOK
+filteredBreakout = rawBreakout and not longSignalRaw and inDateRange
+approachZone     = filtersOK and belowRes and atrSafe and distAtr <= proximityAtr
+strictApproach   = filtersOK and belowRes and atrSafe and distAtr <= strictProximity
+strictFirstBar   = strictApproach and not strictApproach[1]
+approachFirstBar = approachZone and not approachZone[1]
+
+// --- EXIT ALERT ---
+if positionExit
+    exitReason = exitByTP ? "TP HIT" : exitByStop ? "STOP HIT" : "MAX HOLD"
+    exitIcon   = exitByTP ? "🎯" : exitByStop ? "🛑" : "⏱"
+    exitMsg = exitIcon + " STRIKER DJ30 — EXIT (" + exitReason + ")\n━━━━━━━━━━━━━━━━━━━━\nPrice: " + str.tostring(close, format.mintick)
+    alert(exitMsg, alert.freq_once_per_bar_close)
+
+// --- DAY-STOP HALT ALERT (fires once, when crossing the threshold) ---
+if strikerHaltedToday and not strikerHaltedToday[1]
+    haltMsg = "🛑 STRIKER DJ30 — DAY-STOP HIT\n━━━━━━━━━━━━━━━━━━━━\nRealized Day P&L: $" + str.tostring(strikerDayPnlSim, "#,###") + "\nThreshold: " + str.tostring(strikerDayStopPct, "#.#") + "% of $" + str.tostring(accountSize, "#,###") + "\nNo new Striker entries today."
+    alert(haltMsg, alert.freq_once_per_bar_close)
+
+// --- ANTICIPATION ALERTS (SETUP only — informational; NOT a trade signal) ---
+// Fires on first-bar entry into proximity zones. Both gated on filtersOK
+// (matches the visual approachZone / strictApproach plot logic), so an alert
+// only fires when the trade COULD actually trigger if price breaks out.
+//
+// Per Core Principle #3 (fxify-challenge): SETUP and PROXIMITY are
+// informational only. Wait for the FIRE entry alert before trading.
+//
+// Approximate levels assume near-immediate breakout at resistanceLvl.
+// Actual entry-bar values will differ slightly (the strategy locks them
+// on the close of the breakout bar, not now).
+if alertOnAnticipation and strictFirstBar
+    slDistAnt = atrVal * stopAtr
+    slApprox  = resistanceLvl - slDistAnt
+    tpApprox  = resistanceLvl + atrVal * tpAtr
+    lotsAnt   = calcLots(slDistAnt)
+    nearMsg   = "🟠 STRIKER DJ30 — NEAR (breakout imminent)\n━━━━━━━━━━━━━━━━━━━━\n⚠️ SETUP ONLY — not a trade signal\nWait for FIRE entry alert before entering.\n━━━━━━━━━━━━━━━━━━━━\n📍 Price: " + str.tostring(close, format.mintick) + "\n📏 Below Res: " + str.tostring(distAtr, "#.##") + " ATR\n🟢 Resistance: " + str.tostring(resistanceLvl, format.mintick) + "\n━━━━━━━━━━━━━━━━━━━━\nApprox levels if breakout fires:\n🛑 SL ~ " + str.tostring(slApprox, format.mintick) + "\n🎯 TP ~ " + str.tostring(tpApprox, format.mintick) + "\n📊 Lots ~ " + str.tostring(lotsAnt, "#.##") + "\nATR: " + str.tostring(atrVal, "#.#")
+    alert(nearMsg, alert.freq_once_per_bar_close)
+
+if alertOnAnticipation and approachFirstBar and not strictApproach
+    appMsg = "🟡 STRIKER DJ30 — APPROACH\n━━━━━━━━━━━━━━━━━━━━\n⚠️ SETUP ONLY — not a trade signal\nWatch for breakout. Wait for FIRE alert.\n━━━━━━━━━━━━━━━━━━━━\n📍 Price: " + str.tostring(close, format.mintick) + "\n📏 Below Res: " + str.tostring(distAtr, "#.##") + " ATR\n🟢 Resistance: " + str.tostring(resistanceLvl, format.mintick) + "\nATR: " + str.tostring(atrVal, "#.#")
+    alert(appMsg, alert.freq_once_per_bar_close)
+
+// ============================================================================
+// PLOTS
+// ============================================================================
+
+plot(showLevels ? highestHigh : na, "Resistance", color.new(color.green, 70), style=plot.style_stepline)
+plot(showLevels ? lowestLow   : na, "Support",    color.new(color.red,   70), style=plot.style_stepline)
+
+zoneTop       = showZone ? resistanceLvl : na
+zoneBottom    = showZone ? resistanceLvl - (atrVal * proximityAtr) : na
+tp_line       = plot(zoneTop,    "Zone Top",    color.new(color.yellow, 100), editable=false)
+bp_line       = plot(zoneBottom, "Zone Bottom", color.new(color.yellow, 100), editable=false)
+zoneFillColor = filtersOK ? color.new(color.yellow, 85) : color.new(color.gray, 92)
+fill(tp_line, bp_line, color=zoneFillColor, title="Approach Zone")
+
+plotshape(showApproach and approachZone and not strictApproach, "Approach",
+     shape.circle, location.belowbar, color.new(color.orange, 20), size=size.tiny)
+
+plotshape(showApproach and strictFirstBar, "Strict Approach (first)",
+     shape.circle, location.belowbar, color.orange, size=size.small,
+     text="NEAR", textcolor=color.orange)
+
+plotshape(showApproach and strictApproach and not strictFirstBar, "Strict Approach (sustained)",
+     shape.circle, location.belowbar, color.orange, size=size.small)
+
+plotshape(showFilteredBreak and filteredBreakout, "Filtered Breakout",
+     shape.diamond, location.belowbar, color.new(color.green, 75), size=size.tiny,
+     text="FILT", textcolor=color.new(color.gray, 30))
+
+plotshape(showBlocked and blockedSignal, "Blocked Signal",
+     shape.xcross, location.belowbar, color.new(color.blue, 40), size=size.small,
+     text="BLK", textcolor=color.new(color.blue, 30))
+
+// Pyramid marker — no text (label carries it)
+plotshape(pyramidSignal, "Pyramid Add",
+     shape.triangleup, location.belowbar, color.new(color.aqua, 10), size=size.small)
+
+// Long signal marker — no text (label carries it); avoids visual conflict with label
+plotshape(showSignals and longSignal, "Long Signal",
+     shape.diamond, location.belowbar, color.green, size=size.small)
+
+plotshape(showExits and exitByTP, "Exit (TP)",
+     shape.flag, location.abovebar, color.new(color.lime, 0), size=size.small,
+     text="TP", textcolor=color.white)
+
+plotshape(showExits and exitByStop, "Exit (Stop)",
+     shape.flag, location.abovebar, color.new(color.red, 0), size=size.small,
+     text="STOP", textcolor=color.white)
+
+plotshape(showExits and exitByMaxHold and not exitByTP and not exitByStop, "Exit (Max Hold)",
+     shape.flag, location.abovebar, color.new(color.purple, 0), size=size.small,
+     text="HOLD", textcolor=color.white)
+
+bgColorWarmup = color.new(color.yellow, 93)
+bgColorDow    = color.new(color.red,    95)
+bgColorOther  = color.new(color.orange, 95)
+bgColorFinal  = not warmupOK ? bgColorWarmup : not dowOK ? bgColorDow : bgColorOther
+bgcolor(showBgColor ? bgColorFinal : na, title="State")
+
+// ============================================================================
+// DASHBOARD
+// ============================================================================
+
+if showDashboard and barstate.islast
+    var table dash = table.new(position.top_right, 2, 17,
+         bgcolor=color.new(color.black, 85), border_width=1)
+
+    table.cell(dash, 0, 0, "STRIKER DJ30", text_color=color.white, bgcolor=color.orange, text_size=size.small)
+    table.cell(dash, 1, 0, "v4.5",         text_color=color.white, bgcolor=color.orange, text_size=size.small)
+
+    dayStr = currentDow == dayofweek.tuesday ? "TUE" : currentDow == dayofweek.friday ? "FRI" : "OFF"
+    dayLbl = dayStr + (dowOK ? " ✓" : " ✗")
+    table.cell(dash, 0, 1, "Day", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 1, dayLbl, text_color=dowOK ? color.green : color.red, text_size=size.tiny)
+
+    sessLbl = "13-17 UTC" + (sessionOK ? " ✓" : " ✗")
+    table.cell(dash, 0, 2, "Session", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 2, sessLbl, text_color=sessionOK ? color.green : color.red, text_size=size.tiny)
+
+    warmLbl = str.tostring(barsSinceSessionStart) + "/3" + (warmupOK ? " ✓" : " ✗")
+    table.cell(dash, 0, 3, "Warmup", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 3, warmLbl, text_color=warmupOK ? color.green : color.red, text_size=size.tiny)
+
+    expRatio = atrMa > 0 ? atrVal / atrMa - 1 : 0.0
+    expLbl   = str.tostring(expRatio * 100, "#.#") + "%" + (atrExpanding ? " ✓" : " ✗")
+    table.cell(dash, 0, 4, "ATR Exp", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 4, expLbl, text_color=atrExpanding ? color.green : color.gray, text_size=size.tiny)
+
+    bodyLbl = str.tostring(bodyRatio * 100, "#.#") + "%" + (bodyOK ? " ✓" : " ✗")
+    table.cell(dash, 0, 5, "Body", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 5, bodyLbl, text_color=bodyOK ? color.green : color.gray, text_size=size.tiny)
+
+    table.cell(dash, 0, 6, "Prev Bull", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 6, prevBarBullish ? "YES ✓" : "NO ✗", text_color=prevBarBullish ? color.green : color.red, text_size=size.tiny)
+
+    tradesLbl  = str.tostring(tradesToday) + "/" + str.tostring(maxTradesDay)
+    tradesClr  = dailyCapOK ? color.green : color.red
+    table.cell(dash, 0, 7, "Trades Today", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 7, tradesLbl, text_color=tradesClr, text_size=size.tiny)
+
+    posText  = inPosition ? (pyramidFiredSim ? "BASE+PYR" : "BASE") : "FLAT"
+    posColor = inPosition ? (pyramidFiredSim ? color.aqua : color.green) : color.gray
+    table.cell(dash, 0, 8, "Position", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 8, posText, text_color=posColor, text_size=size.tiny)
+
+    // Current lot exposure (if in position)
+    lotsText = inPosition and not na(lotSizeSim) ? str.tostring(lotSizeSim, "#.##") + (pyramidFiredSim and not na(pyrLotSizeSim) ? "+" + str.tostring(pyrLotSizeSim, "#.##") : "") : "—"
+    table.cell(dash, 0, 9, "Lots", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 9, lotsText, text_color=color.white, text_size=size.tiny)
+
+    // Current stop
+    slDashLbl = beTriggeredSim ? "BE Stop" : "Stop"
+    slDashClr = trailTightSim ? color.orange : beTriggeredSim ? color.yellow : color.red
+    slDashVal = inPosition and not na(currentStopSim) ? str.tostring(currentStopSim, format.mintick) : "—"
+    table.cell(dash, 0, 10, slDashLbl, text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 10, slDashVal, text_color=slDashClr, text_size=size.tiny)
+
+    // Current TP
+    tpDashVal = inPosition and not na(tpPriceSim) ? str.tostring(tpPriceSim, format.mintick) : "—"
+    table.cell(dash, 0, 11, "Take Profit", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 11, tpDashVal, text_color=color.green, text_size=size.tiny)
+
+    distText  = belowRes and atrSafe ? str.tostring(distAtr, "#.##") + " ATR" : "ABOVE"
+    distColor = strictApproach ? color.orange : approachZone ? color.yellow : not belowRes ? color.lime : color.gray
+    table.cell(dash, 0, 12, "Dist to Res", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 12, distText, text_color=distColor, text_size=size.tiny)
+
+    // Account/risk summary
+    table.cell(dash, 0, 13, "Account", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 13, "$" + str.tostring(accountSize, "#,###") + " @ " + str.tostring(riskPerTrade, "#.##") + "%", text_color=color.white, text_size=size.tiny)
+
+    // Day P&L (realized from closed trades only — drives the soft-stop)
+    dayPnlPrefix = strikerDayPnlSim >= 0 ? "+$" : "-$"
+    dayPnlLbl    = dayPnlPrefix + str.tostring(math.abs(strikerDayPnlSim), "#,###")
+    dayPnlCol    = strikerDayPnlSim >= 0 ? color.green : color.red
+    table.cell(dash, 0, 14, "Day P&L", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 14, dayPnlLbl, text_color=dayPnlCol, text_size=size.tiny)
+
+    // Day soft-stop guardrail status
+    dayStopLbl = strikerHaltedToday ? "⛔ HALTED" : "ACTIVE (" + str.tostring(strikerDayStopPct, "#.#") + "%)"
+    dayStopCol = strikerHaltedToday ? color.red : color.green
+    table.cell(dash, 0, 15, "Day Stop", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 15, dayStopLbl, text_color=dayStopCol, text_size=size.tiny)
+
+    stateText  = longSignal ? "PRIMARY ✓" : pyramidSignal ? "PYRAMID ✓" : blockedSignal ? "BLOCKED (cap)" : inPosition ? "IN POSITION (" + str.tostring(barsSinceEntry) + "b)" : strictApproach ? "STRICT" : approachZone ? "APPROACH" : filteredBreakout ? "FILT" : filtersOK ? "WAITING" : "FILTERED"
+    stateColor = longSignal ? color.lime : pyramidSignal ? color.aqua : blockedSignal ? color.blue : inPosition ? color.green : strictApproach ? color.orange : approachZone ? color.yellow : filteredBreakout ? color.orange : filtersOK ? color.aqua : color.gray
+    table.cell(dash, 0, 16, "State", text_color=color.gray, text_size=size.tiny)
+    table.cell(dash, 1, 16, stateText, text_color=stateColor, text_size=size.tiny)
+
+// ============================================================================
+// ALERT CONDITIONS (named fallback — use alert() fn for rich messages)
+// ============================================================================
+
+alertcondition(longSignal,       title="Striker v4.5 LONG Signal",      message="STRIKER: Long Entry")
+alertcondition(pyramidSignal,    title="Striker v4.5 PYRAMID Add",      message="STRIKER: Pyramid Add")
+alertcondition(strikerHaltedToday and not strikerHaltedToday[1], title="Striker v4.5 DAY-STOP HIT", message="STRIKER: Day-stop halt — no new entries today")
+alertcondition(exitByTP,         title="Striker v4.5 Exit (TP)",        message="STRIKER: Exit — TP")
+alertcondition(exitByStop,       title="Striker v4.5 Exit (Stop)",      message="STRIKER: Exit — Stop")
+alertcondition(exitByMaxHold and not exitByTP and not exitByStop, title="Striker v4.5 Exit (Max Hold)", message="STRIKER: Exit — Max Hold")
+alertcondition(strictApproach,   title="Striker v4.5 Strict Approach",  message="STRIKER: Breakout imminent")
+alertcondition(approachZone,     title="Striker v4.5 Approach",         message="STRIKER: Within proximity")
+alertcondition(filteredBreakout, title="Striker v4.5 Filtered Breakout", message="STRIKER: Raw breakout filtered")
+alertcondition(blockedSignal,    title="Striker v4.5 Blocked (cap)",    message="STRIKER: Signal blocked by daily cap")

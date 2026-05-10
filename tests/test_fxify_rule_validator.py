@@ -484,3 +484,109 @@ class TestProfitTarget:
         )
         assert passed is True
         assert kind == "completion"
+
+
+class TestMinTradingDays:
+    """validate_min_trading_days — FXIFY 3-Phase rule:
+    "Min Trading Days - 5 days (For each phase)"
+    https://fxify.com/faqs/all-faqs/what-are-the-rules-for-the-assessment-account/
+
+    Completion check: passed=True when trading_days_completed >= min.
+    """
+
+    # --- Boundary ---
+
+    def test_above_minimum_meets(self):
+        from fxify_rule_validator import validate_min_trading_days
+        passed, kind, reason = validate_min_trading_days(
+            trading_days_completed=10,
+            min_trading_days=5,
+        )
+        assert passed is True
+        assert kind == "completion"
+        assert "10" in reason
+        assert "5" in reason
+
+    def test_at_minimum_meets(self):
+        from fxify_rule_validator import validate_min_trading_days
+        passed, _, _ = validate_min_trading_days(
+            trading_days_completed=5,
+            min_trading_days=5,
+        )
+        assert passed is True
+
+    def test_one_below_minimum_does_not_meet(self):
+        from fxify_rule_validator import validate_min_trading_days
+        passed, _, _ = validate_min_trading_days(
+            trading_days_completed=4,
+            min_trading_days=5,
+        )
+        assert passed is False
+
+    def test_zero_days_does_not_meet(self):
+        from fxify_rule_validator import validate_min_trading_days
+        passed, _, _ = validate_min_trading_days(
+            trading_days_completed=0,
+            min_trading_days=5,
+        )
+        assert passed is False
+
+    # --- Reason content ---
+
+    def test_unmet_reason_names_count_and_min(self):
+        from fxify_rule_validator import validate_min_trading_days
+        _, _, reason = validate_min_trading_days(
+            trading_days_completed=3,
+            min_trading_days=5,
+        )
+        assert "3" in reason
+        assert "5" in reason
+
+    def test_met_reason_is_populated(self):
+        from fxify_rule_validator import validate_min_trading_days
+        _, _, reason = validate_min_trading_days(
+            trading_days_completed=7,
+            min_trading_days=5,
+        )
+        assert reason
+        assert "7" in reason
+
+    # --- Kind field ---
+
+    def test_kind_is_completion_when_met(self):
+        from fxify_rule_validator import validate_min_trading_days
+        _, kind, _ = validate_min_trading_days(
+            trading_days_completed=5,
+            min_trading_days=5,
+        )
+        assert kind == "completion"
+
+    def test_kind_is_completion_when_unmet(self):
+        from fxify_rule_validator import validate_min_trading_days
+        _, kind, _ = validate_min_trading_days(
+            trading_days_completed=2,
+            min_trading_days=5,
+        )
+        assert kind == "completion"
+
+    # --- Default override ---
+
+    def test_default_min_comes_from_firm_rules(self):
+        from fxify_rule_validator import validate_min_trading_days
+        passed, _, _ = validate_min_trading_days(trading_days_completed=5)
+        assert passed is True  # default min=5
+
+    # --- ValueError contract ---
+
+    def test_negative_days_raises(self):
+        from fxify_rule_validator import validate_min_trading_days
+        with pytest.raises(ValueError, match="trading_days_completed"):
+            validate_min_trading_days(trading_days_completed=-1)
+
+    def test_negative_min_raises(self):
+        from fxify_rule_validator import validate_min_trading_days
+        with pytest.raises(ValueError, match="min_trading_days"):
+            validate_min_trading_days(
+                trading_days_completed=5,
+                min_trading_days=-1,
+            )

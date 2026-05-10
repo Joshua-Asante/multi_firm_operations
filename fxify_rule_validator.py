@@ -153,3 +153,30 @@ def validate_profit_target(
         "completion",
         f"Profit target not met: equity ${equity:,.2f} < target ${target:,.2f}",
     )
+
+
+def validate_min_trading_days(
+    trading_days_completed: int,
+    min_trading_days: int = _FXIFY["min_trading_days"],
+) -> RuleResult:
+    """Min-trading-days completion check.
+
+    FXIFY 3-Phase: "Min Trading Days - 5 days (For each phase)".
+    Met inclusive (days_completed >= min).
+    """
+    if trading_days_completed < 0:
+        raise ValueError("trading_days_completed must be >= 0")
+    if min_trading_days < 0:
+        raise ValueError("min_trading_days must be >= 0")
+
+    if trading_days_completed >= min_trading_days:
+        return (
+            True,
+            "completion",
+            f"Min trading days met: {trading_days_completed} of {min_trading_days} required",
+        )
+    return (
+        False,
+        "completion",
+        f"Min trading days not met: {trading_days_completed} of {min_trading_days} required",
+    )

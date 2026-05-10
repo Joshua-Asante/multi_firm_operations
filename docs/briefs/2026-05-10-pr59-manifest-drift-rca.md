@@ -276,3 +276,13 @@ $ python scripts/check_data_manifests.py --check
 $ python scripts/check_data_manifests.py --regenerate --dry-run
 # Expected: no changes proposed unless on-disk has drifted from manifest
 ```
+
+---
+
+## Epilogue — Phase B close-out (2026-05-10)
+
+- **Phase B commit on `main`:** `51005fc` (rebased onto `7452e77` after `b22efab`; contains manifest gate + M-9 + ADR + RCA + CLAUDE/REPO_MAP updates). This epilogue landed in a subsequent docs-only commit on `main`.
+- **Format-CI smoke (draft PR):** https://github.com/Joshua-Asante/multi_firm_operations/pull/68 — closed without merge. Deliberate-break commit: `f1f5180`. **Format job** (non-zero): https://github.com/Joshua-Asante/multi_firm_operations/actions/runs/25639640550
+- **Primary clone — `pre-commit` install:** `-rwxr-xr-x 1 joshu 197609 397 May 10 17:02 /c/Users/joshu/multi_firm_operations/.git/hooks/pre-commit`
+- **GH #62 — §5 verification comment:** https://github.com/Joshua-Asante/multi_firm_operations/issues/62#issuecomment-4416341978
+- **Other active clones / worktrees:** single clone for hook install in this session; repeat `bash scripts/install_hooks.sh` elsewhere as needed.

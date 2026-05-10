@@ -1,3 +1,5 @@
+# BROKEN: imports mc_explore, removed in Q-MCFP-1 (2026-05-10).
+# Archive file; not re-runnable as-is.
 """MSEE H1 — Empirical community matrix via MC perturbation.
 
 Q-MSEE-1 from docs/methodology/msee/open_questions.md.

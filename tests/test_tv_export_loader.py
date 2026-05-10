@@ -38,6 +38,8 @@ PEPPERSTONE_DIR = Path(__file__).resolve().parent.parent / "data" / "tv_exports"
 )
 def test_pepperstone_loader(csv_name, strategy, version, symbol, n_trades, n_base, n_pyramid):
     path = PEPPERSTONE_DIR / csv_name
+    if not path.exists():
+        pytest.skip(f"{csv_name} not present (gitignored vendor data; see {PEPPERSTONE_DIR}/SHA256SUMS).")
     df = load_tv_export(
         path,
         expected_strategy=strategy,

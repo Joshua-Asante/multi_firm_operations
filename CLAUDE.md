@@ -96,6 +96,21 @@ To add a firm: define its rules in firm_rules.py as config. Everything downstrea
 * **Operational rules** (incl. doc/code skew audit trigger): [`docs/operational_rules.md`](docs/operational_rules.md).
 * **Strategy-research-phase methodology archive** (INQHIORI ⊕ The Algorithm framework, Pre-Q gates, Case B audits, MVD framing — all retired 2026-04-29; 90-day review gate 2026-07-29): [`archive/docs/methodology/archive/README.md`](archive/docs/methodology/archive/README.md).
 
+## Public-clone posture
+
+This repo is public; two classes of files are gitignored:
+
+* **Vendor-licensed CSVs** under `data/tv_exports/`, `data/bar_data/`,
+  `data/external/` (Pepperstone/OANDA TOS — personal export OK, redistribution
+  not). Per-directory `SHA256SUMS` manifests are tracked.
+* **Pine strategy source** (`**/*.pine`) — held privately to protect the live
+  edge. Per-file hashes pinned in [strategies/MANIFEST.sha256](strategies/MANIFEST.sha256).
+
+Tests that depend on vendor CSVs skip-if-missing. Locally Joshua has both sets,
+so the full 105-test suite passes; on a fresh public clone the data-dependent
+tests skip and the rest still run. The Python pipeline is reproducible end-to-end
+once a valid `data/tv_exports/pepperstone/` is dropped in.
+
 ## Key Principle
 
 The portfolio and strategies are LOCKED. This pipeline manages the *operational layer* — it never touches strategy parameters.

@@ -87,7 +87,9 @@ def reset_state():
 def calculate_protection(equity: float, peak: float) -> dict:
     """Determine active multiplier and scaled risk levels."""
     dd_from_peak = (peak - equity) / peak if equity < peak else 0.0
-    dd_triggered = dd_from_peak >= DD_TRIGGER
+    # ULP-precision rounding before threshold compare, see
+    # docs/adr/2026-05-10-dd-protection-ulp-rounding.md
+    dd_triggered = round(dd_from_peak, 6) >= DD_TRIGGER
 
     if dd_triggered:
         multiplier = DD_SCALE

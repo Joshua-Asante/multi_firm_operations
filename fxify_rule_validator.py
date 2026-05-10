@@ -83,3 +83,38 @@ def validate_max_drawdown(
         "limit",
         f"Max DD ok: equity ${equity:,.2f} > floor ${floor:,.2f}",
     )
+
+
+def validate_daily_loss(
+    current_equity: float,
+    prior_day_eod_balance: float,
+    daily_loss_pct: float = _FXIFY["daily_loss_pct"],
+) -> RuleResult:
+    """Daily-loss limit, basis = prior-day balance recorded at 5pm EST.
+
+    FXIFY 3-Phase: "Daily drawdown - 5% (Based on previous day balance)".
+    Breach inclusive at floor (equity <= floor).
+    """
+    if current_equity < 0:
+        raise ValueError("current_equity must be >= 0")
+    if prior_day_eod_balance <= 0:
+        raise ValueError("prior_day_eod_balance must be > 0")
+    if daily_loss_pct < 0:
+        raise ValueError("daily_loss_pct must be >= 0")
+
+    floor = round(prior_day_eod_balance * (1 - daily_loss_pct / 100), 2)
+    equity = round(current_equity, 2)
+    prior = round(prior_day_eod_balance, 2)
+
+    if equity <= floor:
+        return (
+            False,
+            "limit",
+            f"Daily loss breached: equity ${equity:,.2f} <= floor ${floor:,.2f} "
+            f"(rule: {daily_loss_pct}% of prior-day EOD ${prior:,.2f})",
+        )
+    return (
+        True,
+        "limit",
+        f"Daily loss ok: equity ${equity:,.2f} > floor ${floor:,.2f}",
+    )

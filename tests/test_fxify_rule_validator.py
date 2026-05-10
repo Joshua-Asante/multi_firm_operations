@@ -188,3 +188,144 @@ class TestMaxDrawdown:
         )
         assert passed is False  # inclusive interpretation
         assert kind == "limit"
+
+
+class TestDailyLoss:
+    """validate_daily_loss — FXIFY 3-Phase rule:
+    "Daily drawdown - 5% (Based on previous day balance)"
+    https://fxify.com/faqs/all-faqs/what-are-the-rules-for-the-assessment-account/
+
+    "Daily Loss Limit is calculated based on the balance at the end of
+    the previous day, the balance recorded at 5PM EST time."
+    https://fxify.com/faqs/all-faqs/how-do-you-calculate-the-daily-loss-limit/
+    """
+
+    # --- Rulebook-anchored worked example (spec §7g) ---
+
+    def test_fxify_3phase_faq_example_100k_to_95k(self):
+        # Verbatim FXIFY 3-Phase FAQ:
+        # "On a Three phase account, if your prior day's end of day
+        #  balance was $100,000 you would breach the Daily Loss Limit
+        #  of 5% should your equity the next day fall to $95,000."
+        # Source: how-do-you-calculate-the-daily-loss-limit/
+        from fxify_rule_validator import validate_daily_loss
+        passed, kind, reason = validate_daily_loss(
+            current_equity=95_000.00,
+            prior_day_eod_balance=100_000.00,
+            daily_loss_pct=5.0,
+        )
+        assert passed is False
+        assert kind == "limit"
+        assert "95,000.00" in reason
+
+    # --- Boundary ---
+
+    def test_equity_above_floor_passes(self):
+        from fxify_rule_validator import validate_daily_loss
+        passed, _, _ = validate_daily_loss(
+            current_equity=96_000.00,
+            prior_day_eod_balance=100_000.00,
+            daily_loss_pct=5.0,
+        )
+        assert passed is True
+
+    def test_one_cent_below_floor_breaches(self):
+        from fxify_rule_validator import validate_daily_loss
+        passed, _, _ = validate_daily_loss(
+            current_equity=94_999.99,
+            prior_day_eod_balance=100_000.00,
+            daily_loss_pct=5.0,
+        )
+        assert passed is False
+
+    def test_one_cent_above_floor_passes(self):
+        from fxify_rule_validator import validate_daily_loss
+        passed, _, _ = validate_daily_loss(
+            current_equity=95_000.01,
+            prior_day_eod_balance=100_000.00,
+            daily_loss_pct=5.0,
+        )
+        assert passed is True
+
+    # --- FP-boundary defense ---
+
+    def test_at_exact_floor_breaches_despite_float_imprecision(self):
+        from fxify_rule_validator import validate_daily_loss
+        passed, _, reason = validate_daily_loss(
+            current_equity=95_000.00,
+            prior_day_eod_balance=100_000.00,
+            daily_loss_pct=5.0,
+        )
+        assert passed is False
+        assert "95,000.00" in reason
+
+    # --- Reason content ---
+
+    def test_breach_reason_names_floor_equity_and_pct(self):
+        from fxify_rule_validator import validate_daily_loss
+        _, _, reason = validate_daily_loss(
+            current_equity=90_000.00,
+            prior_day_eod_balance=100_000.00,
+            daily_loss_pct=5.0,
+        )
+        assert "90,000.00" in reason
+        assert "95,000.00" in reason
+        assert "5" in reason
+
+    def test_pass_reason_is_populated(self):
+        from fxify_rule_validator import validate_daily_loss
+        _, _, reason = validate_daily_loss(
+            current_equity=99_500.00,
+            prior_day_eod_balance=100_000.00,
+            daily_loss_pct=5.0,
+        )
+        assert reason
+        assert "99,500.00" in reason
+
+    # --- Default override ---
+
+    def test_default_pct_comes_from_firm_rules(self):
+        from fxify_rule_validator import validate_daily_loss
+        passed, _, _ = validate_daily_loss(
+            current_equity=95_000.00,
+            prior_day_eod_balance=100_000.00,
+        )
+        assert passed is False  # 5% default
+
+    # --- ValueError contract ---
+
+    def test_negative_equity_raises(self):
+        from fxify_rule_validator import validate_daily_loss
+        with pytest.raises(ValueError, match="current_equity"):
+            validate_daily_loss(
+                current_equity=-1.0,
+                prior_day_eod_balance=100_000.00,
+            )
+
+    def test_zero_prior_day_balance_raises(self):
+        from fxify_rule_validator import validate_daily_loss
+        with pytest.raises(ValueError, match="prior_day_eod_balance"):
+            validate_daily_loss(
+                current_equity=100.0,
+                prior_day_eod_balance=0.0,
+            )
+
+    def test_negative_pct_raises(self):
+        from fxify_rule_validator import validate_daily_loss
+        with pytest.raises(ValueError, match="daily_loss_pct"):
+            validate_daily_loss(
+                current_equity=100.0,
+                prior_day_eod_balance=100_000.00,
+                daily_loss_pct=-1.0,
+            )
+
+    # --- Type contract ---
+
+    def test_all_int_inputs_accepted(self):
+        from fxify_rule_validator import validate_daily_loss
+        passed, _, _ = validate_daily_loss(
+            current_equity=95_000,
+            prior_day_eod_balance=100_000,
+            daily_loss_pct=5,
+        )
+        assert passed is False

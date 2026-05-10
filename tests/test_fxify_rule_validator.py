@@ -590,3 +590,186 @@ class TestMinTradingDays:
                 trading_days_completed=5,
                 min_trading_days=-1,
             )
+
+
+from datetime import datetime, timedelta
+
+
+class TestInactivity:
+    """validate_inactivity — FXIFY all-accounts rule:
+    "Must place a trade once in 60 days to avoid inactivity. If not,
+    this would be considered a hard breach."
+    https://fxify.com/faqs/all-faqs/what-are-the-rules-for-the-assessment-account/
+
+    Limit check: passed=True when (now - last_trade_at).days < max_idle_days.
+    Calendar days (timedelta.days truncates).
+    """
+
+    # --- Boundary ---
+
+    def test_recent_trade_passes(self):
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        last = now - timedelta(days=10)
+        passed, kind, reason = validate_inactivity(
+            last_trade_at=last,
+            now=now,
+            max_idle_days=60,
+        )
+        assert passed is True
+        assert kind == "limit"
+        assert "10" in reason
+        assert "60" in reason
+
+    def test_at_max_idle_days_breaches(self):
+        # Inclusive at day boundary per spec §5a.
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        last = now - timedelta(days=60)
+        passed, _, _ = validate_inactivity(
+            last_trade_at=last,
+            now=now,
+            max_idle_days=60,
+        )
+        assert passed is False
+
+    def test_one_day_below_max_passes(self):
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        last = now - timedelta(days=59)
+        passed, _, _ = validate_inactivity(
+            last_trade_at=last,
+            now=now,
+            max_idle_days=60,
+        )
+        assert passed is True
+
+    def test_one_day_above_max_breaches(self):
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        last = now - timedelta(days=61)
+        passed, _, _ = validate_inactivity(
+            last_trade_at=last,
+            now=now,
+            max_idle_days=60,
+        )
+        assert passed is False
+
+    # --- Sub-day timedelta truncates to .days ---
+
+    def test_60_days_minus_one_hour_does_not_breach(self):
+        # 59 days 23 hours -> .days == 59 -> not yet breach
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        last = now - timedelta(days=60) + timedelta(hours=1)
+        passed, _, _ = validate_inactivity(
+            last_trade_at=last,
+            now=now,
+            max_idle_days=60,
+        )
+        assert passed is True
+
+    # --- Reason content ---
+
+    def test_breach_reason_names_idle_count_and_max(self):
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        last = now - timedelta(days=67)
+        _, _, reason = validate_inactivity(
+            last_trade_at=last,
+            now=now,
+            max_idle_days=60,
+        )
+        assert "67" in reason
+        assert "60" in reason
+
+    def test_pass_reason_is_populated(self):
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        last = now - timedelta(days=3)
+        _, _, reason = validate_inactivity(
+            last_trade_at=last,
+            now=now,
+            max_idle_days=60,
+        )
+        assert reason
+        assert "3" in reason
+
+    # --- Kind field ---
+
+    def test_kind_is_limit_when_passing(self):
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        _, kind, _ = validate_inactivity(
+            last_trade_at=now - timedelta(days=1),
+            now=now,
+        )
+        assert kind == "limit"
+
+    def test_kind_is_limit_when_breaching(self):
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        _, kind, _ = validate_inactivity(
+            last_trade_at=now - timedelta(days=70),
+            now=now,
+        )
+        assert kind == "limit"
+
+    # --- Default override ---
+
+    def test_default_max_comes_from_firm_rules(self):
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        last = now - timedelta(days=60)
+        passed, _, _ = validate_inactivity(last_trade_at=last, now=now)
+        assert passed is False  # default 60-day inclusive
+
+    # --- Clock-skew tolerance (spec §6a): up to 5 min future-stamp ok,
+    #     beyond raises. DXTrade fill timestamps vs local now() routinely
+    #     skew sub-second to seconds; raising on microsecond skew is a
+    #     constant false positive. ---
+
+    def test_future_last_trade_within_skew_tolerance_passes(self):
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        near_future = now + timedelta(minutes=4, seconds=59)
+        passed, kind, _ = validate_inactivity(
+            last_trade_at=near_future,
+            now=now,
+            max_idle_days=60,
+        )
+        # Within tolerance: clamped to fresh, passes.
+        assert passed is True
+        assert kind == "limit"
+
+    def test_future_last_trade_at_exact_5min_boundary_passes(self):
+        # Inclusive at boundary: 5 min 0 sec exactly -> tolerated.
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        at_boundary = now + timedelta(minutes=5)
+        passed, _, _ = validate_inactivity(
+            last_trade_at=at_boundary,
+            now=now,
+            max_idle_days=60,
+        )
+        assert passed is True
+
+    def test_future_last_trade_beyond_skew_tolerance_raises(self):
+        # 5 min 1 sec -> beyond tolerance -> raise.
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        far_future = now + timedelta(minutes=5, seconds=1)
+        with pytest.raises(ValueError, match="last_trade_at"):
+            validate_inactivity(last_trade_at=far_future, now=now)
+
+    # --- ValueError contract (other) ---
+
+    def test_negative_max_idle_days_raises(self):
+        from fxify_rule_validator import validate_inactivity
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        with pytest.raises(ValueError, match="max_idle_days"):
+            validate_inactivity(
+                last_trade_at=now,
+                now=now,
+                max_idle_days=-1,
+            )

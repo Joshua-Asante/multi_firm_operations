@@ -49,6 +49,12 @@ _FXIFY = FIRM_RULES["FXIFY"]
 RuleKind = Literal["limit", "completion"]
 RuleResult = tuple[bool, RuleKind, str]
 
+# Clock-skew tolerance for validate_inactivity. DXTrade fill timestamps
+# vs local now() routinely differ by sub-second to seconds; raising on
+# microsecond skew would be a constant false positive. Sub-5-min future
+# stamps are silently clamped to "fresh"; beyond 5 min raises. Spec §6a.
+_CLOCK_SKEW_TOLERANCE_SECONDS = 300
+
 
 def validate_max_drawdown(
     current_equity: float,
@@ -179,4 +185,50 @@ def validate_min_trading_days(
         False,
         "completion",
         f"Min trading days not met: {trading_days_completed} of {min_trading_days} required",
+    )
+
+
+def validate_inactivity(
+    last_trade_at: datetime,
+    now: datetime,
+    max_idle_days: int = _FXIFY["inactivity_max_idle_days"],
+) -> RuleResult:
+    """Inactivity hard-breach check.
+
+    FXIFY all-accounts: "Must place a trade once in 60 days to avoid
+    inactivity. If not, this would be considered a hard breach."
+    Calendar days; breach inclusive at day boundary
+    ((now - last_trade_at).days >= max_idle_days).
+
+    Clock-skew tolerance: last_trade_at up to 5 min after now is
+    silently clamped to now (treated as fresh). Beyond 5 min raises
+    ValueError. See spec §6a.
+    """
+    if max_idle_days < 0:
+        raise ValueError("max_idle_days must be >= 0")
+
+    if last_trade_at > now:
+        skew_seconds = (last_trade_at - now).total_seconds()
+        if skew_seconds > _CLOCK_SKEW_TOLERANCE_SECONDS:
+            raise ValueError(
+                "last_trade_at is more than 5 minutes in the future "
+                "(clock skew tolerance exceeded)"
+            )
+        # Within tolerance: clamp to now -> idle_days = 0.
+        last_trade_at = now
+
+    idle_days = (now - last_trade_at).days
+
+    if idle_days >= max_idle_days:
+        return (
+            False,
+            "limit",
+            f"Inactivity hard breach: {idle_days} days since last trade "
+            f"(max {max_idle_days})",
+        )
+    return (
+        True,
+        "limit",
+        f"Inactivity ok: {idle_days} days since last trade "
+        f"(max {max_idle_days})",
     )

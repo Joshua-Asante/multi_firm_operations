@@ -11,6 +11,7 @@ FIRM_RULES = {
         "min_trading_days": 5,
         "news_trading": True,
         "weekend_holds": True,
+        "inactivity_max_idle_days": 60,
     },
     # Define when onboarding:
     # "FundedNext": { ... },

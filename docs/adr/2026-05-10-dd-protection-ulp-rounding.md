@@ -1,9 +1,11 @@
 # ADR: dd_protection ULP-precision rounding at the trigger comparison
 
 **Date:** 2026-05-10
-**Status:** Proposed
-**Scope:** `dd_protection.py` (line 90), new `tests/test_dd_protection.py`
+**Status:** Accepted (with documented downstream cascade)
+**Scope:** `dd_protection.py` (line 92), new `tests/test_dd_protection.py`
 **Bound to:** [2026-05-08-dd-trigger-c2-relock](2026-05-08-dd-trigger-c2-relock.md) — precision-correctness companion. The C2 lock binds the `0.015 / 0.40×` threshold; this ADR binds how that threshold is compared.
+
+**Ratification note (2026-05-10):** Accepted on the strength of the asymmetric-error-costs reading (account-loss-class miss-fire vs opportunity-cost early-fire). The empirical 47.4% pre-fix miss rate **inverts the brief's framing** — the C2 calibration substrate (anchor 98.09 / 0.36 / 4.73, 2026-05-08 relock) is now known to have systematically under-fired the risk control. Direction of MC drift is asymmetric: post-fix bust rate likely *higher*, pass rate likely *lower*. Issue [#55](https://github.com/Joshua-Asante/multi_firm_operations/issues/55) is **P0** and is the falsifier on whether the C2 lock itself survives. The 0.5pp tolerance from the original brief is provisional; the MC re-run spawn brief reframes it explicitly. The 2026-05-08 bust attribution (striker 44.4 / aegis 24.1 / G 21.3 / NAS 10.2) was computed on the buggy comparison; if the attribution shape changes post-fix, the relock decision itself is up for review (separate ADR if drift confirms).
 
 ## Context
 

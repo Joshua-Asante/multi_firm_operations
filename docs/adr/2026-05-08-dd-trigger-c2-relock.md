@@ -91,3 +91,12 @@ Per the OVERRIDE section in [docs/briefs/Q-DDP-1/recommendation.md](../briefs/Q-
 - Code: `dd_protection.py` (`DD_TRIGGER = 0.015`, `DD_SCALE = 0.40`); `tests/test_mc_anchors.py` (Pepperstone 0.9809/0.0036/0.0473, OANDA 0.9623/0.0069/0.0491); `tests/test_mvd_selfchecks.py` (duplicated pin)
 - MC harness: `portfolio_mc.py` (no source change; constants imported from `dd_protection`)
 - Forward-trigger instrumentation: `analysis/time_to_pass.py` (`--regime-check` mode added 2026-05-08)
+
+---
+
+## Addendum — 2026-05-10
+
+- `mc_explore.py` deleted in Q-MCFP-1 (PR #63, merge 54d22858 on main).
+- C2 anchor 98.09 / 0.36 / 4.73 empirically reconfirmed post-precision-fix
+  (Run A identical to baseline at abs=1e-4).
+- Reference: [docs/briefs/Q-MCFP-1/closure.md](https://github.com/Joshua-Asante/multi_firm_operations/blob/main/docs/briefs/Q-MCFP-1/closure.md)

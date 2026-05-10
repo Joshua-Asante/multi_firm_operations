@@ -25,7 +25,6 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] firm_rules.py
 [A] dd_protection.py — LOCKED single-tier 1.5% / 0.40× (C2 relock 2026-05-08)
 [A] portfolio_mc.py — canonical lock-decision MC
-[A] mc_explore.py — exploratory; explicitly NOT for locks
 
 ## Library
 [A] lib/mvd.py
@@ -122,3 +121,6 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] .github/workflows/tests.yml
 [A] .github/workflows/manifest-check.yml — SHA256SUMS format + no tracked vendor CSVs (not byte validation)
 [A] .gitignore
+
+## Removed files
+mc_explore.py — removed Q-MCFP-1 (2026-05-10), see docs/briefs/Q-MCFP-1/closure.md

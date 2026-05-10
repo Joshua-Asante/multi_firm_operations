@@ -19,7 +19,6 @@ multi_firm_operations/
 ├── firm_rules.py                                     # _BASE_RISK + per-firm meta (FXIFY only canonical)
 ├── dd_protection.py                                  # portfolio DD scaler — Q-DDP-1 LOCKED 2026-05-06
 ├── portfolio_mc.py                                   # canonical lock-decision MC (Pepperstone default)
-├── mc_explore.py                                     # exploratory; explicitly NOT for locks
 ├── CLAUDE.md                                         # canonical project doc
 ├── README.md, CHANGELOG.md, REPO_MAP.md              # root meta
 ├── pyproject.toml                                    # flat py-modules layout (no package namespace)
@@ -102,6 +101,9 @@ multi_firm_operations/
 ```
 
 Conventions: REPO_MAP.md classifies every active path as `[A]` active / `[U]` utility / `[X]` archived / `[?]` open question. The five `[?]` items above are the live disposition queue (see §6).
+
+**Removed files:**
+- `mc_explore.py` — removed Q-MCFP-1 (2026-05-10), see [docs/briefs/Q-MCFP-1/closure.md](../briefs/Q-MCFP-1/closure.md)
 
 ---
 

@@ -64,6 +64,8 @@ class Account:
     """ISO 8601 timestamp of last trade (for inactivity)."""
     trading_days_count: int = 0
     """Completed trading days toward FXIFY min-trading-days completion."""
+    phase_completed_at: Optional[str] = None
+    """ISO 8601 UTC: first time FXIFY validators reported phase_complete (audit trail)."""
 
     @property
     def dd_remaining_pct(self) -> float:
@@ -85,8 +87,6 @@ class Account:
             st = evaluate_fxify_challenge_status(self)
             if st.limit_breached:
                 flags.append("ACCOUNT FAILED")
-            elif 0 < self.dd_remaining_pct < 1.5:
-                flags.append("DD WARNING")
             profit_met = st.completion_results[0][0] if st.completion_results else False
             min_days_met = st.completion_results[1][0] if len(st.completion_results) > 1 else False
             if profit_met and min_days_met and self.profit_target_pct > 0:
@@ -118,6 +118,8 @@ class Account:
             d["last_trade_at"] = self.last_trade_at
         if self.trading_days_count:
             d["trading_days_count"] = self.trading_days_count
+        if self.phase_completed_at is not None:
+            d["phase_completed_at"] = self.phase_completed_at
         return d
 
     @classmethod
@@ -133,6 +135,7 @@ class Account:
             prior_eod_equity=float(d["prior_eod_equity"]) if d.get("prior_eod_equity") is not None else None,
             last_trade_at=d.get("last_trade_at"),
             trading_days_count=int(d.get("trading_days_count", 0)),
+            phase_completed_at=d.get("phase_completed_at"),
         )
 
 
@@ -300,10 +303,6 @@ def add_account(account_id: str, firm: str, initial_balance: float,
     firm_upper = firm.upper()
     rules = FIRM_RULES.get(firm_upper, {})
 
-    prior_eod: Optional[float] = None
-    if firm_upper == "FXIFY":
-        prior_eod = initial_balance
-
     account = Account(
         account_id=account_id,
         firm=firm_upper,
@@ -312,7 +311,6 @@ def add_account(account_id: str, firm: str, initial_balance: float,
         initial_balance=initial_balance,
         dd_limit_pct=dd_limit_pct if dd_limit_pct is not None else rules.get("max_dd_pct", 5.0),
         profit_target_pct=profit_target_pct if profit_target_pct is not None else rules.get("profit_target_pct", 5.0),
-        prior_eod_equity=prior_eod,
     )
     accounts.append(account)
     save_accounts(accounts)
@@ -341,6 +339,12 @@ def update_balance(
                 st = evaluate_fxify_challenge_status(a)
                 if st.limit_breached and a.phase != "failed":
                     a.phase = "failed"
+                elif (
+                    st.phase_complete
+                    and a.phase_completed_at is None
+                    and a.phase != "failed"
+                ):
+                    a.phase_completed_at = datetime.now(timezone.utc).isoformat()
             else:
                 if a.dd_remaining_pct <= 0 and a.phase != "failed":
                     a.phase = "failed"

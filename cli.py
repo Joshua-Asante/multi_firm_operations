@@ -93,8 +93,9 @@ def cmd_update(args):
             fxify_updates=fx if fx else None,
         )
         print(f"Updated: {account.account_id} -> ${account.balance:,.2f}")
-        print(f"  DD remaining: {account.dd_remaining_pct:.2f}%")
-        print(f"  Target remaining: ${account.target_remaining:,.2f}")
+        if account.firm != "FXIFY":
+            print(f"  DD remaining: {account.dd_remaining_pct:.2f}%")
+            print(f"  Target remaining: ${account.target_remaining:,.2f}")
         if account.firm == "FXIFY":
             st = evaluate_fxify_challenge_status(account)
             print("  FXIFY validators:")
@@ -124,9 +125,15 @@ def cmd_status(args):
     for a in accounts:
         flags = ", ".join(a.flags) if a.flags else ""
         fx = fxify_status_summary(a)
+        if a.firm == "FXIFY":
+            dd_str = "    —"
+            tgt_str = "         —"
+        else:
+            dd_str = f"{a.dd_remaining_pct:>6.2f}%"
+            tgt_str = f"${a.target_remaining:>10,.2f}"
         print(
             f"{a.account_id:<20} {a.firm:<10} {a.phase:<10} ${a.balance:>10,.2f} "
-            f"{a.dd_remaining_pct:>6.2f}% ${a.target_remaining:>10,.2f} {fx:>8} {flags}"
+            f"{dd_str:>8} {tgt_str:>12} {fx:>8} {flags}"
         )
 
 
@@ -142,6 +149,8 @@ def cmd_challenge(args):
     for a in fxify:
         st = evaluate_fxify_challenge_status(a)
         print(f"{a.account_id}  phase={a.phase}  balance=${a.balance:,.2f}")
+        if a.phase_completed_at:
+            print(f"  phase_completed_at: {a.phase_completed_at}")
         print("  Limits:")
         for passed, _kind, reason in st.limit_results:
             tag = "ok" if passed else "FAIL"

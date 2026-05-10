@@ -15,9 +15,9 @@ def isolated_accounts_json(tmp_path, monkeypatch):
     return path
 
 
-def test_add_fxify_sets_prior_eod_to_initial(isolated_accounts_json):
+def test_add_fxify_prior_eod_unset(isolated_accounts_json):
     a = accounts.add_account("FXIFY-TEST-1", "FXIFY", 200_000.0)
-    assert a.prior_eod_equity == 200_000.0
+    assert a.prior_eod_equity is None
 
 
 def test_evaluate_fxify_non_fxify_raises(isolated_accounts_json):
@@ -43,12 +43,15 @@ def test_fxify_status_summary_partial_without_last_trade(isolated_accounts_json)
     assert accounts.fxify_status_summary(a) == "partial"
 
 
-def test_fxify_status_summary_ok_with_last_trade(isolated_accounts_json):
+def test_fxify_status_summary_ok_with_full_context(isolated_accounts_json):
     accounts.add_account("FX-OK", "FXIFY", 200_000.0)
     accounts.update_balance(
         "FX-OK",
         200_000.0,
-        fxify_updates={"last_trade_at": datetime.now(timezone.utc).isoformat()},
+        fxify_updates={
+            "last_trade_at": datetime.now(timezone.utc).isoformat(),
+            "prior_eod_equity": 200_000.0,
+        },
     )
     a = accounts.get_account("FX-OK")
     assert accounts.fxify_status_summary(a) == "ok"
@@ -56,8 +59,6 @@ def test_fxify_status_summary_ok_with_last_trade(isolated_accounts_json):
 
 def test_daily_loss_breach(isolated_accounts_json):
     accounts.add_account("FX-DAILY", "FXIFY", 200_000.0)
-    a = accounts.get_account("FX-DAILY")
-    # Prior EOD 200k, daily loss 5% -> floor 190k
     accounts.update_balance(
         "FX-DAILY",
         189_999.99,
@@ -81,7 +82,7 @@ def test_last_trade_at_inactivity(isolated_accounts_json):
     assert a.phase == "failed"
 
 
-def test_phase_complete_flag(isolated_accounts_json):
+def test_phase_complete_flag_and_timestamp(isolated_accounts_json):
     accounts.add_account("FX-DONE", "FXIFY", 200_000.0)
     target = 200_000.0 * 1.05  # 5% profit target
     accounts.update_balance(
@@ -96,3 +97,42 @@ def test_phase_complete_flag(isolated_accounts_json):
     st = accounts.evaluate_fxify_challenge_status(a)
     assert st.phase_complete
     assert "PHASE COMPLETE" in a.flags
+    assert a.phase_completed_at is not None
+    assert "T" in a.phase_completed_at  # ISO 8601
+
+
+def test_phase_completed_at_set_once(isolated_accounts_json):
+    accounts.add_account("FX-DONE2", "FXIFY", 200_000.0)
+    target = 200_000.0 * 1.05
+    accounts.update_balance(
+        "FX-DONE2",
+        target,
+        fxify_updates={
+            "prior_eod_equity": 200_000.0,
+            "trading_days_count": 5,
+        },
+    )
+    first = accounts.get_account("FX-DONE2").phase_completed_at
+    accounts.update_balance(
+        "FX-DONE2",
+        target,
+        fxify_updates={"prior_eod_equity": 200_000.0},
+    )
+    second = accounts.get_account("FX-DONE2").phase_completed_at
+    assert first == second
+
+
+def test_fxify_flags_no_simplified_dd_warning(isolated_accounts_json):
+    """DD WARNING must not come from dd_remaining_pct on FXIFY rows."""
+    accounts.add_account("FX-WARN", "FXIFY", 200_000.0)
+    # Simplified dd_remaining_pct ~0.5% (would have fired old DD WARNING) but max-DD validator still ok.
+    accounts.update_balance(
+        "FX-WARN",
+        191_000.0,
+        fxify_updates={
+            "prior_eod_equity": 200_000.0,
+            "last_trade_at": datetime.now(timezone.utc).isoformat(),
+        },
+    )
+    a = accounts.get_account("FX-WARN")
+    assert "DD WARNING" not in a.flags

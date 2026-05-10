@@ -62,10 +62,10 @@ The post-fix worst case is bounded and recoverable. The pre-fix worst case is un
 
 ## Consequences
 
-- **Historical `dd_protection_state.json`** may contain logged events where the fire-or-not decision could flip under the rounded comparison. Re-evaluation is deferred — see follow-up issue [#3](#follow-up-issues-deferred).
-- **C2 calibration anchor stability.** `portfolio_mc.py` shares the same comparison logic. Post-fix MC re-run is required to confirm the 98.09% / 0.36% / 4.73% anchor survives. Out of scope this PR; see follow-up issue [#2](#follow-up-issues-deferred). Tolerance: 0.5 pp on pass-rate; if drift exceeds, C2 lock is up for re-evaluation in a separate ADR.
-- **MVD self-check epsilon (`1e-4`) unchanged.** Whether to tighten it post-fix is a separate methodology question — see follow-up issue [#4](#follow-up-issues-deferred).
-- **Other risk-control comparison sites** (`accounts.py`, etc.) may carry the same defect pattern. Audit deferred — see follow-up issue [#1](#follow-up-issues-deferred).
+- **Historical `dd_protection_state.json`** may contain logged events where the fire-or-not decision could flip under the rounded comparison. Re-evaluation is deferred — see follow-up issue [#56](https://github.com/Joshua-Asante/multi_firm_operations/issues/56).
+- **C2 calibration anchor stability.** `portfolio_mc.py` shares the same comparison logic. Post-fix MC re-run is required to confirm the 98.09% / 0.36% / 4.73% anchor survives. Out of scope this PR; see follow-up issue [#55](https://github.com/Joshua-Asante/multi_firm_operations/issues/55). Tolerance: 0.5 pp on pass-rate; if drift exceeds, C2 lock is up for re-evaluation in a separate ADR.
+- **MVD self-check epsilon (`1e-4`) unchanged.** Whether to tighten it post-fix is a separate methodology question — see follow-up issue [#57](https://github.com/Joshua-Asante/multi_firm_operations/issues/57).
+- **Other risk-control comparison sites** (`accounts.py`, etc.) may carry the same defect pattern. Audit deferred — see follow-up issue [#54](https://github.com/Joshua-Asante/multi_firm_operations/issues/54).
 - **Reverts:** none. ULP noise is non-deterministic; no specific historical event needs re-running before merge.
 
 ### Falsifier capture (paste of §4 protocol output)
@@ -82,12 +82,12 @@ Construction: 1000 (peak, equity) pairs across three arithmetic paths (multiplic
 
 ### Follow-up issues (deferred)
 
-Filed via `gh issue` after PR open. Cross-referenced here once issue numbers are assigned:
+Filed via `gh issue create` 2026-05-10. Cross-referenced inline:
 
-1. **`accounts.py` ULP-precision audit** — sweep other risk-control comparison sites; disposition Pre-Q if ≥ 3 instances.
-2. **Post-fix MC re-run** — verify C2 anchor (98.09% / 0.36% / 4.73%) stability; tolerance 0.5 pp on pass-rate.
-3. **Historical `dd_protection_state.json` re-evaluation** — flag any fire-or-not flips under rounded comparison.
-4. **MVD self-check epsilon tightening** — post-fix the boundary check is precision-stable; should `1e-4` be tightened?
+1. [**#54**](https://github.com/Joshua-Asante/multi_firm_operations/issues/54) — `accounts.py` ULP-precision audit. Sweep other risk-control comparison sites; disposition Pre-Q if ≥ 3 instances.
+2. [**#55**](https://github.com/Joshua-Asante/multi_firm_operations/issues/55) — Post-fix MC re-run. Verify C2 anchor (98.09% / 0.36% / 4.73%) stability; tolerance 0.5 pp on pass-rate. **The load-bearing falsifier on this ADR's "the calibration anchor survives" claim.**
+3. [**#56**](https://github.com/Joshua-Asante/multi_firm_operations/issues/56) — Historical `dd_protection_state.json` re-evaluation. Flag any fire-or-not flips under rounded comparison.
+4. [**#57**](https://github.com/Joshua-Asante/multi_firm_operations/issues/57) — MVD self-check epsilon tightening. Post-fix the boundary check is precision-stable; should `1e-4` be tightened?
 
 ## Alternatives considered
 

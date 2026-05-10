@@ -35,6 +35,32 @@ Caller-side filter idiom for combining validator results:
     unmet = [r for r in results if r[1] == "completion" and not r[0]]
     in_good_standing = not breached            # account survival
     phase_passed = not breached and not unmet  # phase advancement
+
+Asymmetric error costs (inclusive-at-boundary reading):
+
+  All validators apply inclusive comparisons at boundary values:
+    * limit rules (daily-loss, max-DD, inactivity):
+        breach inclusive  -> equity <= floor / idle_days >= max
+    * completion rules (profit-target, min-trading-days):
+        met inclusive     -> equity >= target / days >= min
+
+  Inclusive readings are chosen on asymmetric-error-costs grounds, not
+  on FAQ wording (some FAQ examples are borderline-exclusive — see
+  test_2phase_faq_example_inclusive_interpretation).
+
+  For limit rules: false-pass at exact boundary masks an account-loss-
+  class breach; false-breach at exact boundary costs at most one trading
+  cycle. Account loss is unrecoverable; missed cycle is recoverable.
+
+  For completion rules: false-met at exact target lets the trader
+  advance one cent early (negligible); false-unmet at exact target
+  blocks advancement when the trader did the work (operational cost).
+
+  Conservative-of-trader picks the inclusive direction in both cases.
+  Same reasoning applies one layer earlier on the precision dimension —
+  see docs/adr/2026-05-10-dd-protection-ulp-rounding.md for the
+  asymmetric-error-cost framing applied to FP precision at threshold
+  comparisons.
 """
 
 from __future__ import annotations

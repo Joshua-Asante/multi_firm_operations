@@ -111,6 +111,46 @@ so the full 105-test suite passes; on a fresh public clone the data-dependent
 tests skip and the rest still run. The Python pipeline is reproducible end-to-end
 once a valid `data/tv_exports/pepperstone/` is dropped in.
 
+### Vendor-data integrity gate
+
+After re-exporting any panel CSV under `data/tv_exports/`, any broker bar file
+under `data/bar_data/`, or any reference CSV under `data/external/`, run
+`python scripts/check_data_manifests.py --regenerate --dry-run` first, then
+`python scripts/check_data_manifests.py --regenerate`, and commit the
+`SHA256SUMS` delta in the **same commit** as the data change.
+
+All four manifest dirs (`data/tv_exports/pepperstone/`,
+`data/tv_exports/oanda/`, `data/bar_data/`, `data/external/`) must be present
+locally before commits that stage anything under `data/`. Restore missing dirs
+via their canonical sources (e.g. `data/bar_data/` via
+`scripts/fetch_oanda_bars.py`) before staging. `--no-verify` is not the
+standing path.
+
+The checker hashes **working-tree bytes** (`open(..., "rb")`). With
+`core.autocrlf=true` (typical on Windows), that is CRLF as checked out—not the
+git blob—matching what `sha256sum` sees on disk.
+
+**Load-bearing gate:** install the git `pre-commit` hook once per clone so
+commits touching those trees cannot land with a stale manifest:
+
+* Bash (macOS / Linux / Git Bash): `bash scripts/install_hooks.sh`
+* Windows cmd: `scripts\install_hooks.bat`
+
+Supplementary: Claude Code `PostToolUse` hooks (e.g. `scripts/lock_event_hook.py`)
+do not replace this; they solve a different class of edits.
+
+**CI is format-only:** `.github/workflows/manifest-check.yml` validates
+`SHA256SUMS` line shape and ensures no `data/tv_exports/**/*.csv` or
+`data/bar_data/**/*.csv` is accidentally tracked. It cannot re-hash gitignored
+bytes on GitHub runners. Escape hatch: `git commit --no-verify` skips the hook
+when intentional.
+
+See [`docs/adr/2026-05-10-manifest-integrity-gate.md`](docs/adr/2026-05-10-manifest-integrity-gate.md).
+
+**M-9 (methodology):** Gitignored vendor-data manifests need a local pre-commit
+hash gate. CI cannot replace it when the bytes aren't in the repo. Manual regen
+drifts silently. [`docs/methodology/lessons/methodology_lessons.md`](docs/methodology/lessons/methodology_lessons.md)
+
 ## Key Principle
 
 The portfolio and strategies are LOCKED. This pipeline manages the *operational layer* — it never touches strategy parameters.

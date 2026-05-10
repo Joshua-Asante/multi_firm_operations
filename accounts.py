@@ -3,15 +3,50 @@ Account dataclass and lot size calculation.
 Single source of truth: data/accounts.json
 """
 
+from __future__ import annotations
+
 import json
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 
 from firm_rules import RISK_TIERS, BASELINE_BALANCE, BASELINE_RISK, FIRM_RULES
 
 DATA_FILE = Path(__file__).parent / "data" / "accounts.json"
+
+
+def _parse_iso_datetime(s: str) -> datetime:
+    """Parse stored last_trade_at; naive strings are treated as UTC."""
+    t = s.strip().replace("Z", "+00:00")
+    dt = datetime.fromisoformat(t)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
+@dataclass
+class FxifyChallengeStatus:
+    """Post-trade FXIFY rule evaluation using fxify_rule_validator."""
+
+    limit_results: list[tuple[bool, str, str]]  # RuleResult tuples
+    completion_results: list[tuple[bool, str, str]]
+    skipped: list[str]
+
+    @property
+    def limit_breached(self) -> bool:
+        return any((not passed) and kind == "limit" for passed, kind, _ in self.limit_results)
+
+    @property
+    def in_good_standing(self) -> bool:
+        return not self.limit_breached
+
+    @property
+    def phase_complete(self) -> bool:
+        return self.in_good_standing and all(
+            passed for passed, kind, _ in self.completion_results if kind == "completion"
+        )
 
 
 @dataclass
@@ -23,6 +58,12 @@ class Account:
     initial_balance: float
     dd_limit_pct: float     # max drawdown % (e.g. 5.0)
     profit_target_pct: float  # target % (e.g. 5.0)
+    prior_eod_equity: Optional[float] = None
+    """Prior trading day EOD balance (5pm EST per FXIFY). Required for daily-loss check."""
+    last_trade_at: Optional[str] = None
+    """ISO 8601 timestamp of last trade (for inactivity)."""
+    trading_days_count: int = 0
+    """Completed trading days toward FXIFY min-trading-days completion."""
 
     @property
     def dd_remaining_pct(self) -> float:
@@ -40,16 +81,29 @@ class Account:
     @property
     def flags(self) -> list[str]:
         flags = []
-        if self.dd_remaining_pct <= 0:
-            flags.append("ACCOUNT FAILED")
-        elif self.dd_remaining_pct < 1.5:
-            flags.append("DD WARNING")
-        if self.target_remaining <= 0 and self.profit_target_pct > 0:
-            flags.append("TARGET HIT")
+        if self.firm == "FXIFY":
+            st = evaluate_fxify_challenge_status(self)
+            if st.limit_breached:
+                flags.append("ACCOUNT FAILED")
+            elif 0 < self.dd_remaining_pct < 1.5:
+                flags.append("DD WARNING")
+            profit_met = st.completion_results[0][0] if st.completion_results else False
+            min_days_met = st.completion_results[1][0] if len(st.completion_results) > 1 else False
+            if profit_met and min_days_met and self.profit_target_pct > 0:
+                flags.append("PHASE COMPLETE")
+            elif profit_met and self.profit_target_pct > 0:
+                flags.append("TARGET HIT")
+        else:
+            if self.dd_remaining_pct <= 0:
+                flags.append("ACCOUNT FAILED")
+            elif self.dd_remaining_pct < 1.5:
+                flags.append("DD WARNING")
+            if self.target_remaining <= 0 and self.profit_target_pct > 0:
+                flags.append("TARGET HIT")
         return flags
 
     def to_dict(self) -> dict:
-        return {
+        d: dict[str, Any] = {
             "account_id": self.account_id,
             "firm": self.firm,
             "phase": self.phase,
@@ -58,10 +112,118 @@ class Account:
             "dd_limit_pct": self.dd_limit_pct,
             "profit_target_pct": self.profit_target_pct,
         }
+        if self.prior_eod_equity is not None:
+            d["prior_eod_equity"] = self.prior_eod_equity
+        if self.last_trade_at is not None:
+            d["last_trade_at"] = self.last_trade_at
+        if self.trading_days_count:
+            d["trading_days_count"] = self.trading_days_count
+        return d
 
     @classmethod
     def from_dict(cls, d: dict) -> "Account":
-        return cls(**d)
+        return cls(
+            account_id=d["account_id"],
+            firm=d["firm"],
+            phase=d["phase"],
+            balance=float(d["balance"]),
+            initial_balance=float(d["initial_balance"]),
+            dd_limit_pct=float(d["dd_limit_pct"]),
+            profit_target_pct=float(d["profit_target_pct"]),
+            prior_eod_equity=float(d["prior_eod_equity"]) if d.get("prior_eod_equity") is not None else None,
+            last_trade_at=d.get("last_trade_at"),
+            trading_days_count=int(d.get("trading_days_count", 0)),
+        )
+
+
+def evaluate_fxify_challenge_status(
+    account: Account,
+    now: Optional[datetime] = None,
+) -> FxifyChallengeStatus:
+    """Run fxify_rule_validator against persisted account fields."""
+    if account.firm != "FXIFY":
+        raise ValueError("evaluate_fxify_challenge_status is only for firm=FXIFY")
+    from fxify_rule_validator import (
+        validate_daily_loss,
+        validate_inactivity,
+        validate_max_drawdown,
+        validate_min_trading_days,
+        validate_profit_target,
+    )
+
+    now = now or datetime.now(timezone.utc)
+    skipped: list[str] = []
+    limit_results: list[tuple[bool, str, str]] = []
+    completion_results: list[tuple[bool, str, str]] = []
+
+    limit_results.append(
+        validate_max_drawdown(
+            account.balance,
+            account.initial_balance,
+            account.dd_limit_pct,
+        )
+    )
+
+    fx = FIRM_RULES["FXIFY"]
+    if account.prior_eod_equity is not None and account.prior_eod_equity > 0:
+        limit_results.append(
+            validate_daily_loss(
+                account.balance,
+                account.prior_eod_equity,
+                fx["daily_loss_pct"],
+            )
+        )
+    else:
+        skipped.append(
+            "Daily loss check skipped (set prior_eod_equity on account or pass --prior-eod on update)"
+        )
+
+    if account.last_trade_at:
+        try:
+            last_t = _parse_iso_datetime(account.last_trade_at)
+            limit_results.append(
+                validate_inactivity(last_t, now, fx["inactivity_max_idle_days"])
+            )
+        except ValueError as e:
+            skipped.append(f"Inactivity check error: {e}")
+    else:
+        skipped.append(
+            "Inactivity check skipped (set last_trade_at or pass --last-trade-at on update)"
+        )
+
+    completion_results.append(
+        validate_profit_target(
+            account.balance,
+            account.initial_balance,
+            account.profit_target_pct,
+        )
+    )
+    completion_results.append(
+        validate_min_trading_days(
+            account.trading_days_count,
+            fx["min_trading_days"],
+        )
+    )
+
+    return FxifyChallengeStatus(
+        limit_results=limit_results,
+        completion_results=completion_results,
+        skipped=skipped,
+    )
+
+
+def fxify_status_summary(account: Account) -> str:
+    """Short token for tabular status: ok | BREACH | partial."""
+    if account.firm != "FXIFY":
+        return "-"
+    if account.phase == "failed":
+        return "failed"
+    st = evaluate_fxify_challenge_status(account)
+    if st.limit_breached:
+        return "BREACH"
+    if st.skipped:
+        return "partial"
+    return "ok"
 
 
 def calc_multiplier(balance: float, phase: str, strategy: str) -> float:
@@ -138,6 +300,10 @@ def add_account(account_id: str, firm: str, initial_balance: float,
     firm_upper = firm.upper()
     rules = FIRM_RULES.get(firm_upper, {})
 
+    prior_eod: Optional[float] = None
+    if firm_upper == "FXIFY":
+        prior_eod = initial_balance
+
     account = Account(
         account_id=account_id,
         firm=firm_upper,
@@ -146,21 +312,38 @@ def add_account(account_id: str, firm: str, initial_balance: float,
         initial_balance=initial_balance,
         dd_limit_pct=dd_limit_pct if dd_limit_pct is not None else rules.get("max_dd_pct", 5.0),
         profit_target_pct=profit_target_pct if profit_target_pct is not None else rules.get("profit_target_pct", 5.0),
+        prior_eod_equity=prior_eod,
     )
     accounts.append(account)
     save_accounts(accounts)
     return account
 
 
-def update_balance(account_id: str, new_balance: float) -> Account:
-    """Update an account's balance. Auto-flags if DD breached or target hit."""
+def update_balance(
+    account_id: str,
+    new_balance: float,
+    fxify_updates: Optional[dict[str, Any]] = None,
+) -> Account:
+    """Update balance and optional FXIFY context keys (only keys present are applied)."""
     accounts = load_accounts()
     for i, a in enumerate(accounts):
         if a.account_id == account_id:
             a.balance = new_balance
-            # Auto-fail if DD breached
-            if a.dd_remaining_pct <= 0 and a.phase != "failed":
-                a.phase = "failed"
+            if fxify_updates:
+                if "prior_eod_equity" in fxify_updates:
+                    a.prior_eod_equity = fxify_updates["prior_eod_equity"]
+                if "last_trade_at" in fxify_updates:
+                    a.last_trade_at = fxify_updates["last_trade_at"]
+                if "trading_days_count" in fxify_updates:
+                    a.trading_days_count = int(fxify_updates["trading_days_count"])
+
+            if a.firm == "FXIFY":
+                st = evaluate_fxify_challenge_status(a)
+                if st.limit_breached and a.phase != "failed":
+                    a.phase = "failed"
+            else:
+                if a.dd_remaining_pct <= 0 and a.phase != "failed":
+                    a.phase = "failed"
             save_accounts(accounts)
             return a
     raise ValueError(f"Account '{account_id}' not found")

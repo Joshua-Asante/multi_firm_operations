@@ -1,0 +1,461 @@
+# Deletion candidate surfacing — inventory report
+
+**Generated:** 2026-05-10 (regenerate via `python scripts/deletion_candidate_report.py`)
+**Inputs:** `REPO_MAP.md` (102 classified path patterns), `git ls-files`
+
+## Mission tier rubric (P0–P3)
+
+| Tier | Meaning | Typical action |
+|------|---------|----------------|
+| **P0 — Protect** | Live ops, CI contract, lock/MC anchors, immutable ADRs/historical docs | Not a deletion candidate |
+| **P1 — Strong review** | `[X]` archive, **unmapped** tracked paths (REPO_MAP gap), superseded trees | Rehome, submodule split, or delete after audit |
+| **P2 — Weak review** | `[U]` utilities / planning artifacts with weak references to hot path | Deprecate, compress, or archive |
+| **P3 — Policy / borderline** | `[?]` or REPO_MAP open questions (e.g. retirement triggers) | Resolve disposition in REPO_MAP first |
+
+**Immutable docs:** `docs/adr/` and `docs/historical/` are P0 by policy (same spirit as `docs/operational_rules.md`).
+
+
+## Summary
+
+- **Tracked files:** 439
+- **P0 (protect):** 65
+- **Review queue (non-P0):** 374
+
+## Review queue (sorted: P1 then P2 then P3)
+
+Lowest mission relevance first within tier (see rubric). **Do not delete** without resolving `risk_notes` and backlinks from ADRs/briefs.
+
+| path | repo_map_tag | mission_tier | referenced_by | risk_notes | suggested_next_step |
+|------|--------------|--------------|---------------|------------|---------------------|
+| `archive/analysis/Q-DJ30-1/build_calendar.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-1/corpus_check.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-1/event_calendar.csv` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-1/per_trade_proximity.csv` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-1/results.json` | X | P1 | basename(17) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-1/run_tests.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-1/tag_trades.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-1/tz_check.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/PHASE_B_HALT.md` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/baseline_repro.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/build_capped_pnl.py` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/capped_pnl_1.5R.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/capped_pnl_2.0R.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/capped_pnl_2.5R.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/capped_pnl_3.0R.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/capped_pnl_3.5R.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/phase_c_survivors.json` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/regime_bootstrap.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/regime_bootstrap_1.5R.json` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/sweep_cap_levels.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/sweep_results.csv` | X | P1 | basename(5) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-2/verdict_pre_registration.md` | X | P1 | path_string(4) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/aggregate_m15_to_daily.py` | X | P1 | path_string(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/corpus_check.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/diagnose_missing.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/dj30_daily_gap.csv` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/half_panel_results.json` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/half_panel_sanity.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/per_trade_gap.csv` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/results.json` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/run_tests.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/tag_trades.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/Q-DJ30-3/verdict_pre_registration.md` | X | P1 | path_string(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/dd_protection_trace.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/__init__.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/correlation.py` | X | P1 | path_string(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/dukascopy_loader.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/dxy_loader.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/event_calendar.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/hurst_phase_a.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/nyfbo_simulator.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/pdsb_simulator.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/pepperstone_spread.py` | X | P1 | path_string(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/permutation.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/results/h_nyfbo_g1.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/results/h_pdsb_g2.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/results/h_pdsb_g2_phaseA_hurst.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/results/h_pdsb_g2_spread125.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/run_h_nyfbo.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/eurusd_lnyo/run_h_pdsb.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/gbpusd_lon/__init__.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/gbpusd_lon/correlation.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/gbpusd_lon/dukascopy_loader.py` | X | P1 | basename(5) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/gbpusd_lon/dxy_loader.py` | X | P1 | basename(5) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/gbpusd_lon/hurst_phase_a.py` | X | P1 | basename(4) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/gbpusd_lon/pepperstone_spread.py` | X | P1 | basename(7) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/gbpusd_lon/permutation.py` | X | P1 | basename(7) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/gbpusd_lon/results/h_lorb_g1_phaseA_hurst.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/gbpusd_lon/results/h_lorb_g1_phaseA_robustness.json` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/striker_nas100/q_nas_1_pyramid_hypothesis.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usdchf_sentinel/__init__.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usdchf_sentinel/bar_loader.py` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/analysis/usdchf_sentinel/permutation.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usdchf_sentinel/results/sentinel_gate.json` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usdchf_sentinel/run_sentinel_gate.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usdchf_sentinel/sentinel_simulator.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usoil/__init__.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usoil/phase1_characterize.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usoil/phase1_clean.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usoil/phase1_fetch.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usoil/phase1_report.py` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/analysis/usoil/phase1_verify.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usoil/phase3_directional.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/analysis/usoil/stage0_reconcile.py` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/data/tv_exports/USOIL_pepperstone_m15_2025-06-02_to_2026-05-01.csv` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/briefs/Q-DJ30-3/Q-DJ30-3.md` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/README.md` | X | P1 | path_string(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/00_gold_regime_shift.png` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/02_rolling_corr.png` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/03_vol_acf.png` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/04_session_maps.png` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/1r_diagnosis.py` | X | P1 | basename(6) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/README.md` | X | P1 | basename(13) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/bar_analysis.py` | X | P1 | basename(4) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/bar_data_high_leverage.md` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/correlated_day_check.py` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q11_striker_funnel_decomp.csv` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q11_striker_funnel_decomp.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q11_striker_funnel_drift.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q12_guardian_hour_decomp.csv` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q12_guardian_hour_decomp.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q12_guardian_hour_drift.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q14_adverse_vs_pnl.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q14_adverse_windows_vs_pnl.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q14_daily_portfolio.csv` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q14_trades_with_adverse_flag.csv` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q15_aegis_monthly_vs_vol.csv` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q15_aegis_vol_coupling.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q15_aegis_vol_coupling.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q3_pairwise_joint_tail.py` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/q5_break_window.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/regime_by_year.csv` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/striker_pyramid_decomposition.py` | X | P1 | basename(4) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/archive/worst_joint_days.csv` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/inquire_phase/findings_q_t_2026-04-27.md` | X | P1 | basename(5) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/inquire_phase/q_t_tuesday_2026_04_27.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/inquire_phase/q_t_tuesday_concurrent_loss_2026_04_27.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/README.md` | X | P1 | basename(13) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h10_senescence.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h10_senescence.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h10_senescence_rolling.csv` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h1_community_matrix.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h1_community_matrix.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h2_daily_clusters.csv` | X | P1 | basename(4) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h2_regime_clusters.json` | X | P1 | basename(4) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h2_regime_clusters.py` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h3_geometric_uplift.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h3_geometric_uplift.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h4_alpha_decay.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h4_alpha_decay_fit.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h4_alpha_decay_rolling.csv` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h5_changepoint.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h5_changepoint.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h5_rolling_sharpe.csv` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h6_storage_conditions.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h6_storage_conditions.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h6c_conditional_correlations.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h6c_conditional_correlations.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h7_regime_forecast.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h7_regime_forecast.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h8_invasion_fitness.json` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h8_invasion_fitness.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h9_capacity.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/msee/archive/h9_capacity_audit.json` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/B1_inflections.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/B2_event_vs_pervasive.json` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/figures/B1_rolling_corr.png` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/findings.md` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/findings_2026-04-26.md` | X | P1 | basename(14) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/findings_2026-04-27.md` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/notice_phase.py` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/o1_rejected_universe_2026_04_27.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/o3_funnel_rolling_drift_2026_04_27.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/o4_adverse_autocorr_2026_04_27.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/o5_filter_contribution_2026_04_27.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/o6_regime_via_conversion_2026_04_27.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/phase0_2026_04_27.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/q_a1_1_aegis_pepperstone_quintile.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/q_a1_2_aegis_pepperstone_q5_drilldown.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/notice_phase/q_a1_aegis_pepperstone_panel.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/analysis/skew_audit/2026-04-27.md` | X | P1 | basename(6) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/data_provenance/2026-04-26_audnzd_oanda_verification.md` | X | P1 | basename(4) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_REJECTED.md` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_acf.png` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_dow.png` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_framework_screen.md` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_hurst_rs.png` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_phase3_equity_aegis.png` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_phase3_equity_rangefade.png` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_phase3_results.json` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_range_trend.png` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_spread_by_hour.png` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_structural_characterization.md` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_structural_results.json` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_audnzd_vol_by_hour.png` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_var_alloc_dd_state_REJECTED.md` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/findings/2026-04-26_var_alloc_observables_stage0.md` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/gate_audits/2026-04-25_q3_halt_rules_design_skew.md` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_nyfbo_kill.md` | X | P1 | path_string(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/gate_audits/2026-05-02_eurusd_m15_h_pdsb_kill.md` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/gate_audits/2026-05-03_gbpusd_m15_h_lorb_phaseA_abort.md` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/gate_audits/README.md` | X | P1 | basename(13) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/AMENDMENT_oanda_rescope.md` | X | P1 | basename(17) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O1_rejected_trades_aegis.csv` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O1_rejected_trades_guardian.csv` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O1_rejected_trades_striker.csv` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O2_trade_paths_aegis.csv` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O2_trade_paths_guardian.csv` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O2_trade_paths_striker.csv` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O3_conversion_funnel_aegis.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O3_conversion_funnel_guardian.csv` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O3_conversion_funnel_striker.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O3_conversion_rolling_aegis.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O3_conversion_rolling_guardian.csv` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O3_conversion_rolling_striker.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O4_bar_corr_rolling.csv` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O4_bar_corr_static.csv` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O4_simultaneous_adverse_windows.csv` | X | P1 | basename(5) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_aegis_block_EOM.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_aegis_block_Fri.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_aegis_block_H11_or_1045.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_aegis_block_Thu.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_aegis_block_TueH10.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_aegis_block_lowATR.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_guardian_block_Fri.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_guardian_block_MonH08.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_guardian_block_MonH09.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_guardian_block_MonH12.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_guardian_block_ThuH12.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_guardian_block_TueH08.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_guardian_block_TueH12.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_guardian_block_Wed.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_striker_block_Mon.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_striker_block_Thu.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_striker_block_Wed.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O5_filter_forensics_striker_block_atrNotExpanding.csv` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O6_regime_features_US30USD.csv` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O6_regime_features_USDJPY.csv` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O6_regime_features_XAUUSD.csv` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O7_slippage_realism_aegis.csv` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O7_slippage_realism_guardian.csv` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/O7_slippage_realism_striker.csv` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/README.md` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/phase0_log.json` | X | P1 | basename(6) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-26/resolved_tz.json` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-27/q_a_aegis_panel_mechanism_gated.md` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-29/q_a1_1_pepperstone_quintile.md` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-29/q_a1_2_pepperstone_q5_drilldown.md` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/identify_corpus/2026-04-29/q_a1_pepperstone_replication.md` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/_active_paths_2026-05-07/analysis_msee/daily_strategy_returns.csv` | X | P1 | basename(10) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/_active_paths_2026-05-07/analysis_msee/daily_strategy_returns.json` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/_active_paths_2026-05-07/analysis_msee/daily_strategy_returns.py` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/_active_paths_2026-05-07/analysis_msee/watch_2026-04-27.json` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/_active_paths_2026-05-07/analysis_msee/watch_2026-04-27.md` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/_active_paths_2026-05-07/msee_watchlist.py` | X | P1 | basename(6) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/findings/2026-04-27_phase1_H3_H10_H4.md` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/findings/2026-04-27_phase2_H6c.md` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/findings/2026-04-27_phase3_H5.md` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/findings/2026-04-27_phase4_5_H2_H6_H7.md` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/findings/2026-04-27_phase6_H1_H9.md` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/findings/2026-04-27_phase7_8_H8_watchlist.md` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/framework.md` | X | P1 | basename(4) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/open_questions.md` | X | P1 | basename(17) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/msee/watch_list.md` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/mvd.md` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/overlays/guardian_conflict_risk.md` | X | P1 | path_string(7) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/audnzd_phase1_clean.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/audnzd_phase1_fetch.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/audnzd_phase1_verify.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/audnzd_phase1_xref.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/audnzd_phase2_structural.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/audnzd_phase3_backtest.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/audnzd_phase3_plots.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/common.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/filters.py` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/notice_scan.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/o1_counterfactual.py` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/o2_trade_paths.py` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/o3_conversion_funnel.py` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/o4_bar_correlation.py` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/o5_filter_forensics.py` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/o6_regime_features.py` | X | P1 | — | archived_tag_X | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/o7_slippage_realism.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/identify/2026-04-26/phase0_discovery.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/var_alloc_inquire/__init__.py` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/var_alloc_inquire/dd_state_mc.py` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/archive/scripts/var_alloc_inquire/var_alloc_mc.py` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/findings/2026-05-06_dj30_event_clustering.md` | X | P1 | basename(3) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/findings/2026-05-06_dj30_gap_magnitude.md` | X | P1 | path_string(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/findings/2026-05-06_dj30_stop_cap.md` | X | P1 | basename(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/gate_audits/2026-05-06_q-dj30-2_pre_reg_amend.md` | X | P1 | basename(7) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/methodology/gate_audits/2026-05-06_q-dj30-3_basis_sanity_substitution.md` | X | P1 | basename(1) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/docs/striker_nas100/q_nas_2_capture_plan.md` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `archive/scripts/run_v55_validation.py` | X | P1 | path_string(2) | archived_tag_X; has_textual_refs | externalize_or_delete_after_audit |
+| `.claude/commands/lock-check.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `.claude/commands/mc-anchors.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `.claude/commands/skew-audit.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `.claude/settings.json` | A | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `analysis/oanda_stage1/__init__.py` | A | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `analysis/oanda_stage1/aegis_stage1.py` | A | P2 | — | — | deprecate_merge_or_archive |
+| `analysis/oanda_stage1/bar_loader.py` | A | P2 | — | — | deprecate_merge_or_archive |
+| `analysis/oanda_stage1/guardian_stage1.py` | A | P2 | — | — | deprecate_merge_or_archive |
+| `analysis/oanda_stage1/permutation.py` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `analysis/oanda_stage1/pine_indicators.py` | A | P2 | — | — | deprecate_merge_or_archive |
+| `analysis/oanda_stage1/post_exit_excursion.py` | A | P2 | — | — | deprecate_merge_or_archive |
+| `analysis/oanda_stage1/striker_stage1.py` | A | P2 | — | — | deprecate_merge_or_archive |
+| `analysis/oanda_stage1/tv_export_loader.py` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `data/audits/issue_54_ulp_audit.json` | A | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `data/audits/issue_54_ulp_audit.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `data/bar_data/SHA256SUMS` | A | P2 | path_string(4) | has_textual_refs | deprecate_merge_or_archive |
+| `data/external/SHA256SUMS` | A | P2 | path_string(4) | has_textual_refs | deprecate_merge_or_archive |
+| `data/tv_exports/oanda/SHA256SUMS` | A | P2 | path_string(5) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/audits/2026-05-08-guardian-v55-indicator-strategy-diff.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/2026-05-10-historical-dd-reeval.md` | A | P2 | — | — | deprecate_merge_or_archive |
+| `docs/briefs/2026-05-10-pr59-manifest-drift-rca.md` | A | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-DDP-1/_plot_pareto_frontier.py` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-DDP-1/_run_regime_robustness.py` | A | P2 | path_string(4) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-DDP-1/anchor_reconciliation.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-DDP-1/drag_rebaseline.md` | A | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-DDP-1/pareto_frontier.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-DDP-1/pareto_frontier.svg` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-DDP-1/recommendation.md` | A | P2 | path_string(10) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-DDP-1/regime_robustness.csv` | A | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-DDP-1/rule0_reconciliation.md` | A | P2 | basename(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-DDP-1/sweep_results.csv` | A | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-MCFP-1/H5_replay_log.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/Q-MCFP-1/closure.md` | A | P2 | path_string(4) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/bust_attribution_flip.md` | A | P2 | path_string(6) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/striker_nas100_q_nas_1_results.md` | A | P2 | path_string(4) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` | A | P2 | path_string(7) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/1r_estimation.md` | A | P2 | path_string(8) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_eurusd_m15_lnyo_g2_inquire_entry.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_eurusd_m15_lnyo_inquire_entry.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_eurusd_m15_lnyo_notice.md` | A | P2 | path_string(9) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_oanda_stage1_aegis.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_oanda_stage1_guardian.md` | A | P2 | — | — | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_oanda_stage1_striker.md` | A | P2 | — | — | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_15min_characterization.md` | A | P2 | path_string(4) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_acf.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_cost_floor.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_eia_event.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_feed_reconciliation.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_hurst.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_intraday_atr.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_phase1_results.json` | A | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_phase2_validation.md` | A | P2 | basename(3) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_phase3_directional.md` | A | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_phase3_results.json` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_q3_bar_sign.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_q3_donchian.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_q3_dow_gate.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_q3_pf_decomp.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-02_usoil_vr.png` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-03_gbpusd_m15_lon_g1_inquire_entry.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-03_gbpusd_m15_lon_notice.md` | A | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-03_usdchf_h4_sentinel_gate.md` | A | P2 | path_string(4) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/findings/2026-05-07_brief_authoring_drifted_from_codebase_shape.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/lessons/methodology_lessons.md` | A | P2 | path_string(5) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/observation_routing.md` | A | P2 | path_string(28) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology/regime_robustness_gate.md` | A | P2 | path_string(8) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/methodology_audit/cluster_001_postmortem_template.md` | U | P2 | — | — | deprecate_merge_or_archive |
+| `docs/notion/repo_context.md` | A | P2 | path_string(5) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/spec/issue_54_survey_brief.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/superpowers/plans/2026-05-10-fxify-rule-validator.md` | U | P2 | — | — | deprecate_merge_or_archive |
+| `docs/superpowers/specs/2026-05-10-fxify-rule-validator-design.md` | U | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/templates/bust_analysis.md` | A | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/templates/calibration_brief.md` | A | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `docs/templates/lock_decision.md` | A | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `fxify_rule_validator.py` | A | P2 | path_string(8) | has_textual_refs | deprecate_merge_or_archive |
+| `live_journal/data/.gitkeep` | U | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `mc_runs/baseline_prefix_pepperstone.txt` | A | P2 | — | — | deprecate_merge_or_archive |
+| `mc_runs/postfix_seeds_42_123_2026.txt` | A | P2 | — | — | deprecate_merge_or_archive |
+| `mc_runs/postfix_seeds_fresh.txt` | A | P2 | — | — | deprecate_merge_or_archive |
+| `scripts/dryrun_aegis_v4_3.py` | U | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `scripts/githooks/pre-commit` | U | P2 | path_string(3) | has_textual_refs | deprecate_merge_or_archive |
+| `scripts/install_hooks.bat` | U | P2 | path_string(2) | has_textual_refs | deprecate_merge_or_archive |
+| `scripts/install_hooks.sh` | U | P2 | path_string(4) | has_textual_refs | deprecate_merge_or_archive |
+| `scripts/replay_state_h5.py` | U | P2 | path_string(3) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/.env.example` | U | P2 | basename(1) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/README.md` | U | P2 | basename(13) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/WIRING_NOTES.md` | U | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/pyproject.toml` | U | P2 | basename(5) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/requirements.txt` | U | P2 | basename(1) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/tests/__init__.py` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/tests/fixtures/README.md` | U | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/tests/fixtures/aegis_v4_3.csv` | U | P2 | basename(3) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/tests/fixtures/guardian_gold_v5_5.csv` | U | P2 | basename(3) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/tests/fixtures/striker_dj30_v4_5.csv` | U | P2 | basename(3) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/tests/fixtures/striker_nas100_v1.csv` | U | P2 | basename(3) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/tests/fixtures/w19_dxtrade_fills.csv` | U | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/tests/fixtures/w19_expected.json` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/tests/test_mc_wrapper.py` | U | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/tests/test_w19.py` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/__init__.py` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/__main__.py` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/backtest_parser.py` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/compute.py` | U | P2 | basename(4) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/config.py` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/dd_wrapper.py` | U | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/fills_parser.py` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/mc_wrapper.py` | U | P2 | path_string(1) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/notion_writer.py` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/provenance.py` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+| `weekly_review_feeder/weekly_review_feeder/ptl_client.py` | U | P2 | basename(2) | has_textual_refs | deprecate_merge_or_archive |
+
+## P0 protect list (excerpt — do not treat as deletion candidates)
+
+_Full count 65; sample first 40 paths._
+
+| path | repo_map_tag |
+|------|--------------|
+| `.github/workflows/manifest-check.yml` | A |
+| `.github/workflows/pylint.yml` | A |
+| `.github/workflows/tests.yml` | A |
+| `.gitignore` | A |
+| `CHANGELOG.md` | A |
+| `CLAUDE.md` | A |
+| `README.md` | A |
+| `REPO_MAP.md` | A |
+| `accounts.py` | A |
+| `analysis/time_to_pass.py` | A |
+| `cli.py` | A |
+| `csv_parser.py` | A |
+| `data/reconciles/2026-05-05_guardian_n_reconcile.md` | A |
+| `data/tv_exports/pepperstone/SHA256SUMS` | A |
+| `dd_protection.py` | A |
+| `docs/adr/2026-03-01-aegis-session-selection.md` | A |
+| `docs/adr/2026-04-17-dd-trigger-calibration.md` | A |
+| `docs/adr/2026-04-17-equity-tier-deletion.md` | A |
+| `docs/adr/2026-04-17-guardian-v5.1-architecture.md` | A |
+| `docs/adr/2026-04-17-portfolio-allocations.md` | A |
+| `docs/adr/2026-04-17-striker-v4.3-pyramid.md` | A |
+| `docs/adr/2026-04-23-guardian-risk-relock-0.34.md` | A |
+| `docs/adr/2026-04-24-mvd-discipline.md` | A |
+| `docs/adr/2026-04-25-mvd-retrofit.md` | A |
+| `docs/adr/2026-05-03-sentinel-gate-decision.md` | A |
+| `docs/adr/2026-05-08-dd-trigger-c2-relock.md` | A |
+| `docs/adr/2026-05-10-dd-protection-ulp-rounding.md` | A |
+| `docs/adr/2026-05-10-manifest-integrity-gate.md` | A |
+| `docs/adr/2026-05-10-mc-c2-anchor-ratification.md` | A |
+| `docs/historical/portfolio_mc_2026-04-20_aegis_2pct_sensitivity.md` | A |
+| `docs/historical/portfolio_mc_2026-04-20_v5.4_v4.4_v4.2.md` | A |
+| `docs/historical/v5_5_validation_halt_2026-04-21.md` | A |
+| `docs/operational_rules.md` | A |
+| `docs/rule_0.md` | A |
+| `firm_rules.py` | A |
+| `lib/mvd.py` | A |
+| `lib/nonlinear.py` | A |
+| `lib/oanda.py` | A |
+| `lib/oanda_creds.py` | A |
+| `lib/tearsheet.py` | A |
+| _… 25 more …_ | |
+
+## Mechanical procedure (repeatable)
+
+1. `git ls-files` enumerate tracked paths.
+2. Parse `REPO_MAP.md` lines matching `^[AUX?]` (see script).
+3. Match each file with `fnmatch` / prefix rules / brace expansion.
+4. Label mission tier via rubric; flag `unmapped_in_REPO_MAP` as P1.
+5. Textual reference scan (UTF-8, non-huge files): substring path + basename.
+6. Exclude local-only trees from git inventory (e.g. `.claude/worktrees/` untracked).
+

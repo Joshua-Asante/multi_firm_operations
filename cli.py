@@ -2,8 +2,9 @@
 CLI for multi-firm operations.
 Usage:
     python cli.py add <account_id> <firm> <balance> [--phase challenge]
-    python cli.py update <account_id> <balance>
+    python cli.py update <account_id> <balance> [--prior-eod ... --last-trade-at ... --trading-days ...]
     python cli.py status
+    python cli.py challenge [account_id]
     python cli.py lots
 """
 
@@ -11,7 +12,13 @@ import argparse
 import sys
 
 from accounts import (
-    add_account, update_balance, load_accounts, get_account, get_multipliers
+    add_account,
+    evaluate_fxify_challenge_status,
+    fxify_status_summary,
+    get_account,
+    get_multipliers,
+    load_accounts,
+    update_balance,
 )
 
 
@@ -73,10 +80,29 @@ def cmd_update(args):
             if args.balance is None:
                 raise ValueError("balance required (or pass --from-oanda for OANDA-tracked accounts)")
             balance = args.balance
-        account = update_balance(args.account_id, balance)
+        fx = {}
+        if args.prior_eod is not None:
+            fx["prior_eod_equity"] = args.prior_eod
+        if args.last_trade_at is not None:
+            fx["last_trade_at"] = args.last_trade_at
+        if args.trading_days is not None:
+            fx["trading_days_count"] = args.trading_days
+        account = update_balance(
+            args.account_id,
+            balance,
+            fxify_updates=fx if fx else None,
+        )
         print(f"Updated: {account.account_id} -> ${account.balance:,.2f}")
         print(f"  DD remaining: {account.dd_remaining_pct:.2f}%")
         print(f"  Target remaining: ${account.target_remaining:,.2f}")
+        if account.firm == "FXIFY":
+            st = evaluate_fxify_challenge_status(account)
+            print("  FXIFY validators:")
+            for passed, kind, reason in st.limit_results + st.completion_results:
+                tag = "ok" if passed else "NO"
+                print(f"    [{tag}] {reason}")
+            for note in st.skipped:
+                print(f"    (skipped) {note}")
         for flag in account.flags:
             print(f"  *** {flag} ***")
     except ValueError as e:
@@ -90,12 +116,43 @@ def cmd_status(args):
         print("No accounts registered.")
         return
 
-    print(f"{'ID':<20} {'Firm':<10} {'Phase':<10} {'Balance':>12} {'DD Left':>8} {'To Target':>12} {'Flags'}")
-    print("-" * 90)
+    print(
+        f"{'ID':<20} {'Firm':<10} {'Phase':<10} {'Balance':>12} {'DD Left':>8} "
+        f"{'To Target':>12} {'FXIFY':>8} {'Flags'}"
+    )
+    print("-" * 102)
     for a in accounts:
         flags = ", ".join(a.flags) if a.flags else ""
-        print(f"{a.account_id:<20} {a.firm:<10} {a.phase:<10} ${a.balance:>10,.2f} "
-              f"{a.dd_remaining_pct:>6.2f}% ${a.target_remaining:>10,.2f} {flags}")
+        fx = fxify_status_summary(a)
+        print(
+            f"{a.account_id:<20} {a.firm:<10} {a.phase:<10} ${a.balance:>10,.2f} "
+            f"{a.dd_remaining_pct:>6.2f}% ${a.target_remaining:>10,.2f} {fx:>8} {flags}"
+        )
+
+
+def cmd_challenge(args):
+    """FXIFY rule detail: limit + completion checks from fxify_rule_validator."""
+    accounts = load_accounts()
+    fxify = [a for a in accounts if a.firm == "FXIFY"]
+    if args.account_id:
+        fxify = [a for a in fxify if a.account_id == args.account_id]
+    if not fxify:
+        print("No FXIFY accounts" + (f" matching {args.account_id!r}" if args.account_id else "."))
+        return
+    for a in fxify:
+        st = evaluate_fxify_challenge_status(a)
+        print(f"{a.account_id}  phase={a.phase}  balance=${a.balance:,.2f}")
+        print("  Limits:")
+        for passed, _kind, reason in st.limit_results:
+            tag = "ok" if passed else "FAIL"
+            print(f"    [{tag}] {reason}")
+        print("  Completion:")
+        for passed, _kind, reason in st.completion_results:
+            tag = "met" if passed else "open"
+            print(f"    [{tag}] {reason}")
+        for note in st.skipped:
+            print(f"  (skipped) {note}")
+        print()
 
 
 def cmd_tearsheet(args):
@@ -150,11 +207,44 @@ def main():
                           help="New balance in account currency. Omit when --from-oanda is set.")
     p_update.add_argument("--from-oanda", action="store_true",
                           help="Read live NAV from OANDA REST API. Only allowed for firm=OANDA accounts that match the credentials in ~/.keys/oanda.txt.")
+    p_update.add_argument(
+        "--prior-eod",
+        type=float,
+        default=None,
+        metavar="BALANCE",
+        help="FXIFY: prior trading day EOD balance (5pm EST) for daily-loss check",
+    )
+    p_update.add_argument(
+        "--last-trade-at",
+        default=None,
+        metavar="ISO_DATETIME",
+        help="FXIFY: last trade time ISO 8601 (e.g. 2026-05-10T14:30:00Z) for inactivity",
+    )
+    p_update.add_argument(
+        "--trading-days",
+        type=int,
+        default=None,
+        metavar="N",
+        help="FXIFY: completed trading days count toward min-trading-days",
+    )
     p_update.set_defaults(func=cmd_update)
 
     # status
     p_status = sub.add_parser("status", help="Show all accounts")
     p_status.set_defaults(func=cmd_status)
+
+    # challenge (FXIFY detail)
+    p_ch = sub.add_parser(
+        "challenge",
+        help="Show FXIFY validator detail (fxify_rule_validator) for FXIFY accounts",
+    )
+    p_ch.add_argument(
+        "account_id",
+        nargs="?",
+        default=None,
+        help="Optional account id filter",
+    )
+    p_ch.set_defaults(func=cmd_challenge)
 
     # lots
     p_lots = sub.add_parser("lots", help="Multiplier reference card for all active accounts")

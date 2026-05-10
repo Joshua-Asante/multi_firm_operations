@@ -118,3 +118,38 @@ def validate_daily_loss(
         "limit",
         f"Daily loss ok: equity ${equity:,.2f} > floor ${floor:,.2f}",
     )
+
+
+def validate_profit_target(
+    current_equity: float,
+    initial_balance: float,
+    profit_target_pct: float = _FXIFY["profit_target_pct"],
+) -> RuleResult:
+    """Profit-target completion check.
+
+    FXIFY 3-Phase: "Profit Targets: Phase 1 - 5%, Phase 2 - 5%, Phase 3 - 5%".
+    Met inclusive at target (equity >= target).
+    """
+    if current_equity < 0:
+        raise ValueError("current_equity must be >= 0")
+    if initial_balance <= 0:
+        raise ValueError("initial_balance must be > 0")
+    if profit_target_pct < 0:
+        raise ValueError("profit_target_pct must be >= 0")
+
+    target = round(initial_balance * (1 + profit_target_pct / 100), 2)
+    equity = round(current_equity, 2)
+    initial = round(initial_balance, 2)
+
+    if equity >= target:
+        return (
+            True,
+            "completion",
+            f"Profit target met: equity ${equity:,.2f} >= target ${target:,.2f} "
+            f"(rule: {profit_target_pct}% of initial ${initial:,.2f})",
+        )
+    return (
+        False,
+        "completion",
+        f"Profit target not met: equity ${equity:,.2f} < target ${target:,.2f}",
+    )

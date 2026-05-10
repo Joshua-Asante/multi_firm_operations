@@ -274,6 +274,60 @@ count thresholds").
 
 ---
 
+## M-9 — Gitignored vendor-data manifests need a local pre-commit hash gate
+
+**Status:** PROMOTED 2026-05-10 (GH [#62](https://github.com/Joshua-Asante/multi_firm_operations/issues/62)
+Phase B — manifest drift between PR #59 and sync 93865f8; NAS100USD missing-on-disk
+caught by manifest vs reality mismatch).
+
+**Anchor incident:** Phase A RCA
+[`docs/briefs/2026-05-10-pr59-manifest-drift-rca.md`](../briefs/2026-05-10-pr59-manifest-drift-rca.md)
+§3 verdict **H2** — *"Manifest correct at b71e4a4 11:12 EDT; on-disk CSVs were
+modified between 11:12 EDT and the spawn pre-flight ~12:10 EDT (or the sync at
+12:21 EDT)."* (quoted from §1 H2 hypothesis as adopted in the aggregate verdict.)
+
+**Cost:** Audit-instance count — silent manifest vs on-disk skew across five
+vendor files in one session; one conclusive missing-file case (NAS100USD.csv)
+that a commit-time **MISSING** check would have surfaced immediately.
+
+**Rule:** Gitignored vendor-data manifests need a local pre-commit hash gate.
+CI cannot replace it when the bytes aren't in the repo. Manual regen drifts
+silently.
+
+**Mechanism (why this fails):** Tracked manifests without an automated
+validator only reflect whatever bytes existed the last time someone ran
+`sha256sum`. Re-exports, CRLF normalization, and file deletes happen on disk;
+CI on GitHub never sees the bytes, so **hash validation in CI is infeasible**
+under the public-clone vendor-data contract. Without a local hook, drift
+stays silent until a human runs a manual reconcile.
+
+**Connection to standing doctrine:** Reinforces Rule 0 (read production +
+on-disk reality before verdicts) and the public-clone posture in `CLAUDE.md`.
+Complements E-class execution lessons: this is methodology-layer **data
+integrity**, not fill quality.
+
+**Watch-point:** Any PR touching `data/**/SHA256SUMS`, any spawn brief
+mentioning vendor panels, or any "re-export" workflow — confirm hook installed
+and regen landed in the same commit as the CSV change.
+
+**Output trigger:** Run `python scripts/check_data_manifests.py --check`;
+if it fails, run `--regenerate --dry-run` then `--regenerate`. Reference this
+lesson + [`docs/adr/2026-05-10-manifest-integrity-gate.md`](../../adr/2026-05-10-manifest-integrity-gate.md).
+
+**Forbidden moves:**
+- Do NOT treat `.github/workflows/manifest-check.yml` as byte-level integrity
+  coverage — it is format + tracked-path enforcement only.
+- Do NOT `git commit --no-verify` for routine vendor-data work; reserve for
+  exceptional bypass with explicit rationale.
+
+**Reproducer / worked example:** Phase A drift table and NAS100USD timeline in
+[`docs/briefs/2026-05-10-pr59-manifest-drift-rca.md`](../briefs/2026-05-10-pr59-manifest-drift-rca.md)
+§2–§3.
+
+**Sibling lessons:** None yet at M-class.
+
+---
+
 ## Versioning & change-log
 
 - **2026-05-08:** Registry seeded. Format spec authored. M-7 added as
@@ -282,3 +336,5 @@ count thresholds").
 - **2026-05-10:** M-8 added as CANDIDATE on the GH #54 ULP-audit near-miss
   anchor. No wrong-verdict flip occurred (DONE_WITH_CONCERNS taxonomy caught
   the gap); promotion gated on second occurrence.
+- **2026-05-10:** M-9 added as PROMOTED on GH #62 Phase B / PR #59 manifest
+  drift RCA (H2 verdict); encodes local pre-commit hash gate + format-only CI.

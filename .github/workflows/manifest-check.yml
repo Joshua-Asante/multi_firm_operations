@@ -1,0 +1,83 @@
+# Hash validation against on-disk is local-only (CSVs are gitignored).
+# The pre-commit hook is the load-bearing gate; this workflow is format-only.
+
+name: Manifest check
+
+on:
+  push:
+    paths:
+      - "data/**/SHA256SUMS"
+      - ".gitignore"
+      - "scripts/check_data_manifests.py"
+  pull_request:
+    paths:
+      - "data/**/SHA256SUMS"
+      - ".gitignore"
+      - "scripts/check_data_manifests.py"
+
+jobs:
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate SHA256SUMS format
+        run: |
+          python3 << 'PY'
+          import pathlib
+          import re
+          import sys
+
+          root = pathlib.Path(".")
+          files = [
+              root / "data/tv_exports/pepperstone/SHA256SUMS",
+              root / "data/tv_exports/oanda/SHA256SUMS",
+              root / "data/bar_data/SHA256SUMS",
+              root / "data/external/SHA256SUMS",
+          ]
+          line_re = re.compile(r"^[0-9a-f]{64} \*.+$")
+          for f in files:
+              if not f.is_file():
+                  sys.exit(f"missing {f}")
+              if f.stat().st_size == 0:
+                  sys.exit(f"empty {f}")
+              seen: set[str] = set()
+              for lineno, raw in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+                  line = raw.strip()
+                  if not line:
+                      continue
+                  if not line_re.match(line):
+                      sys.exit(f"BAD_LINE {f}:{lineno}:{line!r}")
+                  name = line.split("*", 1)[1]
+                  if name in seen:
+                      sys.exit(f"DUPLICATE {f} basename={name!r}")
+                  seen.add(name)
+          print("SHA256SUMS format OK")
+          PY
+
+  no-vendor-csv-tracked:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assert no tracked vendor CSVs under tv_exports or bar_data
+        run: |
+          python3 << 'PY'
+          import subprocess
+          import sys
+
+          out = subprocess.check_output(["git", "ls-files"], text=True)
+          bad: list[str] = []
+          for line in out.splitlines():
+              p = line.strip().replace("\\", "/")
+              if not p.endswith(".csv"):
+                  continue
+              if p.startswith("data/tv_exports/"):
+                  bad.append(p)
+              if p.startswith("data/bar_data/"):
+                  bad.append(p)
+          if bad:
+              print("Tracked vendor CSVs (must stay gitignored):", file=sys.stderr)
+              for b in bad:
+                  print(b, file=sys.stderr)
+              sys.exit(1)
+          print("No tracked vendor CSVs under data/tv_exports or data/bar_data")
+          PY

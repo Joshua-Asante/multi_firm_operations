@@ -1,0 +1,10 @@
+#!/bin/sh
+# Vendor-data manifest gate (GH #62). Runs only when staging paths under
+# data/tv_exports/, data/bar_data/, or data/external/ (including SHA256SUMS).
+ROOT="$(git rev-parse --show-toplevel)" || exit 1
+cd "$ROOT" || exit 1
+
+if git diff --cached --name-only | grep -qE '^data/(tv_exports|bar_data|external)/'; then
+  exec python scripts/check_data_manifests.py --check
+fi
+exit 0

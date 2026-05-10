@@ -1,6 +1,6 @@
 # REPO_MAP — active classification
 
-**Updated:** 2026-05-08 (post C2 relock + repo-map disposition pass; indicator-with-strategy convention added 2026-05-08)
+**Updated:** 2026-05-10 (GH #62 manifest integrity gate: checker + hook + format CI)
 **Convention:**
 - `[A]` active hot-path (production code, locked strategies, active analyses, immutable record)
 - `[U]` utility — runs on demand, not in CI hot path, retained as load-bearing tool
@@ -54,6 +54,10 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [U] scripts/dryrun_aegis_v4_3.py — end-to-end exercise of all 9 lib/mvd helpers; sanity gate (verdict 2026-05-07)
 [A] scripts/fetch_oanda_bars.py — hard-codes USDJPY/XAUUSD/US30USD/NAS100USD only; not a general fetcher
 [A] scripts/lock_event_hook.py
+[U] scripts/check_data_manifests.py — vendor SHA256SUMS check / regenerate (GH #62)
+[U] scripts/githooks/pre-commit — template copied to .git/hooks by install scripts
+[U] scripts/install_hooks.sh — POSIX one-shot hook installer
+[U] scripts/install_hooks.bat — Windows hook installer
 
 ## Live execution
 [A] live_journal/scripts/journal_review.py — signal-vs-fill reconciliation pipeline
@@ -91,7 +95,7 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] docs/methodology/findings/*.md (DJ30 cluster — event_clustering / gap_magnitude / stop_cap — archived 2026-05-08)
 [A] docs/methodology/gate_audits/*.md (Q-DJ30-2/3 audits archived 2026-05-08)
 [A] docs/methodology/lessons/methodology_lessons.md — M-class lesson registry (format spec + M-7 CANDIDATE seeded 2026-05-08)
-[A] docs/adr/*.md — IMMUTABLE record (latest: 2026-05-08-dd-trigger-c2-relock)
+[A] docs/adr/*.md — IMMUTABLE record (latest: 2026-05-10-manifest-integrity-gate)
 [A] docs/briefs/*.md — closed-with-override: Q-DDP-1 (C2 lock 2026-05-08); closed: bust_attribution_flip (2026-05-08); active: NAS100 (×2). Q-DJ30-3 brief archived 2026-05-08.
 [A] docs/historical/*.md — IMMUTABLE record
 [A] docs/templates/*.md
@@ -116,4 +120,5 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] .claude/settings.json
 [A] .github/workflows/pylint.yml
 [A] .github/workflows/tests.yml
+[A] .github/workflows/manifest-check.yml — SHA256SUMS format + no tracked vendor CSVs (not byte validation)
 [A] .gitignore

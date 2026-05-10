@@ -35,3 +35,19 @@ TradingView exports live under `data/tv_exports/{pepperstone,oanda}/` with the
 canonical filename `<Strategy>_<Instrument>_<Version>_<Broker>_<Symbol>_<YYYY-MM-DD>_<hash>.csv`
 (MVD identity gate in `portfolio_mc.py` enforces the seven-field shape). The
 Pepperstone subdir is the lock-anchor source; OANDA is the proxy.
+
+## Public-clone note
+
+This repo's pipeline depends on two classes of files that are **not committed**:
+
+* **Vendor-licensed data** — TradingView strategy-tester exports in `data/tv_exports/`,
+  broker bar feeds in `data/bar_data/`, and reference series in `data/external/`.
+  Pepperstone and OANDA terms permit personal export but not public redistribution.
+  Per-directory `SHA256SUMS` manifests are tracked so any locally-acquired copy
+  can be integrity-verified.
+* **Pine strategy source** — `**/*.pine` files are held privately to protect the
+  live trading edge. Per-file hashes pinned in [strategies/MANIFEST.sha256](strategies/MANIFEST.sha256).
+
+Tests that depend on vendor data (`test_mc_anchors.py`, `test_tv_export_loader.py`)
+skip cleanly when the CSVs are absent. The Python pipeline runs end-to-end as soon
+as a valid `data/tv_exports/pepperstone/` is dropped in.

@@ -29,7 +29,19 @@ versions stay well within this.
 import pytest
 
 from dd_protection import DD_SCALE, DD_TRIGGER
-from portfolio_mc import ALLOCATIONS, compute_default_config
+from portfolio_mc import ALLOCATIONS, OANDA_PANELS, PEPPERSTONE_PANELS, compute_default_config
+
+_PEPPERSTONE_PRESENT = all(p.exists() for p in PEPPERSTONE_PANELS.values())
+_OANDA_PRESENT = all(p.exists() for p in OANDA_PANELS.values())
+
+requires_pepperstone = pytest.mark.skipif(
+    not _PEPPERSTONE_PRESENT,
+    reason="Pepperstone TV-export CSVs not present (gitignored vendor data; see data/tv_exports/pepperstone/SHA256SUMS).",
+)
+requires_oanda = pytest.mark.skipif(
+    not _OANDA_PRESENT,
+    reason="OANDA TV-export CSVs not present (gitignored vendor data; see data/tv_exports/oanda/SHA256SUMS).",
+)
 
 
 @pytest.fixture(scope="module")
@@ -48,6 +60,7 @@ def oanda_result():
     )
 
 
+@requires_pepperstone
 def test_pepperstone_anchor(pepperstone_result):
     """2026-05-08 Pepperstone 4-strategy C2 anchor (code-reproducible).
 
@@ -60,6 +73,7 @@ def test_pepperstone_anchor(pepperstone_result):
     assert pepperstone_result["p99_dd"]    == pytest.approx(0.0473, abs=1e-4)
 
 
+@requires_oanda
 def test_oanda_anchor(oanda_result):
     """2026-05-08 OANDA C2 anchor (pattern-spotting proxy)."""
     assert oanda_result["pass_rate"] == pytest.approx(0.9623, abs=1e-4)
@@ -67,12 +81,14 @@ def test_oanda_anchor(oanda_result):
     assert oanda_result["p99_dd"]    == pytest.approx(0.0491, abs=1e-4)
 
 
+@requires_pepperstone
 def test_pepperstone_panel_shape(pepperstone_result):
     """Panel cardinality MVD: 1120 bdays, 223 week-blocks (Pepperstone)."""
     assert pepperstone_result["n_bdays"] == 1120
     assert pepperstone_result["n_blocks"] == 223
 
 
+@requires_oanda
 def test_oanda_panel_shape(oanda_result):
     """Panel cardinality MVD: 1120 bdays, 223 week-blocks (OANDA)."""
     assert oanda_result["n_bdays"] == 1120
@@ -107,6 +123,7 @@ def test_default_panel_is_pepperstone():
         )
 
 
+@requires_pepperstone
 def test_lock_criteria_satisfied(pepperstone_result):
     """Lock criteria from CLAUDE.md: bust <1%, p99 DD <5%.
 
@@ -120,6 +137,7 @@ def test_lock_criteria_satisfied(pepperstone_result):
     assert pepperstone_result["p99_dd"] < 0.05
 
 
+@requires_pepperstone
 def test_serial_parallel_equivalence():
     """joblib --parallel must produce byte-identical output to sequential.
 

@@ -37,3 +37,13 @@ data/audnzd_oanda_m15_*.csv
 live_journal/data/*.csv
 live_journal/data/*.json
 !live_journal/data/.gitkeep
+
+# Vendor-licensed data (Pepperstone/OANDA-derived TV exports + broker bar feeds + reference data).
+# Held locally only; SHA256SUMS manifests are tracked for integrity verification.
+data/tv_exports/**/*.csv
+data/bar_data/*.csv
+data/external/*.csv
+
+# Pine strategy source — held privately to protect live trading edge.
+# Per-file SHA256 manifest at strategies/MANIFEST.sha256 is tracked.
+**/*.pine

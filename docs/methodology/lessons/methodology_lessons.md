@@ -328,6 +328,55 @@ lesson + [`docs/adr/2026-05-10-manifest-integrity-gate.md`](../../adr/2026-05-10
 
 ---
 
+## M-10 — FXIFY ops integration: validator routing beats parallel display layers
+
+**Status:** PROMOTED 2026-05-10 (multi-layer FXIFY integration review before merge;
+pytest green did not catch display-layer contradictions).
+
+**Anchor incident:** FXIFY challenge tooling shipped as a **parallel layer**: simplified
+`dd_remaining_pct` / `target_remaining` remained on `status`, `cmd_update`, and
+`Account.flags` alongside `fxify_rule_validator`, plus `prior_eod_equity =
+initial_balance` on `add_account`, defeating skip semantics; `phase_complete`
+surfaced only as a volatile flag string with no persisted audit timestamp.
+
+**Cost:** Audit-instance cluster — five contradiction surfaces (flag merge,
+status table adjacency, `cmd_update` duplicate metrics, silent daily-loss
+reference, phase-complete persistence ambiguity); instance count over dollars.
+
+**Rule:** For firm-specific rule validators, **route display and failure through the
+validator exclusively** for that firm; keep simplified accounting properties only
+for firms that do not use the validator. Never default fake inputs that defeat
+explicit skip paths. Persist audit-worthy completion (`phase_completed_at` ISO)
+when adopting completion semantics.
+
+**Mechanism (why tests missed it):** Integration tests exercised validator math;
+they did not assert **single-truth UI** (no adjacent contradictory columns) or
+**serialization of persisted audit fields** (`to_dict` drift vs in-memory set).
+
+**Connection to standing doctrine:** Reinforces Rule 0 (read production paths end-to-end)
+and The Algorithm (**Delete/Simplify** cross-wiring before layering features).
+
+**Watch-point:** Any PR touching `accounts.py` FXIFY branches, `cli.py status/update`,
+or `accounts.json` schema — confirm one routing path per firm and JSON round-trip
+for new persisted fields.
+
+**Output trigger:** Human review checklist for validator/display coupling; optional
+UX snapshot test for FXIFY row shape.
+
+**Forbidden moves:**
+- Do not ship parallel DD semantics for the same firm on `status` / `flags` /
+  `update` without explicit operator doctrine.
+- Do not default `prior_eod_equity` to synthetic values that replace explicit skip.
+
+**Reproducer / worked example:** Pre-fix `python cli.py status` showed DD Left %
+next to FXIFY column; `cmd_update` printed simplified DD lines above validator
+lines for FXIFY.
+
+**Sibling lessons:** Complements M-9 (integrity drift); same theme — green tests
+≠ aligned operator truth.
+
+---
+
 ## Versioning & change-log
 
 - **2026-05-08:** Registry seeded. Format spec authored. M-7 added as
@@ -338,3 +387,5 @@ lesson + [`docs/adr/2026-05-10-manifest-integrity-gate.md`](../../adr/2026-05-10
   the gap); promotion gated on second occurrence.
 - **2026-05-10:** M-9 added as PROMOTED on GH #62 Phase B / PR #59 manifest
   drift RCA (H2 verdict); encodes local pre-commit hash gate + format-only CI.
+- **2026-05-10:** M-10 added as PROMOTED on FXIFY validator/display routing review
+  (parallel-layer contradiction cluster + `phase_completed_at` persistence).

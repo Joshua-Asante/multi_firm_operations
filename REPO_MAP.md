@@ -1,6 +1,6 @@
 # REPO_MAP — active classification
 
-**Updated:** 2026-05-10 (GH #62 manifest integrity gate: checker + hook + format CI)
+**Updated:** 2026-05-10 (GH #62 manifest integrity gate + deletion inventory classification)
 **Convention:**
 - `[A]` active hot-path (production code, locked strategies, active analyses, immutable record)
 - `[U]` utility — runs on demand, not in CI hot path, retained as load-bearing tool
@@ -57,6 +57,19 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [U] scripts/githooks/pre-commit — template copied to .git/hooks by install scripts
 [U] scripts/install_hooks.sh — POSIX one-shot hook installer
 [U] scripts/install_hooks.bat — Windows hook installer
+[U] scripts/replay_state_h5.py — dd-state replay harness (on-demand)
+[U] scripts/deletion_candidate_report.py — regenerates docs/inventory/deletion_candidates.*
+
+## Ops adjunct & inventory
+[A] strategies/MANIFEST.sha256 — Pine SHA256 manifest (**/*.pine gitignored)
+[A] fxify_rule_validator.py — FXIFY challenge rule checks ([tool.setuptools] py-modules)
+[U] weekly_review_feeder/** — nested package; Notion weekly review feeder
+[U] docs/superpowers/** — agent tooling plans/specs (non-load-bearing)
+[A] docs/notion/repo_context.md — Notion-facing tree snapshot for CC briefs
+[A] docs/inventory/** — generated deletion-candidate inventory (Markdown + CSV)
+[A] docs/spec/** — one-off engineering specs / surveys
+[U] docs/methodology_audit/** — audit templates / scaffolding
+[A] mc_runs/*.txt — pinned MC run logs / seed postfix notes
 
 ## Live execution
 [A] live_journal/scripts/journal_review.py — signal-vs-fill reconciliation pipeline
@@ -80,6 +93,12 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] data/reconciles/2026-05-05_guardian_n_reconcile.md
 [A] data/*.sha256 — pinned hashes
 
+## Data — manifests & audits (tracked sidecars)
+[A] data/bar_data/SHA256SUMS — vendor bar-feed manifest
+[A] data/external/SHA256SUMS
+[A] data/tv_exports/oanda/SHA256SUMS — secondary panel manifest
+[A] data/audits/** — engineering / ULP audit artefacts (e.g. issue #54)
+
 ## Tests
 [A] tests/*.py — all CI-load-bearing
 
@@ -92,10 +111,12 @@ Re-classification candidates (flagged `***`) stay `[A]` until a future Simplify 
 [A] docs/operational_rules.md
 [A] docs/methodology/*.md (active set: 1r_estimation, observation_routing, regime_robustness_gate)
 [A] docs/methodology/findings/*.md (DJ30 cluster — event_clustering / gap_magnitude / stop_cap — archived 2026-05-08)
+[A] docs/methodology/findings/** — findings charts + JSON artefacts alongside markdown
 [A] docs/methodology/gate_audits/*.md (Q-DJ30-2/3 audits archived 2026-05-08)
 [A] docs/methodology/lessons/methodology_lessons.md — M-class lesson registry (format spec + M-7 CANDIDATE seeded 2026-05-08)
 [A] docs/adr/*.md — IMMUTABLE record (latest: 2026-05-10-manifest-integrity-gate)
 [A] docs/briefs/*.md — closed-with-override: Q-DDP-1 (C2 lock 2026-05-08); closed: bust_attribution_flip (2026-05-08); active: NAS100 (×2). Q-DJ30-3 brief archived 2026-05-08.
+[A] docs/briefs/** — nested brief dirs + assets (plots, CSV sweeps, helper scripts under brief folders)
 [A] docs/historical/*.md — IMMUTABLE record
 [A] docs/templates/*.md
 [A] docs/audits/*.md — indicator-vs-strategy diff audits (Guardian v5.5 inaugural 2026-05-08, paired with strategies/guardian/LOCK.md)

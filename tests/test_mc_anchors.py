@@ -26,10 +26,23 @@ acceptable drift; numpy/pandas float-arithmetic variations across patch
 versions stay well within this.
 """
 
+import math
+
+import numpy as np
 import pytest
 
 from dd_protection import DD_SCALE, DD_TRIGGER
-from portfolio_mc import ALLOCATIONS, OANDA_PANELS, PEPPERSTONE_PANELS, compute_default_config
+from portfolio_mc import (
+    ALLOCATIONS,
+    DAILY_LOSS_PCT,
+    HORIZON_DAYS,
+    OANDA_PANELS,
+    PEPPERSTONE_PANELS,
+    STARTING_EQUITY,
+    STRATS,
+    _simulate_path,
+    compute_default_config,
+)
 
 _PEPPERSTONE_PRESENT = all(p.exists() for p in PEPPERSTONE_PANELS.values())
 _OANDA_PRESENT = all(p.exists() for p in OANDA_PANELS.values())
@@ -162,3 +175,67 @@ def test_serial_parallel_equivalence():
         assert serial[key] == parallel[key], (
             f"divergence at {key}: serial={serial[key]!r} parallel={parallel[key]!r}"
         )
+
+
+# ── Rule 0-T compliance — direct _simulate_path call against constructed path ─
+
+def test_simulate_path_direct_call_at_daily_loss_boundary():
+    """Rule 0-T: exercise the inner FP comparison directly via _simulate_path.
+
+    Aggregator-level tests (test_pepperstone_anchor etc.) call
+    `compute_default_config` which loops _simulate_path over thousands of
+    bootstrap paths, but no individual path is constructed to test the
+    boundary FP comparison. Without this direct-call test, a future fix
+    to the comparison could pass aggregator-level tests by coincidence —
+    the PR #60 trap.
+
+    Construction: single-day path where the realized P&L lands one ULP
+    above DAILY_LOSS_PCT (-5%) in raw float64 — i.e., raw FP comparison
+    `pnl / STARTING_EQUITY <= DAILY_LOSS_PCT` is FALSE. Post-fix
+    `round(..., 6)` collapses ULP noise and the comparison fires, busting
+    the simulation as `bust_daily` on day 1.
+
+    Pre-fix: this path would NOT bust (raw FP comparison fails to fire),
+    and the rest of the path is zeros, so outcome would be "timeout".
+    Post-fix: outcome is "bust_daily" on day 1.
+
+    Q-MCFP-1 §2.7 Rule 0-T compliance evidence.
+    """
+    n_strats = len(STRATS)
+    horizon = HORIZON_DAYS
+
+    # Path[0]: realize a loss whose pnl/S lands one ULP above -0.05 in raw FP.
+    # Allocate the entire loss to one strategy (any will do); rest get 0.
+    pnl_total = math.nextafter(-10000.0, 0.0)  # = -9999.999999999998
+    path = np.zeros((horizon, n_strats))
+    path[0, 0] = pnl_total
+
+    # Pre-flight invariants: confirm the path actually exercises the boundary.
+    raw_ratio = pnl_total / STARTING_EQUITY
+    assert raw_ratio > DAILY_LOSS_PCT, (
+        f"Construction invariant: raw FP must land above -0.05 (less negative); "
+        f"got pnl_total={pnl_total!r}, ratio={raw_ratio!r}"
+    )
+    assert round(raw_ratio, 6) <= DAILY_LOSS_PCT, (
+        f"Construction invariant: round6 must collapse to -0.05 and fire; "
+        f"got round6={round(raw_ratio, 6)!r}"
+    )
+
+    # Run _simulate_path directly (NOT through compute_default_config).
+    outcome, day, max_dd, culprit = _simulate_path(
+        path, dd_trigger=DD_TRIGGER, dd_scale=DD_SCALE, horizon=horizon
+    )
+
+    # Post-fix expectation: the round6'd comparison fires on day 1, bust_daily.
+    # Pre-fix expectation: would have been "timeout" (raw comparison silent,
+    # rest of path is zeros, no profit, no static DD breach).
+    assert outcome == "bust_daily", (
+        f"post-fix _simulate_path must declare bust_daily on day 1 for the "
+        f"ULP-above-DAILY_LOSS_PCT path; got outcome={outcome!r}, day={day}"
+    )
+    assert day == 1, (
+        f"bust must occur on day 1 (when the loss is realized); got day={day}"
+    )
+    assert culprit == 0, (
+        f"culprit strat index must be the strategy that took the loss; got {culprit}"
+    )

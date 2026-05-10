@@ -194,14 +194,15 @@ def _simulate_path(path: np.ndarray, dd_trigger: float, dd_scale: float,
 
     for day in range(horizon):
         dd_from_peak = (eq - peak) / peak if peak > 0 else 0.0
-        scale = dd_scale if dd_from_peak <= -dd_trigger else 1.0
+        # ULP-precision rounding before threshold compare; see Q-MCFP-1
+        scale = dd_scale if round(dd_from_peak, 6) <= -dd_trigger else 1.0
         strat_pnls = path[day] * scale
         pnl = float(strat_pnls.sum())
         eq_new = eq + pnl
 
-        if pnl / STARTING_EQUITY <= DAILY_LOSS_PCT:
+        if round(pnl / STARTING_EQUITY, 6) <= DAILY_LOSS_PCT:
             return "bust_daily", day + 1, max_dd, int(np.argmin(strat_pnls))
-        if (eq_new - STARTING_EQUITY) / STARTING_EQUITY <= STATIC_DD_PCT:
+        if round((eq_new - STARTING_EQUITY) / STARTING_EQUITY, 6) <= STATIC_DD_PCT:
             return "bust_static", day + 1, max_dd, int(np.argmin(strat_pnls))
 
         eq = eq_new
@@ -213,7 +214,7 @@ def _simulate_path(path: np.ndarray, dd_trigger: float, dd_scale: float,
         if pnl != 0:
             trade_days += 1
 
-        if eq >= PROFIT_TARGET and trade_days >= MIN_TRADING_DAYS:
+        if round(eq, 2) >= PROFIT_TARGET and trade_days >= MIN_TRADING_DAYS:
             return "pass", day + 1, max_dd, None
 
     return "timeout", horizon, max_dd, None
@@ -496,7 +497,8 @@ def mode_historical(dd_trigger: float, dd_scale: float, no_protection: bool,
     trigger_days = 0
     for i in range(min(day, len(path))):
         dd_from_peak = (eq - peak) / peak if peak > 0 else 0.0
-        if not no_protection and dd_from_peak <= -dd_trigger:
+        # ULP-precision rounding mirrors _simulate_path; see Q-MCFP-1
+        if not no_protection and round(dd_from_peak, 6) <= -dd_trigger:
             trigger_days += 1
             scale = dd_scale
         else:
@@ -505,7 +507,7 @@ def mode_historical(dd_trigger: float, dd_scale: float, no_protection: bool,
         eq = eq + pnl
         if eq > peak:
             peak = eq
-        if outcome == "pass" and eq >= PROFIT_TARGET:
+        if outcome == "pass" and round(eq, 2) >= PROFIT_TARGET:
             break
 
     print("=== Portfolio MC — Historical (deterministic) ===")

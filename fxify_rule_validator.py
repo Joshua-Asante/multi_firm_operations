@@ -48,3 +48,38 @@ _FXIFY = FIRM_RULES["FXIFY"]
 
 RuleKind = Literal["limit", "completion"]
 RuleResult = tuple[bool, RuleKind, str]
+
+
+def validate_max_drawdown(
+    current_equity: float,
+    initial_balance: float,
+    max_dd_pct: float = _FXIFY["max_dd_pct"],
+) -> RuleResult:
+    """Static max-drawdown limit.
+
+    FXIFY 3-Phase: "Max total Drawdown - 5% Static (Based on initial balance)".
+    Breach inclusive at floor (equity <= floor).
+    """
+    if current_equity < 0:
+        raise ValueError("current_equity must be >= 0")
+    if initial_balance <= 0:
+        raise ValueError("initial_balance must be > 0")
+    if max_dd_pct < 0:
+        raise ValueError("max_dd_pct must be >= 0")
+
+    floor = round(initial_balance * (1 - max_dd_pct / 100), 2)
+    equity = round(current_equity, 2)
+    initial = round(initial_balance, 2)
+
+    if equity <= floor:
+        return (
+            False,
+            "limit",
+            f"Max DD breached: equity ${equity:,.2f} <= floor ${floor:,.2f} "
+            f"(rule: {max_dd_pct}% of initial ${initial:,.2f})",
+        )
+    return (
+        True,
+        "limit",
+        f"Max DD ok: equity ${equity:,.2f} > floor ${floor:,.2f}",
+    )

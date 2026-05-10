@@ -9,6 +9,8 @@
 
 **Post-merge update (2026-05-10, ~14:36Z):** `tests/test_mc_anchors.py` verification on post-fix main showed C2 anchor (98.09 / 0.36 / 4.73) and OANDA anchor (96.23 / 0.69 / 4.91) hold at `abs=1e-4` tolerance — 50× tighter than the brief's proposed 0.5pp. Parent's escalation of [#55](https://github.com/Joshua-Asante/multi_firm_operations/issues/55) to P0 was based on overweighting the 47.4% boundary-exact mis-fire rate without first checking whether that magnitude translates through the MC impact path. It does not — boundary-exact cases are rare per evaluation step in continuous trajectories, and pre-fix `dd_protection` effectively fired one bar late rather than missing entirely. Issue [#55](https://github.com/Joshua-Asante/multi_firm_operations/issues/55) downgraded to P3; remaining scope is supplementary metric verification (bust attribution shape, median days-to-pass, p50/p95 DD, bust-type split) folded into next hygiene pass. The 2026-05-08 C2 relock decision stands.
 
+**See also:** `docs/adr/2026-05-10-mc-c2-anchor-ratification.md` documents the import-topology reason the C2 anchor was structurally insulated from this fix. The post-merge addendum above records the empirical reproduction (Δ = 0.00 pp); the standalone ADR records the structural reason future PR authors should reference during §0 reads to either domain.
+
 This addendum is additive to the original ratification note (2026-05-10, pre-merge). Editing in place would lose the audit trail of the parent's reasoning *before* the impact-path verification — that escalation logic and the lesson it embeds (overweight boundary-exact magnitude → check impact path → downgrade) is itself the load-bearing artifact, not the corrected verdict alone.
 
 ## Context

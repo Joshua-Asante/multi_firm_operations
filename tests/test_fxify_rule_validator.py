@@ -773,3 +773,90 @@ class TestInactivity:
                 now=now,
                 max_idle_days=-1,
             )
+
+
+class TestCallerIdiom:
+    """Pins the caller-side filter idiom from the module docstring.
+
+    A fresh, healthy account: limits all pass, completions all unmet
+    (no profit yet, no trading days yet). Distinguishes 'in good
+    standing' from 'phase passed'.
+    """
+
+    def test_fresh_account_in_good_standing_but_phase_not_passed(self):
+        from fxify_rule_validator import (
+            validate_daily_loss,
+            validate_inactivity,
+            validate_max_drawdown,
+            validate_min_trading_days,
+            validate_profit_target,
+        )
+
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        # Just-opened $200K account, traded 1 day ago, 0 trading days
+        # complete, no PnL.
+        results = [
+            validate_daily_loss(
+                current_equity=200_000.00,
+                prior_day_eod_balance=200_000.00,
+            ),
+            validate_max_drawdown(
+                current_equity=200_000.00,
+                initial_balance=200_000.00,
+            ),
+            validate_inactivity(
+                last_trade_at=now - timedelta(days=1),
+                now=now,
+            ),
+            validate_profit_target(
+                current_equity=200_000.00,
+                initial_balance=200_000.00,
+            ),
+            validate_min_trading_days(trading_days_completed=0),
+        ]
+
+        breached = [r for r in results if r[1] == "limit" and not r[0]]
+        unmet = [r for r in results if r[1] == "completion" and not r[0]]
+        in_good_standing = not breached
+        phase_passed = not breached and not unmet
+
+        assert in_good_standing is True
+        assert phase_passed is False
+        assert len(unmet) == 2  # profit target + min trading days
+
+    def test_breached_account_not_in_good_standing(self):
+        from fxify_rule_validator import (
+            validate_daily_loss,
+            validate_inactivity,
+            validate_max_drawdown,
+            validate_min_trading_days,
+            validate_profit_target,
+        )
+
+        now = datetime(2026, 5, 10, 12, 0, 0)
+        # Equity at static-DD floor on day 10.
+        results = [
+            validate_daily_loss(
+                current_equity=190_000.00,
+                prior_day_eod_balance=195_000.00,
+            ),
+            validate_max_drawdown(
+                current_equity=190_000.00,
+                initial_balance=200_000.00,
+            ),
+            validate_inactivity(
+                last_trade_at=now - timedelta(days=1),
+                now=now,
+            ),
+            validate_profit_target(
+                current_equity=190_000.00,
+                initial_balance=200_000.00,
+            ),
+            validate_min_trading_days(trading_days_completed=10),
+        ]
+
+        breached = [r for r in results if r[1] == "limit" and not r[0]]
+        in_good_standing = not breached
+
+        assert in_good_standing is False
+        assert len(breached) == 1  # max DD only — daily loss within 5% of prior day

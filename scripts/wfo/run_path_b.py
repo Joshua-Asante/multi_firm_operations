@@ -1,0 +1,140 @@
+#!/usr/bin/env python3
+"""Path B WFO orchestration entry.
+
+Commands:
+  init-run  — write run directory skeleton + manifest template from grid/fold specs.
+  ingest    — validate Silver §16 filename, TV schema, dedupe sha256, metrics → manifest.
+  select    — §16 train selection ladder + ``train_selection_lock.json`` + manifest fold.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import shutil
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+_WFO_DIR = Path(__file__).resolve().parent
+if str(_WFO_DIR) not in sys.path:
+    sys.path.insert(0, str(_WFO_DIR))
+
+from grid_hash import fold_spec_hash_from_path, grid_hash_from_path
+
+from report import emit_reports
+
+
+def _ensure_wfo_path() -> None:
+    if str(_WFO_DIR) not in sys.path:
+        sys.path.insert(0, str(_WFO_DIR))
+
+
+def cmd_init_run(args: argparse.Namespace) -> int:
+    run_dir = Path(args.out_dir)
+    run_dir.mkdir(parents=True, exist_ok=True)
+    gh = grid_hash_from_path(args.grid)
+    fh = fold_spec_hash_from_path(args.fold_spec)
+    manifest = {
+        "run_id": args.run_id,
+        "created_utc": datetime.now(timezone.utc).isoformat(),
+        "grid_path": str(Path(args.grid).resolve()),
+        "grid_hash": gh,
+        "fold_spec_path": str(Path(args.fold_spec).resolve()),
+        "fold_spec_hash": fh,
+        "comparator_csv_sha256": args.comparator_sha256,
+        "seed": int(args.seed),
+        "folds": [],
+        "ingests": [],
+    }
+    (run_dir / "run_manifest.json").write_text(
+        json.dumps(manifest, indent=2), encoding="utf-8"
+    )
+    shutil.copy(args.grid, run_dir / "grid.json")
+    shutil.copy(args.fold_spec, run_dir / "fold_spec.json")
+    emit_reports(run_dir)
+    print(f"Wrote {run_dir / 'run_manifest.json'}")
+    return 0
+
+
+def cmd_emit_reports(args: argparse.Namespace) -> int:
+    emit_reports(args.run_dir)
+    print(f"Wrote reports under {args.run_dir}")
+    return 0
+
+
+def cmd_ingest(args: argparse.Namespace) -> int:
+    _ensure_wfo_path()
+    import operations  # noqa: E402
+
+    row = operations.ingest_tv_csv(
+        Path(args.run_dir),
+        Path(args.csv),
+        min_raw_rows=args.min_raw_rows,
+        min_trades=args.min_trades,
+        max_trades=args.max_trades,
+        notional=args.notional,
+        validate_grid=not args.skip_grid_validate,
+    )
+    print(json.dumps(row, indent=2, default=str))
+    return 0
+
+
+def cmd_select(args: argparse.Namespace) -> int:
+    _ensure_wfo_path()
+    import operations  # noqa: E402
+
+    out = operations.select_train_fold(Path(args.run_dir), fold_id=str(args.fold_id))
+    print(json.dumps(out, indent=2, default=str))
+    return 0
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser(description=__doc__)
+    sub = ap.add_subparsers(dest="cmd", required=True)
+
+    p_init = sub.add_parser("init-run", help="create run_manifest.json + copy specs")
+    p_init.add_argument("--run-id", required=True)
+    p_init.add_argument("--grid", type=Path, required=True)
+    p_init.add_argument("--fold-spec", type=Path, required=True)
+    p_init.add_argument("--out-dir", type=Path, required=True)
+    p_init.add_argument(
+        "--comparator-sha256",
+        required=True,
+        help="64-char sha256 of comparator Guardian Gold CSV (from SHA256SUMS)",
+    )
+    p_init.add_argument("--seed", type=int, default=42)
+
+    p_rep = sub.add_parser("emit-reports", help="write report.md + report.json stub")
+    p_rep.add_argument("--run-dir", type=Path, required=True)
+
+    p_ing = sub.add_parser("ingest", help="ingest one TV CSV into run manifest")
+    p_ing.add_argument("--run-dir", type=Path, required=True)
+    p_ing.add_argument("--csv", type=Path, required=True)
+    p_ing.add_argument("--min-raw-rows", type=int, default=100)
+    p_ing.add_argument("--min-trades", type=int, default=10)
+    p_ing.add_argument("--max-trades", type=int, default=5000)
+    p_ing.add_argument("--notional", type=float, default=200_000.0)
+    p_ing.add_argument(
+        "--skip-grid-validate",
+        action="store_true",
+        help="skip tunable_dimensions membership check (not for production)",
+    )
+
+    p_sel = sub.add_parser("select", help="train-fold selection + lock file (§16)")
+    p_sel.add_argument("--run-dir", type=Path, required=True)
+    p_sel.add_argument("--fold-id", type=str, default="1")
+
+    args = ap.parse_args()
+    if args.cmd == "init-run":
+        return cmd_init_run(args)
+    if args.cmd == "emit-reports":
+        return cmd_emit_reports(args)
+    if args.cmd == "ingest":
+        return cmd_ingest(args)
+    if args.cmd == "select":
+        return cmd_select(args)
+    return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

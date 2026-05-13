@@ -346,8 +346,8 @@ reference, phase-complete persistence ambiguity); instance count over dollars.
 **Rule:** For firm-specific rule validators, **route display and failure through the
 validator exclusively** for that firm; keep simplified accounting properties only
 for firms that do not use the validator. Never default fake inputs that defeat
-explicit skip paths. Persist audit-worthy completion (`phase_completed_at` ISO)
-when adopting completion semantics.
+explicit skip paths. Persist audit-worthy completion (`phase_completed_at` per-phase
+dict of ISO timestamps) when adopting completion semantics.
 
 **Mechanism (why tests missed it):** Integration tests exercised validator math;
 they did not assert **single-truth UI** (no adjacent contradictory columns) or

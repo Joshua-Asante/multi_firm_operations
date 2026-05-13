@@ -31,51 +31,43 @@ from lib.mvd import assert_min_rows, assert_tv_export
 PRICE_COL_BY_INSTRUMENT = {
     "USDJPY":  "Price JPY",
     "XAUUSD":  "Price USD",
+    "XAGUSD":  "Price USD",
     "US30USD": "Price USD",
     "US30":    "Price USD",
     "NAS100":  "Price USD",
 }
 
 
-def load_tv_export(
-    csv_path: str | Path,
+def pair_tv_export_dataframe(
+    raw: pd.DataFrame,
     *,
-    expected_strategy: str,
-    expected_version: str,
     expected_symbol: str,
-    expected_broker: str = "OANDA",
+    min_raw_rows: int = 100,
+    source_label: str = "",
 ) -> pd.DataFrame:
-    """Load a TV export, pair entry/exit rows, return a per-trade DataFrame.
+    """Pair Entry/Exit TV rows into per-trade rows without filename identity checks.
 
-    Identity (filename → strategy/version/broker/symbol) is asserted via
-    `lib.mvd.assert_tv_export` before any rows are read.
+    Used by WFO ``ingest`` for custom ``Silver_*`` filenames while reusing the same
+    column contract as :func:`load_tv_export`.
     """
-    csv_path = Path(csv_path)
-    assert_tv_export(
-        csv_path,
-        expected_strategy=expected_strategy,
-        expected_version=expected_version,
-        expected_broker=expected_broker,
-        expected_symbol=expected_symbol,
-    )
-
-    raw = pd.read_csv(csv_path, encoding="utf-8-sig")
-    assert_min_rows(len(raw), 100, label=f"TV-export rows {csv_path.name}")
+    label = source_label or "TV-export"
+    assert_min_rows(len(raw), min_raw_rows, label=f"{label} rows")
 
     price_col = PRICE_COL_BY_INSTRUMENT[expected_symbol]
     if price_col not in raw.columns:
         raise AssertionError(
-            f"TV-export schema fail: expected price column '{price_col}' "
+            f"TV-export schema fail [{label}]: expected price column '{price_col}' "
             f"for symbol {expected_symbol}, columns={list(raw.columns)}"
         )
 
+    raw = raw.copy()
     raw["Date and time"] = pd.to_datetime(raw["Date and time"])
 
     entries = raw[raw["Type"].str.startswith("Entry")].copy()
     exits = raw[raw["Type"].str.startswith("Exit")].copy()
     if len(entries) != len(exits):
         raise AssertionError(
-            f"TV-export pairing fail [{csv_path.name}]: "
+            f"TV-export pairing fail [{label}]: "
             f"{len(entries)} entries vs {len(exits)} exits"
         )
 
@@ -83,15 +75,14 @@ def load_tv_export(
     exits = exits.set_index("Trade #")
     if not entries.index.equals(exits.index):
         raise AssertionError(
-            f"TV-export pairing fail [{csv_path.name}]: "
+            f"TV-export pairing fail [{label}]: "
             f"Trade # index mismatch between entry and exit rows"
         )
 
     side = entries["Type"].map(lambda t: 1 if "long" in t.lower() else -1)
     if (side != 1).any():
         raise AssertionError(
-            f"TV-export side fail [{csv_path.name}]: "
-            f"non-long entries present (all three strategies are long-only at locked versions)"
+            f"TV-export side fail [{label}]: non-long entries present"
         )
 
     leg_type = entries["Signal"].map(
@@ -118,5 +109,35 @@ def load_tv_export(
         "cum_pnl_usd":   entries["Cumulative P&L USD"].values,
         "cum_pnl_pct":   entries["Cumulative P&L %"].values,
     })
-    out = out.reset_index(drop=True)
-    return out
+    return out.reset_index(drop=True)
+
+
+def load_tv_export(
+    csv_path: str | Path,
+    *,
+    expected_strategy: str,
+    expected_version: str,
+    expected_symbol: str,
+    expected_broker: str = "OANDA",
+) -> pd.DataFrame:
+    """Load a TV export, pair entry/exit rows, return a per-trade DataFrame.
+
+    Identity (filename → strategy/version/broker/symbol) is asserted via
+    `lib.mvd.assert_tv_export` before any rows are read.
+    """
+    csv_path = Path(csv_path)
+    assert_tv_export(
+        csv_path,
+        expected_strategy=expected_strategy,
+        expected_version=expected_version,
+        expected_broker=expected_broker,
+        expected_symbol=expected_symbol,
+    )
+
+    raw = pd.read_csv(csv_path, encoding="utf-8-sig")
+    return pair_tv_export_dataframe(
+        raw,
+        expected_symbol=expected_symbol,
+        min_raw_rows=100,
+        source_label=csv_path.name,
+    )

@@ -9,6 +9,7 @@ Usage:
 """
 
 import argparse
+import json
 import sys
 
 from accounts import (
@@ -150,7 +151,7 @@ def cmd_challenge(args):
         st = evaluate_fxify_challenge_status(a)
         print(f"{a.account_id}  phase={a.phase}  balance=${a.balance:,.2f}")
         if a.phase_completed_at:
-            print(f"  phase_completed_at: {a.phase_completed_at}")
+            print(f"  phase_completed_at: {json.dumps(a.phase_completed_at, sort_keys=True)}")
         print("  Limits:")
         for passed, _kind, reason in st.limit_results:
             tag = "ok" if passed else "FAIL"

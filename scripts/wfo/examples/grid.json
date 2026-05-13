@@ -1,0 +1,23 @@
+{
+  "strategy": "guardian_family_v0",
+  "instrument": "XAGUSD",
+  "broker": "PEPPERSTONE",
+  "tunable_dimensions": {
+    "ema_slow_len": [385, 395, 450, 500, 550],
+    "stop_atr": [1.4, 1.55, 1.75, 2.0, 2.25],
+    "tp_atr": [15, 20, 25, 29, 33],
+    "session": ["NY_Extended", "London_NY_Overlap"]
+  },
+  "fixed_parameters": {
+    "entry_ema_len": 20,
+    "atr_length": 15,
+    "max_hold_bars": 850,
+    "max_daily_trades": 3,
+    "min_bars_before_stop": 0,
+    "grace_stop_mult": 2.0,
+    "risk_pct": 0.30,
+    "allowed_days": ["Tuesday", "Thursday", "Friday"],
+    "blocked_hours": ["Thursday_H08", "H12_entry", "H12_day_gate"]
+  },
+  "expected_config_count": 250
+}

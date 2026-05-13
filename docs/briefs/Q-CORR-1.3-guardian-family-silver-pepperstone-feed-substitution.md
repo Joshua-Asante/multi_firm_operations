@@ -11,23 +11,23 @@
 
 ## §0 Rule-0 reads (production + load-bearing artifacts)
 
-**Authoring note:** this DRAFT was authored in a web-Claude session without filesystem access. Every path below is marked `[§0-pending — read in Claude Code session before lock]`. The parent `multi_firm_operations` session MUST `view` each path with `git log --follow -n 1 -- <path>` confirming commit/timestamp and re-paste anchors into this section BEFORE LOCK. Per brief-authoring SKILL.md Rule 0 sub-rule: §0 without verification anchors decays to ceremony — do not lock without populating them.
+**Authoring note:** this DRAFT was originally authored in a web-Claude session without filesystem access. §0 anchors below were populated 2026-05-13 by CC (`git log --follow -n 1` per path; `stat` for the two gitignored / user-memory paths). LOCK-time Phase 0 still re-runs Edits A/E and the load-bearing residuals (XAGUSD fold-window subset coverage + intra-week gap-freeness; comparator SHA persistence) before lock per brief-authoring SKILL.md Rule 0 sub-rule.
 
-Paths to read at lock-time Phase 0:
+Paths read at §0 (anchors populated 2026-05-13 by CC):
 
-- [`firm_rules.py`](../../firm_rules.py), [`accounts.py`](../../accounts.py), [`dd_protection.py`](../../dd_protection.py) — operational risk layer (context only; Silver admission is orthogonal; no edits proposed). **[§0-pending]**
-- [`docs/rule_0.md`](../rule_0.md) — audit-first discipline. **[§0-pending]**
-- [`docs/methodology/regime_robustness_gate.md`](../methodology/regime_robustness_gate.md) — bootstrap pattern; gate inheritance from Q-CORR-1.2 §14 carries forward modulo OPEN ITEM D recalibration. **[§0-pending]**
-- [`docs/briefs/Q-CORR-1.2-guardian-family-silver-wfo.md`](Q-CORR-1.2-guardian-family-silver-wfo.md) — parent Pre-Q; LOCKED 2026-05-13. Quote §15 fail-rule, §14 gates, §6.5 train-selection lock semantic verbatim where this brief inherits or supersedes. **[§0-pending]**
-- [`docs/spec/wfo-runner-v0.md`](../spec/wfo-runner-v0.md) — Path B orchestration shell; feed-agnostic at the shell level. **[§0-pending]**
-- [`docs/spec/wfo-runner-v0-adversarial-tests.md`](../spec/wfo-runner-v0-adversarial-tests.md) — discipline-falsifier tests. Carry forward unchanged. **[§0-pending]**
-- [`CLAUDE.md`](../../CLAUDE.md) — "Public-clone posture" section AND "Vendor-data integrity gate" section. **[§0-pending]**
-- user memory `feedback_two_tier_canonical_pepperstone_oanda.md` — two-tier canonical rule semantic (lives outside the repo at user-auto-memory storage; in-repo citations recorded in §1 doctrine #2). **[§0-pending — confirm file exists at user-memory path; record `stat`-style last-modified timestamp at lock-time Phase 0]**
-- [`lib/correlation.py`](../../lib/correlation.py) — zero-fill semantic; feed-agnostic at function level. **[§0-pending]**
-- [`lib/regime_bootstrap.py`](../../lib/regime_bootstrap.py) — bootstrap implementation; feed-agnostic. **[§0-pending]**
-- [`data/tv_exports/pepperstone/SHA256SUMS`](../../data/tv_exports/pepperstone/SHA256SUMS) — confirm `_13fad` Gold comparator digest `e38e8fe80419a286666898e8cae41a3be796277844367b7f1dfdcc3a0feba124` still present. Required for OPEN ITEM B inheritance vs replacement decision. **[§0-pending]**
-- [`strategies/MANIFEST.sha256`](../../strategies/MANIFEST.sha256) — Pine v5.5 source hash pin. **Reactivates as load-bearing if OPEN ITEM A resolves to A.ii (Path A);** non-blocking otherwise. **[§0-pending]**
-- [`data/bar_data/XAGUSD.csv`](../../data/bar_data/XAGUSD.csv) — OANDA-pulled M15 bar witness; fetched range `2022-01-02 → 2026-04-19`, 101,421 data rows (CC-verified 2026-05-13 via `wc -l`). **Not yet manifest-tracked.** If OPEN ITEM A resolves to A.ii, this file requires `scripts/check_data_manifests.py --regenerate` in the same commit per vendor-data integrity gate. **[§0-pending — confirm fold-window 2022-01-11 → 2026-04-20 subset coverage and intra-week gap-freeness; no draft-time arithmetic was performed on the fold-window-bounded count.]**
+- [`firm_rules.py`](../../firm_rules.py), [`accounts.py`](../../accounts.py), [`dd_protection.py`](../../dd_protection.py) — operational risk layer (context only; Silver admission is orthogonal; no edits proposed). **[verified: `firm_rules.py` `cd58bb9` 2026-05-10 00:45:56 -0400; `accounts.py` `31110f5` 2026-05-13 16:00:27 -0400; `dd_protection.py` `6c7fa54` 2026-05-10 10:36:42 -0400]**
+- [`docs/rule_0.md`](../rule_0.md) — audit-first discipline. **[verified: `8f84060` 2026-05-07 16:31:57 -0400]**
+- [`docs/methodology/regime_robustness_gate.md`](../methodology/regime_robustness_gate.md) — bootstrap pattern; gate inheritance from Q-CORR-1.2 §14 carries forward modulo OPEN ITEM D recalibration. **[verified: `2567b15` 2026-05-08 18:16:20 -0400]**
+- [`docs/briefs/Q-CORR-1.2-guardian-family-silver-wfo.md`](Q-CORR-1.2-guardian-family-silver-wfo.md) — parent Pre-Q; LOCKED 2026-05-13. Quote §15 fail-rule, §14 gates, §6.5 train-selection lock semantic verbatim where this brief inherits or supersedes. **[verified: `05f4162` 2026-05-13 16:49:25 -0400]**
+- [`docs/spec/wfo-runner-v0.md`](../spec/wfo-runner-v0.md) — Path B orchestration shell; feed-agnostic at the shell level. **[verified: `05f4162` 2026-05-13 16:49:25 -0400]**
+- [`docs/spec/wfo-runner-v0-adversarial-tests.md`](../spec/wfo-runner-v0-adversarial-tests.md) — discipline-falsifier tests. Carry forward unchanged. **[verified: `7e2d5aa` 2026-05-13 17:01:02 -0400]**
+- [`CLAUDE.md`](../../CLAUDE.md) — "Public-clone posture" section AND "Vendor-data integrity gate" section. **[verified: `51005fc` 2026-05-10 17:02:32 -0400; §99 Public-clone posture + §114 Vendor-data integrity gate headings present per CC 2026-05-13 Step 2.2 cross-check item 5a]**
+- user memory `feedback_two_tier_canonical_pepperstone_oanda.md` — two-tier canonical rule semantic (lives outside the repo at user-auto-memory storage; in-repo citations recorded in §1 doctrine #2). **[verified: file present at `C:/Users/joshu/.claude/projects/C--Users-joshu-multi-firm-operations/memory/feedback_two_tier_canonical_pepperstone_oanda.md`, stat mtime 2026-04-28 20:44:42 -0400, size 3595 bytes (CC stat'd 2026-05-13)]**
+- [`lib/correlation.py`](../../lib/correlation.py) — zero-fill semantic; feed-agnostic at function level. **[verified: `31110f5` 2026-05-13 16:00:27 -0400]**
+- [`lib/regime_bootstrap.py`](../../lib/regime_bootstrap.py) — bootstrap implementation; feed-agnostic. **[verified: `31110f5` 2026-05-13 16:00:27 -0400]**
+- [`data/tv_exports/pepperstone/SHA256SUMS`](../../data/tv_exports/pepperstone/SHA256SUMS) — confirm `_13fad` Gold comparator digest `e38e8fe80419a286666898e8cae41a3be796277844367b7f1dfdcc3a0feba124` still present. Required for OPEN ITEM B inheritance vs replacement decision. **[verified: `31110f5` 2026-05-13 16:00:27 -0400; `_13fad` digest line present per CC 2026-05-13 Step 2.2 cross-check item 2]**
+- [`strategies/MANIFEST.sha256`](../../strategies/MANIFEST.sha256) — Pine v5.5 source hash pin. **Reactivates as load-bearing if OPEN ITEM A resolves to A.ii (Path A);** non-blocking otherwise. **[verified: `b71e4a4` 2026-05-10 11:12:33 -0400; 14-line manifest present (file contents not cat'd per public-clone posture)]**
+- [`data/bar_data/XAGUSD.csv`](../../data/bar_data/XAGUSD.csv) — OANDA-pulled M15 bar witness; fetched range `2022-01-02 → 2026-04-19`, 101,421 data rows (CC-verified 2026-05-13 via `wc -l`). **Not yet manifest-tracked.** If OPEN ITEM A resolves to A.ii, this file requires `scripts/check_data_manifests.py --regenerate` in the same commit per vendor-data integrity gate. **[file-anchor verified: stat mtime 2026-05-13 17:11:46 -0400, size 7,325,823 bytes (CC stat'd 2026-05-13); §0-pending — confirm fold-window 2022-01-11 → 2026-04-20 subset coverage and intra-week gap-freeness; no draft-time arithmetic was performed on the fold-window-bounded count.]**
 
 **Surrounding-context sub-rule:** when citing a specific line from any of the above, the §0 reader at lock-time reads ±20 lines of surrounding context, not the line in isolation. Cross-ref grep before declaring anything cruft.
 
@@ -398,3 +398,32 @@ Pre-Lock Checklist OPEN ITEMS A–J are not part of this verification block — 
     + 1 header line per §0 bullet). Single-source-of-truth: if §0 ever
     updates the count, the Verification block follows automatically.
   - No other changes. Status remains `OPEN — DRAFT (pre-lock)`.
+
+- **Rev 4 (2026-05-13):** §0 anchor population (Step 2.1 of the original CC
+  verification handoff, deferred through Rev 1 / Rev 2 / Rev 3 doctrine fixes).
+  - §0 Authoring note: rewritten to reflect populated state. Original wording
+    ("Every path below is marked `[§0-pending`...") preserved as authorship-
+    notes context at line 343 (stale-by-design — describes the original
+    DRAFT state, not the current §0 state).
+  - 13 path bullets: each `**[§0-pending]**` marker replaced with
+    `**[verified: <hash> <ISO timestamp>]**` per `git log --follow -n 1`.
+    Item 8 (user-memory `feedback_two_tier_canonical_pepperstone_oanda.md`):
+    `stat`-style anchor instead (file lives outside the repo). Item 13
+    (`data/bar_data/XAGUSD.csv`): `stat`-style file-anchor alongside the
+    preserved fold-window-subset-coverage §0-pending residual (latter is
+    load-bearing; not satisfied by file existence alone).
+  - Item 7 (CLAUDE.md): cross-reference to CC's Step 2.2 cross-check item
+    5a inlined as anchor-context (lines :99 / :114 of `51005fc` per CC's
+    surrounding-context-sub-rule read).
+  - Item 11 (pepperstone/SHA256SUMS): cross-reference to CC's Step 2.2
+    cross-check item 2 inlined (`_13fad` digest persistence confirmed).
+  - Item 12 (strategies/MANIFEST.sha256): existence + line count noted;
+    contents not cat'd per public-clone posture.
+  - No other changes. Status remains `OPEN — DRAFT (pre-lock)`.
+
+- **Rev 4 known-stale reference:** Line 343 ("All paths cited are
+  `[§0-pending]` until parent-session verification") is in the Draft
+  authorship notes and describes the *original* web-Claude-session DRAFT
+  state. Not updated by Rev 4 because the authorship-notes section is
+  history-of-record, not live state. A future revision may strike or
+  archive it.

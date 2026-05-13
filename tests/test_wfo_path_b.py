@@ -47,6 +47,10 @@ def test_init_run_and_audit(tmp_path):
     assert manifest.is_file()
     data = json.loads(manifest.read_text(encoding="utf-8"))
     assert data["grid_hash"]
+    # §14 Gate 9 disposition convention (orchestration metadata, not gate definition).
+    # Pinned in manifest at init-run per docs/spec/wfo-runner-v0.md §2.
+    assert data["bootstrap_seed"] == 42
+    assert data["bootstrap_n_panels"] == 1000
     assert (run_dir / "report.md").is_file()
 
     audit = [
@@ -87,6 +91,34 @@ def test_audit_detects_oos_before_commit(tmp_path):
     ]
     r = subprocess.run(audit, cwd=str(REPO))
     assert r.returncode == 1
+
+
+def test_init_run_bootstrap_flags_override(tmp_path):
+    """CLI flags can override the canonical (42, 1000) for reproducing historical anchors."""
+    run_dir = tmp_path / "run_override"
+    cmd = [
+        sys.executable,
+        str(WFO / "run_path_b.py"),
+        "init-run",
+        "--run-id",
+        "override",
+        "--grid",
+        str(EXAMPLES / "grid.json"),
+        "--fold-spec",
+        str(EXAMPLES / "fold_spec.json"),
+        "--out-dir",
+        str(run_dir),
+        "--comparator-sha256",
+        "f" * 64,
+        "--bootstrap-seed",
+        "7",
+        "--bootstrap-n-panels",
+        "100",
+    ]
+    subprocess.run(cmd, check=True, cwd=str(REPO))
+    data = json.loads((run_dir / "run_manifest.json").read_text(encoding="utf-8"))
+    assert data["bootstrap_seed"] == 7
+    assert data["bootstrap_n_panels"] == 100
 
 
 def test_train_selection_lock(tmp_path):

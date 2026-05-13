@@ -23,7 +23,15 @@ def test_regime_bootstrap_reproducible():
 
 
 def test_silver_bootstrap_p05_optional():
-    """Wide sanity band when Silver TV export supplied via env."""
+    """Q-CORR-1.2 §15 historical anchor: p05_pf ≈ 1.05 ± 0.02 at the pinned params.
+
+    Brief §15's 1.05 ± 0.02 reproduces against the Q-CORR-1.1 v5.5-on-Silver CSV
+    only at (bootstrap_seed=7, bootstrap_n_panels=100, block_months=6). These are
+    historical-anchor parameters; distinct from the §14 Gate 9 disposition
+    convention (canonical bootstrap_seed=42, bootstrap_n_panels=1000 — orchestration
+    metadata recorded in run_manifest.json at init-run per
+    docs/spec/wfo-runner-v0.md §2).
+    """
     p = os.environ.get("Q_CORR_SILVER_TV_CSV")
     if not p:
         pytest.skip("Q_CORR_SILVER_TV_CSV unset (Silver Guardian TV export).")
@@ -31,5 +39,8 @@ def test_silver_bootstrap_p05_optional():
     if not path.is_file():
         pytest.skip(f"missing {path}")
     daily = load_exit_date_daily_net(path)
-    res = regime_bootstrap_daily_pnl(daily, n_panels=100, seed=20260513)
-    assert 0.5 < res.p05_pf < 1.8, res.p05_pf
+    res = regime_bootstrap_daily_pnl(daily, n_panels=100, seed=7, block_months=6)
+    assert abs(res.p05_pf - 1.05) <= 0.02, (
+        f"§15 historical anchor drift: p05_pf={res.p05_pf:.4f}, expected 1.05 ± 0.02 "
+        f"(seed=7, n_panels=100, block_months=6)"
+    )

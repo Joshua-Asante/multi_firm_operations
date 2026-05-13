@@ -27,7 +27,7 @@ Paths to read at lock-time Phase 0:
 - [`lib/regime_bootstrap.py`](../../lib/regime_bootstrap.py) — bootstrap implementation; feed-agnostic. **[§0-pending]**
 - [`data/tv_exports/pepperstone/SHA256SUMS`](../../data/tv_exports/pepperstone/SHA256SUMS) — confirm `_13fad` Gold comparator digest `e38e8fe80419a286666898e8cae41a3be796277844367b7f1dfdcc3a0feba124` still present. Required for OPEN ITEM B inheritance vs replacement decision. **[§0-pending]**
 - [`strategies/MANIFEST.sha256`](../../strategies/MANIFEST.sha256) — Pine v5.5 source hash pin. **Reactivates as load-bearing if OPEN ITEM A resolves to A.ii (Path A);** non-blocking otherwise. **[§0-pending]**
-- [`data/bar_data/XAGUSD.csv`](../../data/bar_data/XAGUSD.csv) — OANDA-pulled M15 bar witness `2022-01-02T23:00Z → 2026-04-19T23:45Z` (100,865 bars, no intra-week gaps in Q-CORR-1.2 fold window). **Not yet manifest-tracked.** If OPEN ITEM A resolves to A.ii, this file requires `scripts/check_data_manifests.py --regenerate` in the same commit per vendor-data integrity gate. **[§0-pending]**
+- [`data/bar_data/XAGUSD.csv`](../../data/bar_data/XAGUSD.csv) — OANDA-pulled M15 bar witness; fetched range `2022-01-02 → 2026-04-19`, 101,421 data rows (CC-verified 2026-05-13 via `wc -l`). **Not yet manifest-tracked.** If OPEN ITEM A resolves to A.ii, this file requires `scripts/check_data_manifests.py --regenerate` in the same commit per vendor-data integrity gate. **[§0-pending — confirm fold-window 2022-01-11 → 2026-04-20 subset coverage and intra-week gap-freeness; no draft-time arithmetic was performed on the fold-window-bounded count.]**
 
 **Surrounding-context sub-rule:** when citing a specific line from any of the above, the §0 reader at lock-time reads ±20 lines of surrounding context, not the line in isolation. Cross-ref grep before declaring anything cruft.
 
@@ -117,7 +117,7 @@ These are moves the author genuinely considered or was tempted by — they are n
 6. **Relaxing §14 floors** (PF ≥1.50, WR ≥15%, DD ≤8%, p05 PF ≥1.30, MFE/MAE >2.0) without an explicit "why this floor moves on the new feed" justification per OPEN ITEM D. Floors are presumptively portable; the burden of proof is on the relaxation.
 7. **Inlining Pine source** in any artifact eligible for the public-clone path. Reactivated as load-bearing if A.ii. Pine bytes must reach the implementation environment via a scoped private workspace; no paste into briefs, ADRs, commit messages, or CC handoffs that may be cloned.
 8. **Manifesting `data/bar_data/XAGUSD.csv` (OANDA bars) without `scripts/check_data_manifests.py --regenerate` in the same commit as any introduction into a run manifest.** Vendor-data integrity gate. Currently the file is parked but not manifest-tracked; promotion to manifest-tracked status is a separate commit hygiene step that A.ii would force.
-9. **Treating the OANDA-pulled bar witness (100,865 weekday M15 bars) as Lock-class evidence in itself.** It establishes third-party availability of bar coverage for the fold window; it does not establish Pepperstone-TV bar-quality equivalence. A.i/A.iii may use it as a screening-substrate ground truth; Lock-class verdicts still require Pepperstone-TV.
+9. **Treating the OANDA-pulled bar witness (M15 file covering the fold window) as Lock-class evidence in itself.** It establishes third-party availability of bar coverage for the fold window; it does not establish Pepperstone-TV bar-quality equivalence. A.i/A.iii may use it as a screening-substrate ground truth; Lock-class verdicts still require Pepperstone-TV.
 10. **Multi-question creep.** Q-CORR-1.3 has one parent question (§2). OPEN ITEMS A–J are sub-decisions Joshua resolves at LOCK; they do not justify spawning parallel Pre-Qs (per brief-authoring SKILL.md trap #11, parent-Q convention applies).
 
 ---
@@ -290,9 +290,9 @@ The following claims in this DRAFT depend on filesystem reads I could not perfor
 - That Q-CORR-1.2 §15 closing paragraph reads verbatim as quoted in §1 (handoff source; cross-check against the LOCKED file).
 - That `data/tv_exports/pepperstone/SHA256SUMS` still contains the `_13fad` row with digest `e38e8fe8…` (no rotation since 2026-05-13 LOCK).
 - That `lib/correlation.py` and `lib/regime_bootstrap.py` are at the paths cited (no refactor since 2026-05-13).
-- That `data/bar_data/XAGUSD.csv` exists with the 100,865-bar OANDA-pull described in the handoff (and that it is not yet manifest-tracked).
+- That `data/bar_data/XAGUSD.csv` covers the Q-CORR-1.2 fold window 2022-01-11 → 2026-04-20 (subset of CC-verified fetched range 2022-01-02 → 2026-04-19) without intra-week gaps. CC verified existence + 101,421 data rows + not-manifest-tracked status on 2026-05-13; fold-window subset coverage and gap-freeness remain unverified.
 - That CLAUDE.md `:99` "Public-clone posture" and `:114` "Vendor-data integrity gate" sections read as paraphrased in §1 doctrines #3 and #5.
-- That the two-tier canonical rule's in-repo citations in §1 doctrine #2 (`docs/adr/2026-05-03-...md:135`, `docs/briefs/bust_attribution_flip.md:86,122`, `docs/methodology/findings/2026-05-03_usdchf_h4_sentinel_gate.md:162`) still resolve to the cited line numbers (verify with `grep -n "two-tier canonical"` after §0 read).
+- That the two-tier canonical rule's in-repo citations in §1 doctrine #2 (`docs/adr/2026-05-03-...md:135`, `docs/briefs/bust_attribution_flip.md:86,122`, `docs/methodology/findings/2026-05-03_usdchf_h4_sentinel_gate.md:162`) still resolve to the cited line numbers (verify with `grep -n "Two-tier canonical"` after §0 read).
 - That `strategies/MANIFEST.sha256` exists and pins Pine source hashes (relevant only if OPEN ITEM A resolves A.ii).
 
 If any of these is inaccurate at §0 read time, this DRAFT needs revision before LOCK — flag and pause rather than silently correcting.
@@ -322,10 +322,10 @@ git log --follow -n 1 -- lib/regime_bootstrap.py
 # Expected: commits postdating 2026-05-13 LOCK only if a refactor occurred; report timestamp into §0.
 
 ls data/bar_data/XAGUSD.csv && wc -l data/bar_data/XAGUSD.csv
-# Expected: file exists; row count consistent with 100,865 bars + header.
+# Expected: file exists; row count consistent with §0 bullet count (101,421 data rows + 1 header line).
 
 # Cross-reference verification (cited facts match canonical sources)
-grep -n "two-tier canonical" \
+grep -n "Two-tier canonical" \
   docs/adr/2026-05-03-sentinel-gate-decision.md \
   docs/briefs/bust_attribution_flip.md \
   docs/methodology/findings/2026-05-03_usdchf_h4_sentinel_gate.md
@@ -368,4 +368,33 @@ Pre-Lock Checklist OPEN ITEMS A–J are not part of this verification block — 
     grep evidence confirmed exist.
   - Notes appendix from Rev 1: removed (both flagged items closed; Revision log
     is the active audit trail going forward).
+  - No other changes. Status remains `OPEN — DRAFT (pre-lock)`.
+
+- **Rev 3 (2026-05-13):** Closure of Rev-2 CC verification concerns C1 + C2 (and adjacent surfaces of same defect families discovered during Rev 3 authoring) per parent disposition.
+  - §0 bullet for `data/bar_data/XAGUSD.csv` (C1.i): struck unverified "100,865
+    bars" + "no intra-week gaps in fold window"; replaced with CC-verified
+    101,421-row fetched-range count + §0-pending tag on fold-window subset
+    coverage and gap-freeness. No draft-time arithmetic was performed on the
+    fold-window-bounded count.
+  - §5 #9 (C1.ii): struck "(100,865 weekday M15 bars)" parenthetical; replaced
+    with "(M15 file covering the fold window)". §5 #9 load-bearing intent
+    preserved; fabricated count removed.
+  - Verification block grep (C2): case-corrected `"two-tier canonical"` →
+    `"Two-tier canonical"` to match stored form across the three citation
+    files. Fail-loud on case drift; case-insensitive flag would hide future
+    drift (parent disposition option b).
+  - "Items I could not verify" XAGUSD bullet (C1-ext, found during Rev 3
+    authoring): struck "100,865-bar OANDA-pull" claim; rephrased to track only
+    the still-unverified claims (fold-window subset coverage + gap-freeness).
+    CC's Rev-2 evidence closes the existence + count + manifest-status halves.
+  - "Items I could not verify" two-tier-citations bullet (C2-ext, found during
+    Rev 3 authoring): case-corrected embedded `grep -n "two-tier canonical"` →
+    `grep -n "Two-tier canonical"` to match Verification block (Edit C) and
+    stored form. §0 reader at lock-time no longer dispatches a doomed
+    lowercase grep as part of the verification narrative.
+  - Verification block `wc -l` expectation comment (C1-ext-2, found during
+    Rev 3 dryrun-validation grep sweep): struck "100,865 bars + header"
+    expectation; replaced with §0-anchored expectation (101,421 data rows
+    + 1 header line per §0 bullet). Single-source-of-truth: if §0 ever
+    updates the count, the Verification block follows automatically.
   - No other changes. Status remains `OPEN — DRAFT (pre-lock)`.

@@ -1,5 +1,6 @@
 """Integration tests: Account + fxify_rule_validator + persistence hooks."""
 
+import json
 from datetime import datetime, timezone
 
 import pytest
@@ -98,7 +99,8 @@ def test_phase_complete_flag_and_timestamp(isolated_accounts_json):
     assert st.phase_complete
     assert "PHASE COMPLETE" in a.flags
     assert a.phase_completed_at is not None
-    assert "T" in a.phase_completed_at  # ISO 8601
+    assert "challenge" in a.phase_completed_at
+    assert "T" in a.phase_completed_at["challenge"]
 
 
 def test_phase_completed_at_set_once(isolated_accounts_json):
@@ -120,6 +122,66 @@ def test_phase_completed_at_set_once(isolated_accounts_json):
     )
     second = accounts.get_account("FX-DONE2").phase_completed_at
     assert first == second
+
+
+def test_phase_completed_at_two_phase_keys_after_rollover(isolated_accounts_json):
+    """Operator advances Account.phase; each phase gets its own completion timestamp."""
+    accounts.add_account("FX-PH", "FXIFY", 200_000.0, phase="phase_1")
+    t1 = 200_000.0 * 1.05
+    accounts.update_balance(
+        "FX-PH",
+        t1,
+        fxify_updates={
+            "prior_eod_equity": 200_000.0,
+            "trading_days_count": 5,
+        },
+    )
+    a = accounts.get_account("FX-PH")
+    assert set(a.phase_completed_at.keys()) == {"phase_1"}
+    ts1 = a.phase_completed_at["phase_1"]
+
+    accs = accounts.load_accounts()
+    for x in accs:
+        if x.account_id == "FX-PH":
+            x.phase = "phase_2"
+            x.initial_balance = t1
+            x.balance = t1
+            x.trading_days_count = 0
+            x.prior_eod_equity = t1
+    accounts.save_accounts(accs)
+
+    t2 = t1 * 1.05
+    accounts.update_balance(
+        "FX-PH",
+        t2,
+        fxify_updates={
+            "prior_eod_equity": t1,
+            "trading_days_count": 5,
+        },
+    )
+    a = accounts.get_account("FX-PH")
+    assert "phase_1" in a.phase_completed_at
+    assert "phase_2" in a.phase_completed_at
+    assert a.phase_completed_at["phase_1"] == ts1
+    assert a.phase_completed_at["phase_2"] != ts1
+
+
+def test_legacy_phase_completed_at_string_migrates(isolated_accounts_json):
+    payload = [
+        {
+            "account_id": "LEG",
+            "firm": "FXIFY",
+            "phase": "challenge",
+            "balance": 200_000.0,
+            "initial_balance": 200_000.0,
+            "dd_limit_pct": 5.0,
+            "profit_target_pct": 5.0,
+            "phase_completed_at": "2020-01-01T00:00:00+00:00",
+        }
+    ]
+    isolated_accounts_json.write_text(json.dumps(payload), encoding="utf-8")
+    a = accounts.get_account("LEG")
+    assert a.phase_completed_at == {"challenge": "2020-01-01T00:00:00+00:00"}
 
 
 def test_fxify_flags_no_simplified_dd_warning(isolated_accounts_json):

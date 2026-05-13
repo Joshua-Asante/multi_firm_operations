@@ -48,6 +48,36 @@ class FxifyChallengeStatus:
             passed for passed, kind, _ in self.completion_results if kind == "completion"
         )
 
+    @property
+    def profit_target_passed(self) -> bool:
+        """True iff validate_profit_target passed (completion tuple index 0)."""
+        if not self.completion_results:
+            return False
+        passed, kind, _ = self.completion_results[0]
+        return kind == "completion" and passed
+
+    @property
+    def min_trading_days_passed(self) -> bool:
+        """True iff validate_min_trading_days passed (completion tuple index 1)."""
+        if len(self.completion_results) < 2:
+            return False
+        passed, kind, _ = self.completion_results[1]
+        return kind == "completion" and passed
+
+
+def _phase_completed_at_from_dict(d: dict) -> Optional[dict[str, str]]:
+    """Load per-phase completion timestamps; migrate legacy single ISO string."""
+    raw = d.get("phase_completed_at")
+    if raw is None:
+        return None
+    if isinstance(raw, str):
+        key = str(d.get("phase", "challenge"))
+        return {key: raw}
+    if isinstance(raw, dict):
+        out = {str(k): str(v) for k, v in raw.items()}
+        return out if out else None
+    return None
+
 
 @dataclass
 class Account:
@@ -64,8 +94,8 @@ class Account:
     """ISO 8601 timestamp of last trade (for inactivity)."""
     trading_days_count: int = 0
     """Completed trading days toward FXIFY min-trading-days completion."""
-    phase_completed_at: Optional[str] = None
-    """ISO 8601 UTC: first time FXIFY validators reported phase_complete (audit trail)."""
+    phase_completed_at: Optional[dict[str, str]] = None
+    """FXIFY: maps Account.phase -> ISO 8601 UTC when validators first reported phase_complete."""
 
     @property
     def dd_remaining_pct(self) -> float:
@@ -84,11 +114,13 @@ class Account:
     def flags(self) -> list[str]:
         flags = []
         if self.firm == "FXIFY":
+            # Profit/target flags: sole source is fxify_rule_validator completion tuples
+            # (not Account.target_remaining — avoids parallel-truth pattern).
             st = evaluate_fxify_challenge_status(self)
             if st.limit_breached:
                 flags.append("ACCOUNT FAILED")
-            profit_met = st.completion_results[0][0] if st.completion_results else False
-            min_days_met = st.completion_results[1][0] if len(st.completion_results) > 1 else False
+            profit_met = st.profit_target_passed
+            min_days_met = st.min_trading_days_passed
             if profit_met and min_days_met and self.profit_target_pct > 0:
                 flags.append("PHASE COMPLETE")
             elif profit_met and self.profit_target_pct > 0:
@@ -118,8 +150,8 @@ class Account:
             d["last_trade_at"] = self.last_trade_at
         if self.trading_days_count:
             d["trading_days_count"] = self.trading_days_count
-        if self.phase_completed_at is not None:
-            d["phase_completed_at"] = self.phase_completed_at
+        if self.phase_completed_at:
+            d["phase_completed_at"] = dict(self.phase_completed_at)
         return d
 
     @classmethod
@@ -135,7 +167,7 @@ class Account:
             prior_eod_equity=float(d["prior_eod_equity"]) if d.get("prior_eod_equity") is not None else None,
             last_trade_at=d.get("last_trade_at"),
             trading_days_count=int(d.get("trading_days_count", 0)),
-            phase_completed_at=d.get("phase_completed_at"),
+            phase_completed_at=_phase_completed_at_from_dict(d),
         )
 
 
@@ -339,12 +371,11 @@ def update_balance(
                 st = evaluate_fxify_challenge_status(a)
                 if st.limit_breached and a.phase != "failed":
                     a.phase = "failed"
-                elif (
-                    st.phase_complete
-                    and a.phase_completed_at is None
-                    and a.phase != "failed"
-                ):
-                    a.phase_completed_at = datetime.now(timezone.utc).isoformat()
+                elif st.phase_complete and a.phase != "failed":
+                    pcm = dict(a.phase_completed_at) if a.phase_completed_at else {}
+                    if a.phase not in pcm:
+                        pcm[a.phase] = datetime.now(timezone.utc).isoformat()
+                        a.phase_completed_at = pcm
             else:
                 if a.dd_remaining_pct <= 0 and a.phase != "failed":
                     a.phase = "failed"

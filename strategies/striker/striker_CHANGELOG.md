@@ -16,10 +16,6 @@ _Queued changes. Move to a dated entry on commit._
 
 - **v5 architectural rebuild** — priority #1 post-challenge pass. Hypothesis: strip BE/trail/T1 management following the Guardian v4 → v5.1 pattern, lift μ/σ from 1.24 toward portfolio average. See Notion: "Striker v5 architectural rebuild — priority #1 post-challenge — 2026-04-17".
 
-## Outstanding TODO
-
-- **v4.5 lock-decision rationale (open)** — the [v4.5] § Rationale block (~line 38) still carries `[TODO Joshua: confirm/edit lock-decision rationale.]` plus an inferred-from-file-diff placeholder. Replace with the confirmed rationale at next touch.
-
 ---
 
 ## 2026-05-08 — NAS100 split-out + dd_protection C2 relock (cross-ref)
@@ -48,7 +44,7 @@ Multi-parameter tuning — five inputs adjusted:
 Risk per trade, daily DD cap, max trades/day, lookback, ATR length, BE trigger, pyramid default size and trigger, maxHold, minBars all preserved from v4.4.
 
 ### Rationale
-[TODO Joshua: confirm/edit lock-decision rationale.] Inferred from file-level diff: tighter entry filter (body ratio) + slightly tighter stop + slightly wider TP shifts the per-trade R-multiple distribution. Trail tightens earlier and at a shorter distance, locking gains sooner. Net intent appears to be reducing per-trade adverse-excursion exposure while preserving the pyramid-cohort upside.
+The migration thesis was that in a portfolio where the FXIFY DD cap is the binding constraint, trading ~$77K of net for ~1pp of max-DD compression is the right swap — that 1pp shows up directly in MC bust-rate. The 4-strategy re-MC bore that out (Pass 97.88% / Bust 0.22% / p99 DD 4.55%; pre-re-export figure was 98.13 / 0.22 / 4.49, superseded same-day after the Guardian 87e73 → 33781 phantom-signal correction — see `data/reconciles/2026-05-05_guardian_n_reconcile.md`).
 
 ### Portfolio MC anchors (2026-05-05)
 - 4-strategy Pepperstone lock (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, 10K × 3 seeds): **97.88% pass / 0.22% bust / p99 DD 4.55%** (median days-to-pass 23). DJ30 bust attribution 40.9% — still the marginal bust contributor; share down from 43.4% under the 3-strategy 04-26 anchor. Both lock gates (bust < 1%, p99 DD < 5%) pass with comfortable margin. Pinned in `tests/test_mc_anchors.py`.

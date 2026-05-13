@@ -377,6 +377,62 @@ lines for FXIFY.
 
 ---
 
+## M-AHF — Audit hooks check storage form, not human-readable property
+
+**Status:** PROMOTED 2026-05-10 (third instance auto-graduation per registry rule *"auto-graduates on third instance regardless of dollar cost"*)
+**Domain:** brief-authoring · ADR authoring · methodology audit
+**Sibling lessons:** M-EC (Execution Commit) · Rule 0 (audit-first) · Rule 0-T (test-call-graph)
+
+### Pattern
+
+Mechanical audit hooks (grep regexes, count assertions, presence checks) are repeatedly authored against the **author's mental form** of the value being inspected, rather than against the **storage form** in the artifact under audit. The hook tests *"is this string present in the form I'm thinking of"* when it should test *"is this property held in whichever form the artifact uses."*
+
+Mental form ≠ storage form. The hook author imagines the value as it reads in conversation or specification; the artifact stores it in whichever form the storage convention dictates. When the two diverge, the hook silently passes or fails on the wrong property.
+
+### Anchors (three instances, all 2026-05-10)
+
+| # | Round | Hook intent | Author's mental form | Storage form | Failure mode |
+|---|---|---|---|---|---|
+| 1 | GH #55 ratification, round 1 (commit `50664cd` predecessor) | Verify ADR content stability across commits | *"Commit hasn't been amended"* | File contents at commit ref | Commit metadata used as proxy for content; missed actual content drift |
+| 2 | GH #55 ratification, round 2 (commit `50664cd`) | Verify MC anchor pins in test file | `98.09% / 0.36% / 4.73%` (percent form) | `0.9809 / 0.0036 / 0.0473` (decimal form) | Hook matched zero pins; required round-trip correction |
+| 3 | PR #73 hook 4 (CC handoff for feed-equivalence-brief-commit) | Verify trashed Notion page ID doesn't leak outside §Lock metadata | `notion.so/358dc0b53c11818085d0cc36692e0185` (URL form) | `358dc0b53c11818085d0cc36692e0185` (bare page ID) | CC correctly used bare-ID grep to verify the property; surfaced hook over-scoping as a defect rather than a content failure |
+
+Instance 3 differs from 1 and 2 in cost: CC's autonomy absorbed the form-fidelity gap by interpreting the hook's *intent* (property: page ID does not leak) rather than its *expression* (form: URL string present). No round-trip, no dollar cost. The pattern still fired — CC's report flagged the discrepancy explicitly as a handoff-authoring defect.
+
+### Counter-measure
+
+When authoring an audit hook, before committing the regex or assertion:
+
+1. **State the property in plain language**, not as a grep expression. *"Page ID does not leak outside §Lock metadata"* is the property. `grep 'notion.so/358dc0b...'` is one mechanization. Many other mechanizations exist; pick whichever covers the property.
+2. **`cat` the target file** (or echo its expected content) and confirm the regex matches the literal storage form. If the property could be held in alternate forms (URL vs bare ID; percent vs decimal; commit metadata vs file content), cover all forms or restate the property to make form irrelevant.
+3. **Prefer property assertions over form matches** when storage form is variable or under author control. Example: instead of `grep 'notion.so/PAGE_ID' <file>`, use a form-agnostic ID match scoped to the section that should/shouldn't contain it:
+   ```bash
+   # Property: bare page ID appears exactly once, inside §Lock metadata
+   awk '/^## §Lock metadata/,/^## /' <file> | grep -c '358dc0b53c11818085d0cc36692e0185'  # expect 1
+   grep -c '358dc0b53c11818085d0cc36692e0185' <file>                                       # expect 1 (total)
+   ```
+   Two assertions, one property, form-irrelevant.
+
+### Promotion provenance
+
+- **Round 1** (GH #55, 2026-05-10): single instance, candidate registry, log-entry status.
+- **Round 2** (GH #55, 2026-05-10): second instance same day, sharper two-layer formulation, log-entry status. Pre-registered rule: *"third instance auto-graduates regardless of dollar cost."*
+- **Round 3** (PR #73, 2026-05-10): third instance. CC correctly interpreted intent, surfaced over-scoping. Auto-promotion triggered per the pre-registered rule.
+
+The rule is what fired the promotion, not a fresh judgement. If the rule hadn't existed, instance 3 would have stayed log-entry status because CC absorbed the cost — and the lesson would have been understated. Pre-registration is what made the third instance count.
+
+### Related candidates (not promoted)
+
+- **Count-expectation pinned at authoring time before final artifact existed.** PR #73 hook 3 (`prop_firm_pipeline` count expected 1, brief retained 2 — second retention is operationally legitimate). First instance. Stays log-entry status; re-check on next instance.
+
+### Cross-reference
+
+- **Rule 0** (audit-first) reads production state before authoring decisions. M-AHF extends Rule 0 to authoring time of the audit hooks themselves.
+- **Rule 0-T** (test-call-graph) verifies that a test reaches the changed path. M-AHF is the sibling for audit hooks: verifies that a hook matches the stored form. Both attack indirection; Rule 0 against doc indirection, Rule 0-T against test-coverage indirection, M-AHF against form-mismatch indirection.
+- **M-EC** (Execution Commit) is the *result* discipline — forward-binding the lock to a live signal. M-AHF is the *audit-mechanization* discipline — forward-binding the hook to the storage form. Both belong to the brief-authoring discipline-checks bundle.
+
+---
+
 ## Versioning & change-log
 
 - **2026-05-08:** Registry seeded. Format spec authored. M-7 added as
@@ -389,3 +445,6 @@ lines for FXIFY.
   drift RCA (H2 verdict); encodes local pre-commit hash gate + format-only CI.
 - **2026-05-10:** M-10 added as PROMOTED on FXIFY validator/display routing review
   (parallel-layer contradiction cluster + `phase_completed_at` persistence).
+- **2026-05-10:** M-AHF added as PROMOTED on third-instance auto-graduation per
+  registry rule (audit hooks check storage form, not human-readable property;
+  three same-day instances: GH #55 round 1, GH #55 round 2, PR #73 hook 4).

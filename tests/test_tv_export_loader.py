@@ -9,10 +9,17 @@ from pathlib import Path
 
 import pytest
 
-from analysis.oanda_stage1.tv_export_loader import load_tv_export
+from analysis.oanda_stage1.tv_export_loader import (
+    PRICE_COL_BY_INSTRUMENT,
+    load_tv_export,
+)
 
 
 PEPPERSTONE_DIR = Path(__file__).resolve().parent.parent / "data" / "tv_exports" / "pepperstone"
+
+
+def test_xagusd_price_column_registered():
+    assert PRICE_COL_BY_INSTRUMENT["XAGUSD"] == "Price USD"
 
 
 @pytest.mark.parametrize(

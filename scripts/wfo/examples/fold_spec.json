@@ -1,0 +1,8 @@
+{
+  "n_folds": 1,
+  "train_start": "2022-01-11",
+  "train_end": "2025-05-10",
+  "oos_start": "2025-05-11",
+  "oos_end": "2026-04-20",
+  "comment": "40-month train / 11.3-month OOS, using Q-CORR-1.1 disposition's Pepperstone XAGUSD trade-date span (2022-01-11 -> 2026-04-20). OOS truncated to actual data end; spec window is 12 months nominal."
+}

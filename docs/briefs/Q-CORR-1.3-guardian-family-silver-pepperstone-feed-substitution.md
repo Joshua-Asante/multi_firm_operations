@@ -21,8 +21,8 @@ Paths to read at lock-time Phase 0:
 - [`docs/briefs/Q-CORR-1.2-guardian-family-silver-wfo.md`](Q-CORR-1.2-guardian-family-silver-wfo.md) — parent Pre-Q; LOCKED 2026-05-13. Quote §15 fail-rule, §14 gates, §6.5 train-selection lock semantic verbatim where this brief inherits or supersedes. **[§0-pending]**
 - [`docs/spec/wfo-runner-v0.md`](../spec/wfo-runner-v0.md) — Path B orchestration shell; feed-agnostic at the shell level. **[§0-pending]**
 - [`docs/spec/wfo-runner-v0-adversarial-tests.md`](../spec/wfo-runner-v0-adversarial-tests.md) — discipline-falsifier tests. Carry forward unchanged. **[§0-pending]**
-- [`CLAUDE.md`](../../CLAUDE.md) — "Strategy Reference" headnote (two-tier canonical rule) AND "Public-clone posture" section AND "Vendor-data integrity gate" section. **[§0-pending]**
-- Memory file `feedback_two_tier_canonical_pepperstone_oanda.md` — two-tier canonical rule semantic. Path within repo TBD at §0 read. **[§0-pending]**
+- [`CLAUDE.md`](../../CLAUDE.md) — "Public-clone posture" section AND "Vendor-data integrity gate" section. **[§0-pending]**
+- user memory `feedback_two_tier_canonical_pepperstone_oanda.md` — two-tier canonical rule semantic (lives outside the repo at user-auto-memory storage; in-repo citations recorded in §1 doctrine #2). **[§0-pending — confirm file exists at user-memory path; record `stat`-style last-modified timestamp at lock-time Phase 0]**
 - [`lib/correlation.py`](../../lib/correlation.py) — zero-fill semantic; feed-agnostic at function level. **[§0-pending]**
 - [`lib/regime_bootstrap.py`](../../lib/regime_bootstrap.py) — bootstrap implementation; feed-agnostic. **[§0-pending]**
 - [`data/tv_exports/pepperstone/SHA256SUMS`](../../data/tv_exports/pepperstone/SHA256SUMS) — confirm `_13fad` Gold comparator digest `e38e8fe80419a286666898e8cae41a3be796277844367b7f1dfdcc3a0feba124` still present. Required for OPEN ITEM B inheritance vs replacement decision. **[§0-pending]**
@@ -67,7 +67,7 @@ Q-CORR-1.3 is that new Pre-Q. It does not propose to back-port any fix into Q-CO
 **Binding doctrine inherited from `multi_firm_operations`:**
 
 1. **Rule 0** ([`docs/rule_0.md`](../rule_0.md)) — production reads before brief authorship.
-2. **Two-tier canonical rule** (CLAUDE.md "Strategy Reference" headnote; memory `feedback_two_tier_canonical_pepperstone_oanda.md`): *"OANDA findings can route Action; Joshua validates in TradingView before code/lock change. CLAUDE.md headline MC stays Pepperstone-anchored."* Implication for this Pre-Q: an OANDA-only execution path **cannot directly produce a portfolio-promotion lock verdict**. Q-CORR-1.3's output must route to Pepperstone-TV-native confirmation before any Silver lock decision; this shapes OPEN ITEM A and Gate 3 below.
+2. **Two-tier canonical rule** (canonical: user memory `feedback_two_tier_canonical_pepperstone_oanda.md`; in-repo citations: `docs/adr/2026-05-03-sentinel-gate-decision.md:135`, `docs/briefs/bust_attribution_flip.md:86,122`, `docs/methodology/findings/2026-05-03_usdchf_h4_sentinel_gate.md:162`): *"OANDA findings can route Action; Joshua validates in TradingView before code/lock change. CLAUDE.md headline MC stays Pepperstone-anchored."* Implication for this Pre-Q: an OANDA-only execution path **cannot directly produce a portfolio-promotion lock verdict**. Q-CORR-1.3's output must route to Pepperstone-TV-native confirmation before any Silver lock decision; this shapes OPEN ITEM A and Gate 3 below.
 3. **Public-clone posture** (CLAUDE.md) — Pine v5.5 source is gitignored, hash-pinned in `strategies/MANIFEST.sha256`. Path A re-implementation needs source bytes; Q-CORR-1.2 §6 closed this concern only because Path B was chosen. If OPEN ITEM A resolves to A.ii, the concern reactivates as a load-bearing constraint on how source is provided to the implementation environment.
 4. **Regime-robustness gate** ([`docs/methodology/regime_robustness_gate.md`](../methodology/regime_robustness_gate.md)) — 6mo block bootstrap + half-panel split. Q-CORR-1.3 inherits Q-CORR-1.2 §14 Gates 9/10 in principle; numerical anchors may recalibrate per OPEN ITEM D.
 5. **Vendor-data integrity gate** (CLAUDE.md) — any new comparator CSV or third-party bar file requires `scripts/check_data_manifests.py --regenerate` in the same commit as the bytes. Binds OPEN ITEMS A.ii and B.
@@ -178,6 +178,8 @@ Acceptance procedures for the downstream execution (when H1-substitute is chosen
 
 Runnable greps/commands. Final pinned values resolve at LOCK; the structure below is feed-agnostic.
 
+
+
 ```bash
 # Verify chosen comparator CSV digest in SHA256SUMS (OPEN ITEM B)
 # If B.i (inherit Pepperstone _13fad Gold):
@@ -211,6 +213,10 @@ test -f docs/briefs/Q-CORR-1.2/closure.md || test -f docs/rejected_candidates.md
 python scripts/check_data_manifests.py --check data/bar_data/XAGUSD.csv
 # Expected: manifest entry present with SHA256
 ```
+
+
+
+
 
 ---
 
@@ -285,7 +291,8 @@ The following claims in this DRAFT depend on filesystem reads I could not perfor
 - That `data/tv_exports/pepperstone/SHA256SUMS` still contains the `_13fad` row with digest `e38e8fe8…` (no rotation since 2026-05-13 LOCK).
 - That `lib/correlation.py` and `lib/regime_bootstrap.py` are at the paths cited (no refactor since 2026-05-13).
 - That `data/bar_data/XAGUSD.csv` exists with the 100,865-bar OANDA-pull described in the handoff (and that it is not yet manifest-tracked).
-- That `CLAUDE.md` carries the two-tier canonical rule headnote and public-clone-posture section as paraphrased in §1 doctrine #2 and #3.
+- That CLAUDE.md `:99` "Public-clone posture" and `:114` "Vendor-data integrity gate" sections read as paraphrased in §1 doctrines #3 and #5.
+- That the two-tier canonical rule's in-repo citations in §1 doctrine #2 (`docs/adr/2026-05-03-...md:135`, `docs/briefs/bust_attribution_flip.md:86,122`, `docs/methodology/findings/2026-05-03_usdchf_h4_sentinel_gate.md:162`) still resolve to the cited line numbers (verify with `grep -n "two-tier canonical"` after §0 read).
 - That `strategies/MANIFEST.sha256` exists and pins Pine source hashes (relevant only if OPEN ITEM A resolves A.ii).
 
 If any of these is inaccurate at §0 read time, this DRAFT needs revision before LOCK — flag and pause rather than silently correcting.
@@ -293,6 +300,8 @@ If any of these is inaccurate at §0 read time, this DRAFT needs revision before
 ---
 
 ## Verification block (pre-LOCK)
+
+
 
 ```bash
 # Discipline checks (mechanical)
@@ -316,9 +325,14 @@ ls data/bar_data/XAGUSD.csv && wc -l data/bar_data/XAGUSD.csv
 # Expected: file exists; row count consistent with 100,865 bars + header.
 
 # Cross-reference verification (cited facts match canonical sources)
-grep -c "two-tier canonical" CLAUDE.md
-# Expected: ≥1 (confirms doctrine #2 is present in the cited source).
+grep -n "two-tier canonical" \
+  docs/adr/2026-05-03-sentinel-gate-decision.md \
+  docs/briefs/bust_attribution_flip.md \
+  docs/methodology/findings/2026-05-03_usdchf_h4_sentinel_gate.md
+# Expected: matches at :135, :86, :122, and :162 respectively (line numbers per §1 doctrine #2).
 ```
+
+
 
 Pre-Lock Checklist OPEN ITEMS A–J are not part of this verification block — they resolve at LOCK, not at DRAFT completion.
 
@@ -331,3 +345,27 @@ Pre-Lock Checklist OPEN ITEMS A–J are not part of this verification block — 
 - **Decisions deferred to Joshua:** all of OPEN ITEMS A–J. The DRAFT enumerates the choices and surfaces trade-offs; it does not pre-commit.
 - **Cuts I considered and did not make:** (i) collapsing OPEN ITEM A into "default to A.iii since most policy-compliant" — rejected because Phase 0 may produce a transient cause (A.iv resume) that makes the whole substitution unnecessary; (ii) folding §6.A and §6.B into a single procedural-gates block — rejected because Phase 0 is a pre-LOCK blocker while §6.B is a LOCK-time decision audit, and conflating them obscures the temporal ordering.
 - **Brief-authoring discipline self-check:** §0 paths listed (anchors pending); §4 falsifier binary; §5 forbidden moves load-bearing; §6 gates produce binary verdicts per class; §2 names symptom not fix; §10 hooks runnable. Trap #11 (multi-question) addressed via parent-Q convention in §5 forbidden move #10.
+
+---
+
+## Revision log
+
+- **Rev 1 (2026-05-13):** Doctrine attribution fix per parent A3 disposition.
+  - §1 doctrine #2: removed false CLAUDE.md attribution; added user-memory canonical
+    + three in-repo citations per parent session grep evidence.
+  - §0 memory-file bullet: replaced "path within repo TBD" with parent A4 convention
+    (basename + "user memory" qualifier).
+  - "Items I could not verify" #5: split into separate CLAUDE.md and two-tier-rule items
+    to prevent re-conflation at §0 read time.
+  - No other changes. Status remains `OPEN — DRAFT (pre-lock)`.
+
+- **Rev 2 (2026-05-13):** Residual doctrine-attribution surfaces closed per parent disposition.
+  - Verification block: replaced CLAUDE.md grep with multi-path grep against the
+    three in-repo citation files registered in §1 doctrine #2 by Rev 1.
+  - §0 CLAUDE.md bullet: struck "(two-tier canonical rule)" parenthetical and
+    "Strategy Reference" clause; bullet now cites only Public-clone posture (:99)
+    and Vendor-data integrity gate (:114) — the two CLAUDE.md sections parent's
+    grep evidence confirmed exist.
+  - Notes appendix from Rev 1: removed (both flagged items closed; Revision log
+    is the active audit trail going forward).
+  - No other changes. Status remains `OPEN — DRAFT (pre-lock)`.

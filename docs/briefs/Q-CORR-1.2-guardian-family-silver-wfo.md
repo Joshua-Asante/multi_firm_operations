@@ -350,7 +350,7 @@ Execute and record outcomes in [`docs/spec/wfo-runner-v0-adversarial-tests.md`](
 - [ ] `python -m pytest tests/ -q` — baseline preserved (140+ pass pattern)
 - [ ] `python scripts/wfo/acceptance_silver.py` with `Q_CORR_SILVER_TV_CSV` set — §7.2 Silver refs (238 / 1.613 / 11.34% / 11.52%)
 - [ ] `lib/correlation.py` anchor ρ_DJNAS ≈ **0.0217 ± 0.001** on canonical DJ30/NAS pair
-- [ ] `lib/regime_bootstrap.py` Silver bootstrap p05 ≈ **1.05 ± 0.02** when Silver CSV supplied
+- [ ] `lib/regime_bootstrap.py` Silver bootstrap p05 ≈ **1.05 ± 0.02** when Silver CSV supplied, computed at **`bootstrap_seed=7, bootstrap_n_panels=100, block_months=6`** (historical Q-CORR-1.1 amendment §7 anchor; reproducibility-pinned per 2026-05-13 pre-flight finding). **Distinct from §14 Gate 9 disposition convention** — see [`docs/spec/wfo-runner-v0.md`](../spec/wfo-runner-v0.md) §2 (canonical `bootstrap_seed=42, bootstrap_n_panels=1000`, recorded in `run_manifest.json` at `init-run` as orchestration metadata, not part of the gate definition).
 
 If any item fails, halt. If the fix changes methodology (gates/grid), open **Q-CORR-1.3** — do not amend Q-CORR-1.2 mid-flight.
 

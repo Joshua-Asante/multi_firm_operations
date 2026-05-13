@@ -15,7 +15,8 @@ Define a reproducible walk-forward **Path B** workflow: TradingView-native strat
 ## §2 Definitions
 
 - **Grid:** JSON file listing parameter dimensions; canonical sort + `json.dumps(..., sort_keys=True)` produces `grid_hash` (v0 uses JSON to avoid a PyYAML dependency).
-- **Run manifest:** JSON declaring `run_id`, `grid_hash`, `fold_spec_hash`, `comparator_csv_hash`, `seed`, per-fold train selections, paths to ingested CSVs, and timestamps for audit.
+- **Run manifest:** JSON declaring `run_id`, `grid_hash`, `fold_spec_hash`, `comparator_csv_hash`, `seed`, `bootstrap_seed`, `bootstrap_n_panels`, per-fold train selections, paths to ingested CSVs, and timestamps for audit.
+- **Bootstrap convention (orchestration metadata, not gate definition):** `bootstrap_seed` and `bootstrap_n_panels` are pinned in the manifest at `init-run` and used by §14 Gate 9 (`lib.regime_bootstrap.regime_bootstrap_daily_pnl`) for reproducibility. Canonical defaults — `bootstrap_seed=42`, `bootstrap_n_panels=1000` — give noise-reduced `p05_pf` at the library's default `block_months=6`. The Gate 9 floor (`p05 PF ≥ 1.30`) is the gate; the seed/n_panels values are how it is mechanized, not part of the gate definition. Q-CORR-1.2 brief §15 acceptance reference for `p05 ≈ 1.05 ± 0.02` against the Q-CORR-1.1 v5.5 baseline reproduces only at `bootstrap_seed=7, bootstrap_n_panels=100` — that is a historical anchor, distinct from this disposition convention.
 - **Train selection commit:** Event where the best train-fold config (per objective) is written to the manifest and `train_selection_lock.json` **before** OOS TV exports for that fold.
 
 ---
@@ -23,7 +24,7 @@ Define a reproducible walk-forward **Path B** workflow: TradingView-native strat
 ## §3 Algorithm (Path B subset)
 
 1. Freeze `grid.json` → compute `grid_hash` (SHA-256 of canonical JSON bytes; see `scripts/wfo/grid_hash.py`).
-2. Initialize `run_manifest.json` with fold plan (`fold_spec_hash`), comparator digest (`comparator_csv_sha256` from `SHA256SUMS` line), RNG `seed`.
+2. Initialize `run_manifest.json` with fold plan (`fold_spec_hash`), comparator digest (`comparator_csv_sha256` from `SHA256SUMS` line), RNG `seed`, and bootstrap convention (`bootstrap_seed`, `bootstrap_n_panels`) for §14 Gate 9.
 3. For each fold:
    - **Ingest** train TV exports: `python scripts/wfo/run_path_b.py ingest --run-dir <run> --csv <path>` (§16 `Silver_*_train.csv` naming; schema via `pair_tv_export_dataframe`; rows appended to manifest `ingests`).
    - **Select** train winner: `python scripts/wfo/run_path_b.py select --run-dir <run> --fold-id 1` (§16 ladder → `train_selection_lock.json` + manifest `folds[]` timestamps).

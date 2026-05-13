@@ -43,6 +43,8 @@ def cmd_init_run(args: argparse.Namespace) -> int:
         "fold_spec_hash": fh,
         "comparator_csv_sha256": args.comparator_sha256,
         "seed": int(args.seed),
+        "bootstrap_seed": int(args.bootstrap_seed),
+        "bootstrap_n_panels": int(args.bootstrap_n_panels),
         "folds": [],
         "ingests": [],
     }
@@ -103,6 +105,22 @@ def main() -> int:
         help="64-char sha256 of comparator Guardian Gold CSV (from SHA256SUMS)",
     )
     p_init.add_argument("--seed", type=int, default=42)
+    p_init.add_argument(
+        "--bootstrap-seed",
+        type=int,
+        default=42,
+        help=(
+            "Canonical RNG seed for §14 Gate 9 regime bootstrap (orchestration "
+            "metadata, not gate definition). Recorded in manifest at init-run; "
+            "Gate 9 disposition uses these values for reproducibility."
+        ),
+    )
+    p_init.add_argument(
+        "--bootstrap-n-panels",
+        type=int,
+        default=1000,
+        help="Canonical n_panels for §14 Gate 9 regime bootstrap (orchestration metadata).",
+    )
 
     p_rep = sub.add_parser("emit-reports", help="write report.md + report.json stub")
     p_rep.add_argument("--run-dir", type=Path, required=True)

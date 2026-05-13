@@ -35,4 +35,10 @@ These scenarios validate that `train_selection_lock.py` and `audit_path_b_orderi
 
 | Date | Operator | Outcome / notes |
 |------|----------|-----------------|
-|      |          | (fill on execution) |
+| 2026-05-13 | Claude Code (Q-CORR-1.2 §15 pre-flight) | **Scenario 1 PASS.** Covered by [`tests/test_wfo_path_b.py::test_train_selection_lock`](../../tests/test_wfo_path_b.py): `assert_oos_matches_lock` raises `AssertionError` when basename differs from `expected_oos_csv_basename`. Targeted run green at HEAD `31110f5`. |
+| 2026-05-13 | Claude Code (Q-CORR-1.2 §15 pre-flight) | **Scenario 2 PASS.** Covered by [`tests/test_wfo_path_b.py::test_audit_detects_oos_before_commit`](../../tests/test_wfo_path_b.py): manifest with OOS `mtime` predating `train_selection_committed_utc` causes `audit_path_b_ordering.py` to exit `1`. Targeted run green at HEAD `31110f5`. |
+| 2026-05-13 | Claude Code (Q-CORR-1.2 §15 pre-flight) | **Scenario 3 PASS-WITH-LIMITATION.** Three sub-cases exercised manually: (3a) fully-forged manifest+lock pair → audit returns `0` (PASS), confirming the §6.5 acknowledged gap "does not prevent a determined bypass of git history"; (3b) distinguishable forgery signature: `lock_file.mtime − lock.committed_utc = 7200s` in the forged case vs ~0s in legitimate flow — detectable but not surfaced by the current audit script; (3c) partial forgery (lock rewritten, manifest left consistent with original ordering) → audit returns `1` (FAIL). Residual: a determined attacker who coherently rewrites both manifest and lock can pass `audit_path_b_ordering.py`. Git-committing `train_selection_lock.json` is the load-bearing mitigation (§6.5 line "committed or timestamp-persisted **before** any OOS TV export"). |
+
+## Findings surfaced to brief author
+
+- **Scenario 3 residual (informational, no methodology change):** `audit_path_b_ordering.py` is a one-sided check (manifest-only). A coherent post-hoc forgery of both `run_manifest.json` and `train_selection_lock.json` passes the audit. Mitigation already in §6.5: commit `train_selection_lock.json` to git **before** OOS TV export. A small follow-up script (`audit_lock_mtime_consistency.py`, ~20 lines) cross-checking `lock_file.stat().st_mtime` vs `lock["committed_utc"]` would close the forensic gap. Not gating Q-CORR-1.2 — flagged for post-disposition consideration.

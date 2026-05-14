@@ -168,7 +168,7 @@ Inherited verbatim from Q-CORR-1.2 §14 except where OPEN ITEM D recalibrates fl
 Acceptance procedures for the downstream execution (when H1-substitute is chosen) parallel Q-CORR-1.2 §7 with feed-substituted artifacts:
 
 - §7.1: Phase 0 reconnaissance log committed to `docs/notes/Q-CORR-1.3-phase0-cause-id.md` (or similar) **before** LOCK.
-- §7.2: If A.ii, a Silver-on-new-feed reference run reproducing Q-CORR-1.1 amendment §7's metric shape (i.e., a Silver Q-CORR-1.1-equivalent on the substituted feed). Anchor numbers TBD per OPEN ITEM D — likely **not** Pepperstone's `238 / 1.613 / 11.34% / 11.52%` (those are Pepperstone-anchored).
+- §7.2: If A.ii, a Silver-on-new-feed reference run reproducing Q-CORR-1.1 amendment §7's metric shape (i.e., a Silver Q-CORR-1.1-equivalent on the substituted feed). Anchor numbers TBD per OPEN ITEM D — likely **not** Pepperstone's `238 / 1.613 / 11.34% / 14.99%` (those are Pepperstone-anchored; DD figure updated 2026-05-13 from compounded-peak `11.52%` to static-equity notional `14.99%` per the DD-convention amendment recorded in Q-CORR-1.2 §15).
 - §7.3: Selection-bias smoke test (Q-CORR-1.2 §7.4 carries forward).
 - §7.4: §10 audit hooks pass.
 
@@ -255,7 +255,7 @@ Joshua must resolve every box below before LOCK. Each item is a real fork the br
   - [ ] **C.recompute** — Re-derive ρ_DJNAS on substituted feed; X′_F = (ρ_DJNAS_F + 0.10) − 0.023.
   - [ ] **C.inherit** — Keep X′ = 0.10 with explicit ρ-stability justification (cross-feed ρ shift evidence).
 
-- [ ] **D. §14 PF/WR/DD/p05 floor portability.** Q-CORR-1.2 §14 floors anchored to Pepperstone Q-CORR-1.1 reference numbers (238 / 1.613 / 11.34% / 11.52%) and `bootstrap_seed=7, n_panels=100, block_months=6` p05 anchor 1.05 ± 0.02.
+- [ ] **D. §14 PF/WR/DD/p05 floor portability.** Q-CORR-1.2 §14 floors anchored to Pepperstone Q-CORR-1.1 reference numbers (238 / 1.613 / 11.34% / 14.99%; DD updated 2026-05-13 from compounded-peak `11.52%` to static-equity notional `14.99%` per the DD-convention amendment in Q-CORR-1.2 §15) and `bootstrap_seed=7, n_panels=100, block_months=6` p05 anchor 1.05 ± 0.02.
   - [ ] **D.inherit** — Floors carry forward unchanged with "floors are presumptively feed-portable" rationale.
   - [ ] **D.reanchor** — Re-run a Q-CORR-1.1-equivalent reference on substituted feed; re-anchor floors to that reference; document drift.
 

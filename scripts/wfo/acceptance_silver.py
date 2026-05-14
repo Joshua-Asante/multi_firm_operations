@@ -36,8 +36,14 @@ def main() -> int:
     peak = eq.cummax()
     dd = float(((peak - eq) / 200_000.0).max() * 100.0)
 
-    # Amendment §7 reference (brief §7.2): 238 trades / PF 1.613 / WR 11.34% / DD 11.52%
-    ref_n, ref_pf, ref_wr, ref_dd = 238, 1.613, 11.34, 11.52
+    # Amendment §7 reference (brief §7.2): 238 trades / PF 1.613 / WR 11.34% / DD 14.99%.
+    # DD-convention amendment 2026-05-13: reference DD was originally 11.52%
+    # (TV's compounded-peak basis from the Q-CORR-1.1 amendment §7 panel);
+    # corrected to 14.99% (static-equity notional $200K basis) to match this
+    # implementation and the codebase's standing static-equity convention
+    # (trade-csv-reconcile skill trap #9). Empirical: dc6a3 dump computes
+    # DD = 11.52% compounded-peak = 14.99% notional.
+    ref_n, ref_pf, ref_wr, ref_dd = 238, 1.613, 11.34, 14.99
     ok = (
         abs(n_trades - ref_n) <= 2
         and abs(pf - ref_pf) < 0.05

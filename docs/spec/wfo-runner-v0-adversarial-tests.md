@@ -31,6 +31,20 @@ These scenarios validate that `train_selection_lock.py` and `audit_path_b_orderi
 
 ---
 
+## Scenario 4 — NO_CANDIDATE lock refusal (Seam #1 follow-up, 2026-05-13)
+
+**Setup:** Train sweep ingest completes; no config in the manifest passes the §16 hard constraints (DD ≤ 8% AND WR ≥ 15% AND trades ≥ 50). `run_path_b.py select --fold=1` is invoked.
+
+**Expected behavior chain:**
+
+1. `select_train_fold` writes `train_selection_lock.json` with `selection_status="NO_CANDIDATE"`, `candidate_count=0`, `selected_config_id=""`, and a committed UTC timestamp — preserving an audit trail of the failed selection attempt.
+2. `select` raises `ValueError` (CLI exits with code `1`).
+3. If an operator subsequently attempts to ingest an OOS CSV against this lock, `assert_oos_matches_lock` raises `AssertionError` with message `"OOS ingest refused: lock <path> has selection_status=NO_CANDIDATE"` — preventing accidental OOS work against a failed-train run.
+
+**Disposition implication:** NO_CANDIDATE at the data layer is a FALSIFIED-disposition signal per §17. Operator closes the Pre-Q FALSIFIED on grounds that no parameter zone clears the §16 floor; appends to `docs/rejected_candidates.md`; does NOT proceed to OOS.
+
+---
+
 ## Record
 
 | Date | Operator | Outcome / notes |

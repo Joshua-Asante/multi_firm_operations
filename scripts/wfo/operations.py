@@ -29,6 +29,11 @@ from silver_filename import (
 from trade_metrics import trade_panel_metrics
 from train_selection_lock import write_train_selection_lock
 
+_FLOOR_DD_MAX_PCT = 8.0
+_FLOOR_WR_MIN_PCT = 15.0
+_FLOOR_TRADES_MIN = 50
+_TIE_TOL = 1e-9
+
 
 def _read_manifest(run_dir: Path) -> dict:
     mp = run_dir / "run_manifest.json"
@@ -41,6 +46,16 @@ def _write_manifest(run_dir: Path, data: dict) -> None:
     (run_dir / "run_manifest.json").write_text(
         json.dumps(data, indent=2), encoding="utf-8"
     )
+
+
+def _fold_entry(manifest: dict, fold_id: str) -> dict:
+    folds = manifest.setdefault("folds", [])
+    for f in folds:
+        if str(f.get("fold_id")) == str(fold_id):
+            return f
+    entry = {"fold_id": str(fold_id), "oos_csv_paths": []}
+    folds.append(entry)
+    return entry
 
 
 def ingest_tv_csv(
@@ -109,8 +124,39 @@ def ingest_tv_csv(
         "config_id": config_id,
     }
     ingests.append(row)
+
+    if parsed["phase"] == "oos":
+        from train_selection_lock import read_train_selection_lock
+
+        lock = read_train_selection_lock(run_dir / "train_selection_lock.json")
+        fold = _fold_entry(manifest, str(lock.get("fold_id", "1")))
+        oos_paths = fold.setdefault("oos_csv_paths", [])
+        if str(csv_path) not in oos_paths:
+            oos_paths.append(str(csv_path))
+
     _write_manifest(run_dir, manifest)
     return row
+
+
+def _detect_tie_break(feasible_sorted: list[dict]) -> list[str] | None:
+    """Inspect top-2 of sorted feasible list; return tier list or None for no-tie."""
+    if len(feasible_sorted) < 2:
+        return None
+    a, b = feasible_sorted[0], feasible_sorted[1]
+    ma, mb = a["metrics"], b["metrics"]
+    if abs(float(ma["pf"]) - float(mb["pf"])) > _TIE_TOL:
+        return None
+    tiers = ["pf_tie"]
+    if abs(float(ma["max_dd_pct"]) - float(mb["max_dd_pct"])) > _TIE_TOL:
+        return tiers
+    tiers.append("dd_tie")
+    wd_a = abs(float(ma["wr_pct"]) - 20.0)
+    wd_b = abs(float(mb["wr_pct"]) - 20.0)
+    if abs(wd_a - wd_b) > _TIE_TOL:
+        return tiers
+    tiers.append("wr_distance_tie")
+    tiers.append("alpha_id")
+    return tiers
 
 
 def select_train_fold(
@@ -130,15 +176,44 @@ def select_train_fold(
     for row in train_rows:
         m = row["metrics"]
         if (
-            m["n_trades"] >= 50
-            and m["wr_pct"] >= 15.0
-            and m["max_dd_pct"] <= 8.0
+            m["n_trades"] >= _FLOOR_TRADES_MIN
+            and m["wr_pct"] >= _FLOOR_WR_MIN_PCT
+            and m["max_dd_pct"] <= _FLOOR_DD_MAX_PCT
         ):
             feasible.append(row)
 
+    constraint_floors = {
+        "DD_max": _FLOOR_DD_MAX_PCT,
+        "WR_min": _FLOOR_WR_MIN_PCT,
+        "trades_min": _FLOOR_TRADES_MIN,
+    }
+    grid_hash = manifest.get("grid_hash")
+    fold_spec_hash = manifest.get("fold_spec_hash")
+    lock_path = run_dir / "train_selection_lock.json"
+
     if not feasible:
+        committed = write_train_selection_lock(
+            lock_path,
+            fold_id=fold_id,
+            expected_oos_csv_basename="",
+            selected_config_id="",
+            selection_status="NO_CANDIDATE",
+            constraint_floors=constraint_floors,
+            tie_break_applied=None,
+            candidate_count=0,
+            grid_hash=grid_hash,
+            fold_spec_hash=fold_spec_hash,
+        )
+        fold = _fold_entry(manifest, fold_id)
+        fold["train_selection_committed_utc"] = committed
+        fold["selection_status"] = "NO_CANDIDATE"
+        fold["candidate_count"] = 0
+        _write_manifest(run_dir, manifest)
         raise ValueError(
-            "no feasible train config (need n_trades>=50, WR>=15%, DD<=8% per §16)"
+            "no feasible train config "
+            f"(need n_trades>={_FLOOR_TRADES_MIN}, "
+            f"WR>={_FLOOR_WR_MIN_PCT}%, DD<={_FLOOR_DD_MAX_PCT}% per §16); "
+            f"NO_CANDIDATE lock written to {lock_path}"
         )
 
     def sort_key(r: dict) -> tuple:
@@ -150,31 +225,30 @@ def select_train_fold(
 
     feasible.sort(key=sort_key)
     best = feasible[0]
+    tie_break_applied = _detect_tie_break(feasible)
     oos_name = expected_oos_basename(best["basename"])
 
-    lock_path = run_dir / "train_selection_lock.json"
     committed = write_train_selection_lock(
         lock_path,
         fold_id=fold_id,
         expected_oos_csv_basename=oos_name,
         selected_config_id=best["config_id"],
+        selection_status="OK",
+        constraint_floors=constraint_floors,
+        tie_break_applied=tie_break_applied,
+        candidate_count=len(feasible),
+        grid_hash=grid_hash,
+        fold_spec_hash=fold_spec_hash,
         extra={"train_basename": best["basename"], "metrics": best["metrics"]},
     )
 
-    folds = manifest.setdefault("folds", [])
-    fold_entry = None
-    for f in folds:
-        if str(f.get("fold_id")) == str(fold_id):
-            fold_entry = f
-            break
-    if fold_entry is None:
-        fold_entry = {"fold_id": str(fold_id), "oos_csv_paths": []}
-        folds.append(fold_entry)
-
-    fold_entry["train_selection_committed_utc"] = committed
-    fold_entry["selected_config_id"] = best["config_id"]
-    fold_entry["selected_train_basename"] = best["basename"]
-    fold_entry["expected_oos_csv_basename"] = oos_name
+    fold = _fold_entry(manifest, fold_id)
+    fold["train_selection_committed_utc"] = committed
+    fold["selected_config_id"] = best["config_id"]
+    fold["selected_train_basename"] = best["basename"]
+    fold["expected_oos_csv_basename"] = oos_name
+    fold["candidate_count"] = len(feasible)
+    fold["selection_status"] = "OK"
     _write_manifest(run_dir, manifest)
 
     return {
@@ -182,4 +256,6 @@ def select_train_fold(
         "expected_oos_csv_basename": oos_name,
         "train_selection_committed_utc": committed,
         "lock_path": str(lock_path),
+        "candidate_count": len(feasible),
+        "tie_break_applied": tie_break_applied,
     }

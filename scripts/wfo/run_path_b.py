@@ -2,9 +2,12 @@
 """Path B WFO orchestration entry.
 
 Commands:
-  init-run  — write run directory skeleton + manifest template from grid/fold specs.
-  ingest    — validate Silver §16 filename, TV schema, dedupe sha256, metrics → manifest.
-  select    — §16 train selection ladder + ``train_selection_lock.json`` + manifest fold.
+  init-run      -- write run directory skeleton + manifest template from grid/fold specs.
+  ingest        -- validate Silver §16 filename, TV schema, dedupe sha256, metrics -> manifest.
+                   --csv accepts either a single CSV path or a directory (batch mode).
+  select        -- §16 train selection ladder + train_selection_lock.json + manifest fold.
+  emit-reports  -- write report.md + report.json; auto-evaluate §14 gates when OOS present
+                   (disposition verdict printed to stdout per Q-CORR-1.2 handoff §5.8).
 """
 from __future__ import annotations
 
@@ -59,8 +62,12 @@ def cmd_init_run(args: argparse.Namespace) -> int:
 
 
 def cmd_emit_reports(args: argparse.Namespace) -> int:
-    emit_reports(args.run_dir)
+    comparator_dir = Path(args.comparator_dir) if args.comparator_dir else None
+    result = emit_reports(args.run_dir, comparator_dir=comparator_dir)
     print(f"Wrote reports under {args.run_dir}")
+    if result.get("mode") == "full":
+        print(f"\nDISPOSITION: {result['disposition']}")
+        return 0 if result["disposition"] == "RESOLVED" else 2
     return 0
 
 
@@ -68,9 +75,31 @@ def cmd_ingest(args: argparse.Namespace) -> int:
     _ensure_wfo_path()
     import operations  # noqa: E402
 
+    csv_path = Path(args.csv)
+    run_dir = Path(args.run_dir)
+    if csv_path.is_dir():
+        rows = []
+        files = sorted(csv_path.glob("*.csv"))
+        if not files:
+            print(json.dumps({"batch_count": 0, "rows": []}, indent=2))
+            return 1
+        for f in files:
+            row = operations.ingest_tv_csv(
+                run_dir,
+                f,
+                min_raw_rows=args.min_raw_rows,
+                min_trades=args.min_trades,
+                max_trades=args.max_trades,
+                notional=args.notional,
+                validate_grid=not args.skip_grid_validate,
+            )
+            rows.append(row)
+        print(json.dumps({"batch_count": len(rows), "rows": rows}, indent=2, default=str))
+        return 0
+
     row = operations.ingest_tv_csv(
-        Path(args.run_dir),
-        Path(args.csv),
+        run_dir,
+        csv_path,
         min_raw_rows=args.min_raw_rows,
         min_trades=args.min_trades,
         max_trades=args.max_trades,
@@ -85,7 +114,11 @@ def cmd_select(args: argparse.Namespace) -> int:
     _ensure_wfo_path()
     import operations  # noqa: E402
 
-    out = operations.select_train_fold(Path(args.run_dir), fold_id=str(args.fold_id))
+    try:
+        out = operations.select_train_fold(Path(args.run_dir), fold_id=str(args.fold_id))
+    except ValueError as e:
+        print(json.dumps({"selection_status": "ERROR", "message": str(e)}, indent=2))
+        return 1
     print(json.dumps(out, indent=2, default=str))
     return 0
 
@@ -122,12 +155,23 @@ def main() -> int:
         help="Canonical n_panels for §14 Gate 9 regime bootstrap (orchestration metadata).",
     )
 
-    p_rep = sub.add_parser("emit-reports", help="write report.md + report.json stub")
+    p_rep = sub.add_parser("emit-reports", help="write report.md + report.json; §14 if OOS present")
     p_rep.add_argument("--run-dir", type=Path, required=True)
+    p_rep.add_argument(
+        "--comparator-dir",
+        type=Path,
+        default=None,
+        help="directory containing comparator CSV + SHA256SUMS (default: data/tv_exports/pepperstone/ under repo root)",
+    )
 
-    p_ing = sub.add_parser("ingest", help="ingest one TV CSV into run manifest")
+    p_ing = sub.add_parser("ingest", help="ingest one TV CSV (or a directory) into run manifest")
     p_ing.add_argument("--run-dir", type=Path, required=True)
-    p_ing.add_argument("--csv", type=Path, required=True)
+    p_ing.add_argument(
+        "--csv",
+        type=Path,
+        required=True,
+        help="path to a single CSV, or to a directory containing *.csv files (batch ingest, alphabetical order)",
+    )
     p_ing.add_argument("--min-raw-rows", type=int, default=100)
     p_ing.add_argument("--min-trades", type=int, default=10)
     p_ing.add_argument("--max-trades", type=int, default=5000)

@@ -348,7 +348,7 @@ Execute and record outcomes in [`docs/spec/wfo-runner-v0-adversarial-tests.md`](
 ### Acceptance battery
 
 - [ ] `python -m pytest tests/ -q` — baseline preserved (140+ pass pattern)
-- [ ] `python scripts/wfo/acceptance_silver.py` with `Q_CORR_SILVER_TV_CSV` set — §7.2 Silver refs (238 / 1.613 / 11.34% / 11.52%)
+- [ ] `python scripts/wfo/acceptance_silver.py` with `Q_CORR_SILVER_TV_CSV` set — §7.2 Silver refs (238 / 1.613 / 11.34% / 14.99%). **DD-convention amendment 2026-05-13:** reference DD was originally `11.52%` (TV's compounded-peak basis from the Q-CORR-1.1 amendment §7 panel); corrected to `14.99%` (static-equity notional $200K basis) to match `acceptance_silver.py` implementation and the codebase's standing static-equity convention (trade-csv-reconcile skill trap #9). Empirical reconciliation: dc6a3 dump (`Guardian_Gold_v5.5_PEPPERSTONE_XAGUSD_2026-05-13_dc6a3.csv`) computes DD = 11.52% compounded-peak = 14.99% notional. Three other anchors (N / PF / WR) reproduce exactly under both conventions and are unchanged.
 - [ ] `lib/correlation.py` anchor ρ_DJNAS ≈ **0.0217 ± 0.001** on canonical DJ30/NAS pair
 - [ ] `lib/regime_bootstrap.py` Silver bootstrap p05 ≈ **1.05 ± 0.02** when Silver CSV supplied, computed at **`bootstrap_seed=7, bootstrap_n_panels=100, block_months=6`** (historical Q-CORR-1.1 amendment §7 anchor; reproducibility-pinned per 2026-05-13 pre-flight finding). **Distinct from §14 Gate 9 disposition convention** — see [`docs/spec/wfo-runner-v0.md`](../spec/wfo-runner-v0.md) §2 (canonical `bootstrap_seed=42, bootstrap_n_panels=1000`, recorded in `run_manifest.json` at `init-run` as orchestration metadata, not part of the gate definition).
 

@@ -1,9 +1,10 @@
 # Q-CORR-1.3 — Guardian-family Silver (XAGUSD) Pepperstone-TV feed substitution (Pre-Q DRAFT)
 
-**Status:** `OPEN — DRAFT (pre-lock)`
+**Status:** `CLOSED-RESOLVED` (H1-resume; see §H1-resume closure below)
 **Draft date:** 2026-05-13
-**Parent:** Q-CORR-1.2 (Silver WFO admission gate; halted per its §15 fail-rule)
-**Predecessor disposition:** Q-CORR-1.2 transitions to `SUPERSEDED` at Q-CORR-1.3 LOCK (see OPEN ITEM I for closure record convention).
+**Closed date:** 2026-05-13
+**Parent:** Q-CORR-1.2 (Silver WFO admission gate; halted per its §15 fail-rule, now resumes unchanged per H1-resume closure)
+**Predecessor disposition:** Q-CORR-1.2 RESUMES unchanged. The §15 spot-check tested the wrong capacity surface (chart-display depth, not strategy-tester depth); strategy-tester depth is intact. Q-CORR-1.2 does NOT transition to SUPERSEDED. OPEN ITEMS A–J below collapse to A.iv (resume); B–J moot.
 **Loop:** Inquire-phase Pre-Q — binary methodology decision about feed substitution + revision tuple under doctrine constraints. **Not** a strategy admission run; **not** portfolio lock; **not** a re-MC.
 **Artifact path:** flat brief at [`docs/briefs/Q-CORR-1.3-guardian-family-silver-pepperstone-feed-substitution.md`](Q-CORR-1.3-guardian-family-silver-pepperstone-feed-substitution.md) (subdir convention to be confirmed at lock — see OPEN ITEM I).
 
@@ -427,3 +428,144 @@ Pre-Lock Checklist OPEN ITEMS A–J are not part of this verification block — 
   state. Not updated by Rev 4 because the authorship-notes section is
   history-of-record, not live state. A future revision may strike or
   archive it.
+
+- **Rev 5 (2026-05-13):** Status promoted to `CLOSED-RESOLVED` (H1-resume).
+  See §H1-resume closure section appended below. Header fields updated
+  (Status / Closed date / Parent / Predecessor disposition). No §4 / §5 /
+  §6 / OPEN ITEM body edits — those become historical context under
+  closure. Adjacent surface edit: §1 doctrine #2 + §0 reference numbers
+  updated 11.52% → 14.99% per the DD-convention amendment in Q-CORR-1.2
+  §15 (commit 2bd43a0).
+
+---
+
+## §H1-resume closure (2026-05-13)
+
+**Verdict:** CLOSED-RESOLVED — H1-resume.
+
+### Phase 0 verdict
+
+The §0.5 Phase 0 reconnaissance was unblocked operationally before the
+formal §6.A Gate A.1 record could be produced. The verdict that emerged:
+
+- **Cause-1 (Pepperstone broker-side feed truncation):** falsified.
+  Both `PEPPERSTONE:XAGUSD` and `OANDA:XAGUSD` on TV cap at the same
+  earliest-bar timestamp `2025-06-30 18:00 UTC-4` on Joshua's Premium
+  plan. Same broker-independent first-bar implicates TV-side, not
+  Pepperstone-side, truncation.
+- **Cause-2 (TV plan-tier mismatch):** disfavored. Premium-tier M15
+  display cap is ~20K bars (~4y); both feeds show ~10.5 months (~17.6K
+  bars) — well under the documented plan ceiling.
+- **Cause-3 (Pepperstone symbol routing `XAGUSD.a`):** falsified.
+  Symbol does not exist on TV.
+- **Cause-NOVEL (the actual cause):** TV's per-symbol display cap on
+  spot-metals / CFD silver instruments is narrower than the headline
+  Premium plan limit (chart shows ~10 months regardless of broker; OANDA
+  REST API has full history). This is a TV-platform behavior, not a
+  broker behavior.
+
+But the novel cause turned out to be **off-target** for the actual gating
+constraint. The decisive empirical finding was:
+
+### The §15 spot-check tested the wrong capacity surface
+
+Q-CORR-1.2 §15 pre-flight item authored as:
+> *"Spot-check Pepperstone TV: XAGUSD 15m availability 2022-01-11 → 2026-04-20 (or longer)"*
+
+This tested **chart-display depth**, which is capped by TV at ~10 months
+on the XAGUSD symbol. But Q-CORR-1.2 Path B does NOT consume chart-display
+bars; it consumes **TV strategy-tester trade-CSV exports**. Strategy-tester
+depth is independent of chart-display depth on TV — the tester loads bars
+from TV's backend deeper than the rolling chart-display window.
+
+Empirical proof: running Guardian v5.5 in TV strategy-tester on the
+PEPPERSTONE:XAGUSD 15m chart with backtest range `2022-01-11 → 2026-04-20`
+produced [`Guardian_Gold_v5.5_PEPPERSTONE_XAGUSD_2026-05-13_dc6a3.csv`](../../data/tv_exports/pepperstone/Guardian_Gold_v5.5_PEPPERSTONE_XAGUSD_2026-05-13_dc6a3.csv)
+— 238 trades, first entry 2022-01-11 10:15, last exit 2026-04-20 20:00.
+The fold window is fully covered by strategy-tester depth.
+
+This is also corroborated by the pre-existing [`_13fad` Gold comparator](../../data/tv_exports/pepperstone/Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-12_13fad.csv)
+which produced 201 trades over the same fold window on `PEPPERSTONE:XAUUSD`
+— proof that TV strategy-tester reaches 2022 on at least Pepperstone Gold
+on Joshua's Premium plan. dc6a3 confirms the same property holds on
+Pepperstone XAGUSD.
+
+### dc6a3 reconciliation against Q-CORR-1.1 amendment §7 reference
+
+Per trade-csv-reconcile skill canonical pipeline (filtered to `Exit` rows,
+Trade #-paired, Guardian-archetype 1R = median loss):
+
+| Metric | dc6a3 | Q-CORR-1.1 §7 ref | Verdict |
+|---|---|---|---|
+| N trades | 238 | 238 | OK (exact) |
+| WR | 11.34% | 11.34% | OK (exact) |
+| PF | 1.613 | 1.613 | OK (exact) |
+| DD (compounded-peak basis) | 11.52% | 11.52% (original ref convention) | OK (exact) |
+| DD (static-equity notional $200K basis) | 14.99% | 14.99% (post-amendment ref convention) | OK (exact) |
+| Net P&L | $117,466.89 | (no pinned ref) | — |
+| 1R (median loss, n=211) | $863.32 | (no pinned ref) | — |
+
+DD reproduces under both conventions; the dual-convention reproduction
+surfaced the DD-convention drift between Q-CORR-1.1's reference value
+(TV's native compounded-peak panel) and `acceptance_silver.py`'s
+implementation (static-equity notional). Resolved in commit `2bd43a0`
+(option a per parent disposition: update reference to match
+implementation, since static-equity is the codebase-wide convention).
+
+### OPEN ITEMS A–J disposition
+
+| Item | Disposition |
+|---|---|
+| A. Feed source | A.iv (resume) — no feed substitution needed; Q-CORR-1.2 Path B runs on Pepperstone TV strategy-tester as locked |
+| B. Comparator series | Moot — Q-CORR-1.2 §14 Gate 3 comparator (`_13fad` Pepperstone Gold) stays as locked |
+| C. X′ recalibration | Moot — Q-CORR-1.2 §4.1 X′ = 0.10 stays as locked |
+| D. §14 floor portability | Moot — floors stay as locked; DD reference value corrected to 14.99% per commit 2bd43a0 |
+| E. Fold spec window | Moot — `2022-01-11 → 2026-04-20` confirmed runnable on Pepperstone TV strategy-tester |
+| F. Correlation comparator semantic | Moot — zero-fill on bdate_range carries forward unchanged |
+| G. OOS protection | Moot — §6.5 train_selection_lock semantic carries forward unchanged |
+| H. Pine source access | Moot — Path A not selected; Pine source access concern stays non-blocking under Path B |
+| I. Q-CORR-1.2 disposition | Q-CORR-1.2 resumes; no SUPERSEDED transition |
+| J. Phase 0 vs §15 pre-flight separation | Resolved by clarifying §15 spot-check tested wrong surface (chart-display vs strategy-tester depth) |
+
+### Q-CORR-1.2 disposition
+
+Q-CORR-1.2 (LOCKED 2026-05-13) RESUMES UNCHANGED. The §15 fail-rule
+("If any item fails, halt … open Q-CORR-1.3 — do not amend Q-CORR-1.2
+mid-flight") was correctly invoked given the §15 spot-check item's
+empirical failure, but the underlying methodology (Path B trade-CSV
+ingestion + §14 gates) was never the actual blocker — strategy-tester
+depth was always sufficient. The Q-CORR-1.2 §15 pre-flight checklist
+"Spot-check Pepperstone TV: XAGUSD 15m availability 2022-01-11 →
+2026-04-20" item is now operationally moot for the chart-display sense
+in which it was originally authored; its load-bearing intent (verify
+strategy-tester can produce the trade CSV for the fold window) is
+**satisfied** by dc6a3. Joshua may now mark §15 complete and proceed
+with the train sweep workflow (§16) as originally locked.
+
+### Methodology lesson captured
+
+The §15 spot-check authored against chart-display depth when the load-
+bearing capacity is strategy-tester depth is a classic case of brief-
+authoring trap #13 (precision exceeds grounding): the brief committed
+to a specific spot-check test without grounding which TV capacity surface
+the gate actually depends on. The lesson generalizes: any TV-data-related
+pre-flight check must specify which TV surface (chart-display vs
+strategy-tester) it's testing, because they have independent caps.
+
+### Audit trail commits
+
+| Commit | Scope |
+|---|---|
+| `2bd43a0` | DD-convention amendment — Q-CORR-1.1 §7 ref 11.52% → 14.99% (static-equity notional) |
+| `eb6a045` | data(manifests) — dc6a3 promotion + bar_data NAS100USD/XAGUSD + external strip + hook patch (empty manifests allowed) |
+| (this commit) | Q-CORR-1.3 H1-resume closure |
+
+### Related artifacts
+
+- dc6a3 CSV (gitignored; SHA256 in `data/tv_exports/pepperstone/SHA256SUMS`):
+  `f35c40ed2ef6d083e4984f90b6848c96e7f3ca382c5cbd54b24dc090eb9d7dc5`
+- dc6a3 reconciliation methodology: trade-csv-reconcile skill canonical
+  pipeline (skill at `~/.claude/skills/trade-csv-reconcile/`).
+- OANDA XAGUSD M15 bar witness at `data/bar_data/XAGUSD.csv` retained as
+  a third-party-witness anchor (Q-CORR-1.3 §0; not load-bearing for
+  Q-CORR-1.2 admission gate).

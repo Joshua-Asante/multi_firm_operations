@@ -111,10 +111,14 @@ def check_all() -> int:
             failed = True
         if parse_errs:
             continue
-        if manifest.is_file() and manifest.stat().st_size == 0:
-            print(f"EMPTY_MANIFEST {_rel_posix(manifest)}", file=sys.stderr)
-            failed = True
-            continue
+
+        # An empty manifest is a legitimate state: the manifest dir
+        # tracks zero CSVs. The EXTRA / MISSING checks below still cover
+        # the accidental-strip case (CSVs on disk but not in manifest →
+        # EXTRA per file) and the silent-loss case (manifest entry exists
+        # but file missing → MISSING). Removed the standalone EMPTY_MANIFEST
+        # hard-failure on 2026-05-13 to support intentionally-empty manifest
+        # dirs (e.g., dead datasets being stripped from the integrity gate).
 
         on_disk = _list_csv_basenames(d)
         manifest_names = set(entries)

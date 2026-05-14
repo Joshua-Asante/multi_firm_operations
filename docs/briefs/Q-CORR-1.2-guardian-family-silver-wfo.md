@@ -1,13 +1,15 @@
 # Q-CORR-1.2 — Guardian-family Silver (XAGUSD) WFO admission (Pre-Q)
 
-**Status:** LOCKED  
-**Lock date:** 2026-05-13  
-**Date:** 2026-05-13  
-**Parent:** Q-CORR-1.1 (correlation gate methodology; X lock and zero-fill semantic)  
-**Loop:** Inquire-phase Pre-Q — binary admission for a viable Guardian-family parameter zone on Silver; **not** portfolio lock or 5-strategy re-MC.  
+**Status:** CLOSED — WITHDRAWN PRE-LOCK (2026-05-14)
+**Closure pointer:** [`Q-CORR-1-closure.md`](Q-CORR-1-closure.md) §2 — parent programme Q-CORR-1 closed on SNAG-budget exhaustion; Q-CORR-1.2 never locked, never run; not falsified, not superseded, not ambiguous. Disposition stands; do not resurrect. Re-proposal requires new mechanism evidence per closure §3 + a fresh Pre-Q. The §11–§19 lock amendment below is historical record only.
+
+**Lock date:** 2026-05-13 (superseded by closure 2026-05-14)
+**Date:** 2026-05-13
+**Parent:** Q-CORR-1.1 (correlation gate methodology; X lock and zero-fill semantic)
+**Loop:** Inquire-phase Pre-Q — binary admission for a viable Guardian-family parameter zone on Silver; **not** portfolio lock or 5-strategy re-MC.
 **Artifact path:** flat brief at [`docs/briefs/Q-CORR-1.2-guardian-family-silver-wfo.md`](Q-CORR-1.2-guardian-family-silver-wfo.md) (subdir convention not adopted for this Pre-Q).
 
-**LOCK amendment:** §11–§19 appended 2026-05-13. After this revision, §4 hypothesis, §6 gates, and the parameter grid are frozen per §5 forbidden moves. Mid-run amendments are forbidden; methodology-layer changes require a new Pre-Q.
+**LOCK amendment (historical):** §11–§19 appended 2026-05-13. After this revision, §4 hypothesis, §6 gates, and the parameter grid are frozen per §5 forbidden moves. Mid-run amendments are forbidden; methodology-layer changes require a new Pre-Q. Superseded 2026-05-14 by Q-CORR-1 programme closure.
 
 ---
 

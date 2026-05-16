@@ -39,6 +39,16 @@ PROFIT_TARGET = 210_000
 DAILY_LOSS_PCT = -0.05
 STATIC_DD_PCT = -0.05
 MIN_TRADING_DAYS = 5
+# HORIZON_DAYS is a MODELING ARTIFACT, not an FXIFY rule. FXIFY challenges have
+# no max-days timeout — see firm_rules.py:14 `inactivity_max_idle_days = 60`,
+# which is the ACTUAL FXIFY timeout rule and is NOT modeled by this simulator
+# (bootstrap structure makes 60 consecutive idle bdays vanishingly rare).
+# The 150-bday cap exists for runtime tractability. The "timeout" outcome
+# returned below = "did not reach +5% within 150 bdays AND did not bust" — it
+# is NOT an FXIFY inactivity bust. The ~1% timeout rate in canonical anchors is
+# dominated by paths that would have passed within ~7 more days (p99 unbounded
+# days-to-pass measured 147-156 across 3 allocation scenarios, 2026-05-15).
+# Q-MCTO-1 gates whether to replace this semantic with the FXIFY-correct one.
 HORIZON_DAYS = 150
 SIMS_PER_SEED = 10_000
 SEEDS = (42, 123, 2026)
@@ -217,6 +227,9 @@ def _simulate_path(path: np.ndarray, dd_trigger: float, dd_scale: float,
         if round(eq, 2) >= PROFIT_TARGET and trade_days >= MIN_TRADING_DAYS:
             return "pass", day + 1, max_dd, None
 
+    # 150-bday horizon-runout. NOT an FXIFY inactivity bust — see HORIZON_DAYS
+    # comment block above. Q-MCTO-1 gates structural change to FXIFY-correct
+    # semantics (60-day inactivity bust, no horizon cap).
     return "timeout", horizon, max_dd, None
 
 

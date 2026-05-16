@@ -69,8 +69,8 @@ SYMBOL_SYNONYMS = {
 
 STRATEGIES = {
     "guardian":     {"symbol": "XAUUSD", "risk_pct": 0.34, "pyramid": False, "label": "Guardian"},
-    "striker_dj30": {"symbol": "DJ30",   "risk_pct": 1.00, "pyramid": True,  "label": "Striker DJ30"},
-    "striker_nas":  {"symbol": "NAS100", "risk_pct": 0.40, "pyramid": True,  "label": "Striker NAS100"},
+    "striker_dj30": {"symbol": "DJ30",   "risk_pct": 0.75, "pyramid": True,  "label": "Striker DJ30"},
+    "striker_nas":  {"symbol": "NAS100", "risk_pct": 0.45, "pyramid": True,  "label": "Striker NAS100"},
     "aegis":        {"symbol": "USDJPY", "risk_pct": 1.50, "pyramid": False, "label": "Aegis"},
 }
 

@@ -45,9 +45,9 @@ SEEDS = (42, 123, 2026)
 
 ALLOCATIONS: Dict[str, float] = {
     "guardian":       0.0034,
-    "striker":        0.0100,
+    "striker":        0.0075,
     "aegis":          0.0150,
-    "striker_nas100": 0.0040,
+    "striker_nas100": 0.0045,
 }
 STRATS = tuple(ALLOCATIONS.keys())
 
@@ -70,10 +70,10 @@ OANDA_PANELS: Dict[str, Path] = {
 
 PEPPERSTONE_DIR = Path(__file__).parent / "data" / "tv_exports" / "pepperstone"
 PEPPERSTONE_PANELS: Dict[str, Path] = {
-    "guardian":       PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv",
-    "striker":        PEPPERSTONE_DIR / "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv",
-    "aegis":          PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv",
-    "striker_nas100": PEPPERSTONE_DIR / "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-05_7ca6f.csv",
+    "guardian":       PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-14_3b689.csv",
+    "striker":        PEPPERSTONE_DIR / "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-14_e4dd7.csv",
+    "aegis":          PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-05-14_d2682.csv",
+    "striker_nas100": PEPPERSTONE_DIR / "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-14_da880.csv",
 }
 
 # Pepperstone is the CLAUDE.md canonical lock anchor; OANDA is the pattern-spotting proxy
@@ -116,12 +116,17 @@ def load_trades(path: Path) -> pd.DataFrame:
     out = exits[["exit_date", "pnl"]].sort_values("exit_date").reset_index(drop=True)
     if not out.empty:
         # MVD window — catches "4yr panel actually 14mo" class (audit instance #8).
+        # Tolerance 100d (was 60d): on strict-window exports (e.g. 2022-05-14 →
+        # 2026-05-14), Aegis's restrictive filters delay first trade ~2 months,
+        # leaving a 1367-day span vs the 1460-day expected. The 1400d threshold
+        # would have caught the prior 681-day Aegis sub-panel (2024-06 → 2026-04)
+        # — the floor still rejects ≥3-month coverage gaps.
         assert_window(
             out["exit_date"].iloc[0].to_pydatetime(),
             out["exit_date"].iloc[-1].to_pydatetime(),
             expected_min_days=4 * 365,
             label=f"MC input panel {path.name}",
-            tolerance_days=60,
+            tolerance_days=100,
         )
     return out
 

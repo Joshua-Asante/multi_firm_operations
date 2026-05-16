@@ -145,8 +145,8 @@ _Last refreshed: 2026-05-07_
   - `STARTING_EQUITY = 200_000`, `PROFIT_TARGET = 210_000`, `DAILY_LOSS_PCT = -0.05`, `STATIC_DD_PCT = -0.05`, `MIN_TRADING_DAYS = 5`, `HORIZON_DAYS = 150`, `SIMS_PER_SEED = 10_000`, `SEEDS = (42, 123, 2026)`
   - `PEPPERSTONE_PANELS` (4 strategies, all v-current) + `OANDA_PANELS` (3 strategies, DJ30 still v4.4)
   - `EXPECTED_VERSIONS_BY_BROKER` — Pepperstone = v5.5/v4.5/v4.3/v1; OANDA = v5.5/v4.4/v4.3
-- **MVD gates:** `assert_tv_export` (filename identity), `assert_min_rows` (≥100 raw rows), `assert_window` (≥4yr panel ±60d), `assert_no_fallback` on aggregated `implied_1r` fallback count.
-- **Anchor pinned by:** `tests/test_mc_anchors.py` — Pepperstone C2 (4-strategy at dd_protection 1.5%/0.40×) 98.09/0.36/4.73, attribution striker 44.4% / aegis 24.1% / guardian 21.3% / NAS 10.2%; OANDA C2 (3-strategy) 96.23/0.69/4.91. Relocked 2026-05-08.
+- **MVD gates:** `assert_tv_export` (filename identity), `assert_min_rows` (≥100 raw rows), `assert_window` (≥4yr panel ±100d — tolerance loosened from 60d on 2026-05-14 to accept strict-window exports where filter warm-up delays first trade), `assert_no_fallback` on aggregated `implied_1r` fallback count.
+- **Anchor pinned by:** `tests/test_mc_anchors.py` — Pepperstone C2 (4-strategy at dd_protection 1.5%/0.40×, **DJ30 0.75% pyramid 500% / NAS 0.45%**) 98.78/0.12/4.17 on 2026-05-14 allocation refresh, attribution guardian 34.3% / aegis 28.6% / striker 25.7% / NAS 11.4%; OANDA C2 (3-strategy, no NAS panel) reshapes through DJ30 risk reduction only: 96.33/0.40/4.73 (was 96.23/0.69/4.91). dd_protection constants unchanged from 2026-05-08 C2 relock; 2026-05-14 is an allocation refresh that re-validates C2 with wider margin. Prior 2026-05-14 panel-refresh-only anchor (98.65/0.25/4.69) and 2026-05-08 C2 anchor (98.09/0.36/4.73) preserved as historical in CLAUDE.md. Override of regime-robustness gate documented in `docs/adr/2026-05-14-allocation-refresh.md`.
 - **Does NOT contain:** per-firm scaling, live-deploy logic, allocation tuning. Read-only simulation against frozen panels.
 
 ---

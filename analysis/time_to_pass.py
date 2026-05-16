@@ -84,7 +84,7 @@ def main_default():
     print("=== Time-to-pass distribution ===")
     print(f"Sims: {total:,} ({pmc.SIMS_PER_SEED:,} x {len(pmc.SEEDS)} seeds), "
           f"horizon {pmc.HORIZON_DAYS} days")
-    print(f"Pass:             {pass_rate:>7.2%}  (baseline 98.09% under C2)")
+    print(f"Pass:             {pass_rate:>7.2%}  (baseline 98.78% under C2, 2026-05-14 allocation refresh)")
     print(f"Bust:             {bust_rate:>7.2%}")
     print(f"Right-censored:   {timeout_rate:>7.2%}  (timeout >= 150d)")
     print()
@@ -94,9 +94,9 @@ def main_default():
     print(f"  p90:  {p90}")
     print()
 
-    # Halt-condition check (baseline updated 2026-05-08 to C2 anchor 98.09%)
-    delta_pp = abs(pass_rate - 0.9809) * 100
-    print(f"Deviation from 98.09% C2 baseline: {delta_pp:.2f} pp")
+    # Halt-condition check (baseline updated 2026-05-14 to C2 allocation-refresh anchor 98.78%)
+    delta_pp = abs(pass_rate - 0.9878) * 100
+    print(f"Deviation from 98.78% C2 baseline: {delta_pp:.2f} pp")
     if delta_pp > 2.0:
         print("HALT: >2pp drift — do NOT post to Notion.")
         sys.exit(2)
@@ -216,7 +216,7 @@ def regime_check():
         print("     2026-05-08 relock (otherwise this is the same regime data")
         print("     re-read).")
         print("  2. Re-run portfolio_mc on the full live-extended panel and")
-        print("     compare to the C2 anchor 98.09 / 0.36 / 4.73.")
+        print("     compare to the C2 allocation-refresh anchor 98.78 / 0.12 / 4.17.")
         print("  3. Author docs/briefs/Q-DDP-2/ if the live data confirms the")
         print("     regime-fragility risk materialized.")
         sys.exit(3)

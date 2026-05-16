@@ -25,11 +25,13 @@ FIRM_RULES = {
 # Pepperstone-sourced CSVs (2022→2026) showed headroom under 1% bust + 5% p99 DD.
 # Striker NAS100 v1 added 2026-05-07 at 0.40% (DXTrade contractValue=10
 # broker-verified; 4-strategy MC anchor 97.88/0.22/4.55 already covers it).
+# 2026-05-14 allocation refresh: DJ30 risk 1.00% → 0.75% (with Pine pyramid
+# 350% → 500%); NAS100 0.40% → 0.45%. See docs/adr/2026-05-14-allocation-refresh.md.
 # Phase axis retained as a lookup key for downstream callers, but both phases
 # are byte-identical by construction so a future re-lock can't desync them.
-_BASE_RISK = {"guardian": 0.0034, "striker": 0.0100, "aegis": 0.0150, "striker_nas100": 0.0040}
+_BASE_RISK = {"guardian": 0.0034, "striker": 0.0075, "aegis": 0.0150, "striker_nas100": 0.0045}
 RISK_TIERS = {phase: _BASE_RISK for phase in ("challenge", "funded")}
 
 # Baseline: Pine Script indicators output lot sizes for this account
 BASELINE_BALANCE = 200_000
-BASELINE_RISK = RISK_TIERS["challenge"]  # Guardian 0.34%, Striker 1.00%, Aegis 1.50%
+BASELINE_RISK = RISK_TIERS["challenge"]  # Guardian 0.34%, Striker 0.75% (pyr 500%), Aegis 1.50%, NAS 0.45%

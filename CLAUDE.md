@@ -97,6 +97,7 @@ To add a firm: define its rules in firm_rules.py as config. Everything downstrea
 * **Regime-robustness gate** (mandatory before any LOCK CANDIDATE on a `dd_protection`-class risk constant; 6mo block bootstrap + half-panel split, both pinned to brief floor; Q-DDP-1 worked example 2026-05-06): [`docs/methodology/regime_robustness_gate.md`](docs/methodology/regime_robustness_gate.md).
 * **Operational rules** (incl. doc/code skew audit trigger): [`docs/operational_rules.md`](docs/operational_rules.md).
 * **Strategy-research-phase methodology archive** (INQHIORI ⊕ The Algorithm framework, Pre-Q gates, Case B audits, MVD framing — all retired 2026-04-29; 90-day review gate 2026-07-29): [`archive/docs/methodology/archive/README.md`](archive/docs/methodology/archive/README.md).
+* **Rejected portfolio candidates** (standing registry of directions investigated and rejected; re-proposal requires new mechanism evidence, not new parameters): [`docs/rejected_candidates.md`](docs/rejected_candidates.md). Current entry: Guardian-family on XAGUSD (Silver) closed 2026-05-14 per [`docs/briefs/Q-CORR-1-closure.md`](docs/briefs/Q-CORR-1-closure.md) (parent Q-CORR-1 SNAG-budget exhaustion). The surviving belt finding — instrument-level correlation is not a reliable proxy for strategy-level correlation (NAS100/DJ30 anchor) — is independent of the candidate rejection and remains in the portfolio-construction belt.
 
 ## Public-clone posture
 

@@ -1,8 +1,10 @@
 # WFO runner spec v0
 
-**STATUS:** READY — Path B subset (orchestration shell; Python Pine re-implementation explicitly out of scope for Q-CORR-1.2).
+**STATUS (2026-05-14):** RE-CLASSIFIED — general-purpose OOS infrastructure, **not Silver-specific**. Original target Q-CORR-1.2 closed pre-lock per [`docs/briefs/Q-CORR-1-closure.md`](../briefs/Q-CORR-1-closure.md) §5.2. Spec is parked at current state; decision (retain parked / carry to completion as standalone infra) deferred to the next strategy-admission investigation. Do NOT dispatch new CC handoffs against this spec citing Q-CORR-1.2 — that target is dead. Future use requires a fresh Pre-Q whose authoritative artifact names a live admission target.
 
-**Audience:** Q-CORR-1.2 Pre-Q, future Guardian-family WFO work.
+**STATUS (prior):** READY — Path B subset (orchestration shell; Python Pine re-implementation explicitly out of scope for Q-CORR-1.2).
+
+**Audience:** future strategy-admission investigations requiring deterministic walk-forward orchestration. The Q-CORR-1.2 audience tag is historical record only.
 
 ---
 

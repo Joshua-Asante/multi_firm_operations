@@ -39,15 +39,25 @@ PROFIT_TARGET = 210_000
 DAILY_LOSS_PCT = -0.05
 STATIC_DD_PCT = -0.05
 MIN_TRADING_DAYS = 5
+# HORIZON_DAYS is a MODELING ARTIFACT, not an FXIFY rule. FXIFY challenges have
+# no max-days timeout — see firm_rules.py:14 `inactivity_max_idle_days = 60`,
+# which is the ACTUAL FXIFY timeout rule and is NOT modeled by this simulator
+# (bootstrap structure makes 60 consecutive idle bdays vanishingly rare).
+# The 150-bday cap exists for runtime tractability. The "timeout" outcome
+# returned below = "did not reach +5% within 150 bdays AND did not bust" — it
+# is NOT an FXIFY inactivity bust. The ~1% timeout rate in canonical anchors is
+# dominated by paths that would have passed within ~7 more days (p99 unbounded
+# days-to-pass measured 147-156 across 3 allocation scenarios, 2026-05-15).
+# Q-MCTO-1 gates whether to replace this semantic with the FXIFY-correct one.
 HORIZON_DAYS = 150
 SIMS_PER_SEED = 10_000
 SEEDS = (42, 123, 2026)
 
 ALLOCATIONS: Dict[str, float] = {
     "guardian":       0.0034,
-    "striker":        0.0100,
+    "striker":        0.0075,
     "aegis":          0.0150,
-    "striker_nas100": 0.0040,
+    "striker_nas100": 0.0045,
 }
 STRATS = tuple(ALLOCATIONS.keys())
 
@@ -70,10 +80,10 @@ OANDA_PANELS: Dict[str, Path] = {
 
 PEPPERSTONE_DIR = Path(__file__).parent / "data" / "tv_exports" / "pepperstone"
 PEPPERSTONE_PANELS: Dict[str, Path] = {
-    "guardian":       PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv",
-    "striker":        PEPPERSTONE_DIR / "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv",
-    "aegis":          PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv",
-    "striker_nas100": PEPPERSTONE_DIR / "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-05_7ca6f.csv",
+    "guardian":       PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-14_3b689.csv",
+    "striker":        PEPPERSTONE_DIR / "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-14_e4dd7.csv",
+    "aegis":          PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-05-14_d2682.csv",
+    "striker_nas100": PEPPERSTONE_DIR / "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-14_da880.csv",
 }
 
 # Pepperstone is the CLAUDE.md canonical lock anchor; OANDA is the pattern-spotting proxy
@@ -116,12 +126,17 @@ def load_trades(path: Path) -> pd.DataFrame:
     out = exits[["exit_date", "pnl"]].sort_values("exit_date").reset_index(drop=True)
     if not out.empty:
         # MVD window — catches "4yr panel actually 14mo" class (audit instance #8).
+        # Tolerance 100d (was 60d): on strict-window exports (e.g. 2022-05-14 →
+        # 2026-05-14), Aegis's restrictive filters delay first trade ~2 months,
+        # leaving a 1367-day span vs the 1460-day expected. The 1400d threshold
+        # would have caught the prior 681-day Aegis sub-panel (2024-06 → 2026-04)
+        # — the floor still rejects ≥3-month coverage gaps.
         assert_window(
             out["exit_date"].iloc[0].to_pydatetime(),
             out["exit_date"].iloc[-1].to_pydatetime(),
             expected_min_days=4 * 365,
             label=f"MC input panel {path.name}",
-            tolerance_days=60,
+            tolerance_days=100,
         )
     return out
 
@@ -217,6 +232,9 @@ def _simulate_path(path: np.ndarray, dd_trigger: float, dd_scale: float,
         if round(eq, 2) >= PROFIT_TARGET and trade_days >= MIN_TRADING_DAYS:
             return "pass", day + 1, max_dd, None
 
+    # 150-bday horizon-runout. NOT an FXIFY inactivity bust — see HORIZON_DAYS
+    # comment block above. Q-MCTO-1 gates structural change to FXIFY-correct
+    # semantics (60-day inactivity bust, no horizon cap).
     return "timeout", horizon, max_dd, None
 
 

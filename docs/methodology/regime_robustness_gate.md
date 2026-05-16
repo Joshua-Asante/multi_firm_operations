@@ -179,7 +179,7 @@ Steps 4–5 are not part of the brief that ran this gate — they are downstream
 - **Q-DDP-1 worked example**: `docs/briefs/Q-DDP-1/recommendation.md`
 - **Locked dd_protection config**: `multi_firm_operations/dd_protection.py` (DD_TRIGGER=0.015, DD_SCALE=0.40 — C2 relock 2026-05-08)
 - **MC harness**: `multi_firm_operations/portfolio_mc.py`
-- **Production-pinned MC anchor**: `tests/test_mc_anchors.py` (98.09% / 0.36% / 4.73% on 52mo Pepperstone, 4-strategy at C2)
+- **Production-pinned MC anchor**: `tests/test_mc_anchors.py` (98.78% / 0.12% / 4.17% on 48mo Pepperstone 2026-05-14 allocation refresh, 4-strategy at C2 with DJ30 0.75%/pyramid 500% + NAS 0.45%; prior panel-refresh-only anchor 98.65/0.25/4.69 and 2026-05-08 C2 anchor 98.09/0.36/4.73 preserved as historical in CLAUDE.md. The 2026-05-14 allocation refresh overrides this gate explicitly per `docs/adr/2026-05-14-allocation-refresh.md` §Override.)
 
 ---
 

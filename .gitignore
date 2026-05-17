@@ -40,6 +40,7 @@ live_journal/data/*.json
 
 # Vendor-licensed data (Pepperstone/OANDA-derived TV exports + broker bar feeds + reference data).
 # Held locally only; SHA256SUMS manifests are tracked for integrity verification.
+# Note: data/external/SHA256SUMS may be empty when no reference CSVs are committed; manifest-check workflow tolerates this.
 data/tv_exports/**/*.csv
 data/bar_data/*.csv
 data/external/*.csv

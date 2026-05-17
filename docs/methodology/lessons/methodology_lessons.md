@@ -17,6 +17,14 @@ shape; the distinction is which layer the lesson lives at:
   methodology failure caused a measurable P&L mistake. Watch-points fire from
   brief-authoring discipline (Rule-0 reads, pre-Q gate audit, regime-robustness
   gate, etc.) rather than from a runtime script.
+- **F-class — fixture-caught defect.** Counterfactual lessons: a defect that
+  *would have* corrupted brief evidence had a fixture test not pinned the
+  anchor invariant. Introduced 2026-05-16 alongside
+  `docs/adr/2026-05-16-fixture-test-requirement.md`. Anchored to a specific
+  dated investigation; cost is the counterfactual brief that would have been
+  corrupted (dollar estimate when P&L-acting, audit-instance count
+  otherwise). Watch-point fires during §0 of brief authoring when an analysis
+  script is listed as a production read.
 
 Both registries are durable canon. Memory entries that overlap with a
 registered lesson exist only as compact pointers; the lesson itself lives here.
@@ -433,6 +441,91 @@ The rule is what fired the promotion, not a fresh judgement. If the rule hadn't 
 
 ---
 
+## F-1 — TradingView <30-day JPY P&L inflation (~153× at USDJPY ~150)
+
+**Status:** CANDIDATE 2026-05-16 (retroactive seed; defect predates F-class infrastructure)
+**Domain:** brief-evidence integrity · analysis-script output validation
+**Sibling lessons:** M-AHF (audit hooks check storage form) · Rule 0 (audit-first) · code-defect-debugging skill (canonical anchor)
+
+### Pattern
+
+TradingView reports JPY-quoted instrument P&L in raw JPY (not USD) on holds
+strictly under 30 calendar days, while reporting USD on longer holds. The
+short-horizon JPY figure looks like a plausible USD value at first read but
+is inflated by the quote rate (~153× at USDJPY ~150). Any brief that cited
+TV-reported P&L on a sub-30-day USDJPY trade as USD evidence would silently
+overstate by two orders of magnitude.
+
+### Anchor incident
+
+- **Investigation:** Q-MT5-TV equivalence.
+- **Defect surface:** TV display layer; JPY→USD conversion omitted on
+  short-horizon JPY-quoted holds.
+- **Discovery path:** noticed manually during equivalence cross-check; not
+  caught by any fixture suite (none existed at the time).
+- **Canonical fix:** `tv_mt5_pnl_reconciliation.py` (commit `8e2a2d6`,
+  2026-05-16) encodes the independent USD formula and a `compute_pnl_tv_buggy`
+  regression helper that reproduces the defect. Fixture suite at
+  `tests/test_tv_mt5_pnl_reconciliation.py` pins the canonical, inverse, and
+  30-day boundary cases against independently derived expected values.
+
+### Cost
+
+**Audit-instance count: 1** (retroactive seed). The Q-MT5-TV equivalence work
+was diagnostic rather than P&L-acting, so the counterfactual is
+re-investigation cost (~1 session) rather than direct dollar loss. The lesson
+seeds the registry; future fixture-caught defects accumulate alongside.
+
+### Rule
+
+Before citing an analysis-script output as brief evidence, confirm the script
+has a fixture test under `tests/test_<basename>.py` pinning its anchor
+invariant against an independently derived expected value, and that
+`pytest tests/test_<basename>.py -v` returns green.
+
+### Mechanism (why this fails)
+
+Order-of-magnitude defects in numeric output escape eyeballing when the
+incorrect magnitude is *plausible at first glance*. The TV JPY figure on a
+sub-30-day USDJPY hold reads as a reasonable percentage; only the
+side-by-side comparison against an independently derived USD value reveals
+the ~153× inflation. Fixture tests with expected values derived by hand (not
+by the same code path) catch this class because the comparison is between
+two independent derivations, not a self-check.
+
+### Connection to standing doctrine
+
+- `docs/adr/2026-05-16-fixture-test-requirement.md` — codifying ADR;
+  extends Rule 0 from "production code read" to "production code read AND
+  fixture-tested where output is load-bearing."
+- `docs/rule_0.md` — canonical Rule 0 text being extended.
+- `code-defect-debugging` skill — canonical JPY 153× anchor (TV <30-day JPY
+  ~153× P&L inflation) lives in the skill's defect catalogue.
+
+### Watch-point
+
+During §0 of brief authoring, when listing an analysis script as a production
+read. The check fires at the brief-authoring time, not at script-edit time.
+
+### Output trigger
+
+If the cited script lacks `tests/test_<basename>.py` OR its fixture suite is
+red, block brief authoring until fixture test lands and pytest is green. The
+ADR's Hook 1 (`scripts/check_brief_evidence_coverage.py`) provides the
+mechanical check across all committed briefs and ADRs.
+
+### Promotion criteria for F-class
+
+Same shape as M-class:
+- (a) single instance with dollar cost ≥ $3,000 OR
+- (b) three separate fixture-caught defects across the registry.
+
+F-1 stays CANDIDATE as a retroactive seed; PROMOTION fires on the second
+genuinely fixture-caught defect (i.e. one where the fixture suite, not
+manual inspection, surfaced the defect first).
+
+---
+
 ## Versioning & change-log
 
 - **2026-05-08:** Registry seeded. Format spec authored. M-7 added as
@@ -448,3 +541,7 @@ The rule is what fired the promotion, not a fresh judgement. If the rule hadn't 
 - **2026-05-10:** M-AHF added as PROMOTED on third-instance auto-graduation per
   registry rule (audit hooks check storage form, not human-readable property;
   three same-day instances: GH #55 round 1, GH #55 round 2, PR #73 hook 4).
+- **2026-05-16:** F-class introduced (fixture-caught defect). F-1 added as
+  CANDIDATE on the Q-MT5-TV JPY ~153× anchor (retroactive seed; defect
+  predates F-class infrastructure). F-class definition added to registry intro.
+  Codifying ADR: `docs/adr/2026-05-16-fixture-test-requirement.md`.

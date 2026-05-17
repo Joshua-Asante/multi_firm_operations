@@ -26,7 +26,7 @@ broker = ["oandapyV20"]
 dev = ["pytest", "pytest-xdist"]
 
 [tool.setuptools]
-py-modules = ["accounts", "cli", "csv_parser", "dd_protection", "firm_rules", "fxify_rule_validator", "portfolio_mc"]
+py-modules = ["accounts", "cli", "csv_parser", "dd_protection", "firm_rules", "fxify_rule_validator", "portfolio_mc", "tv_mt5_pnl_reconciliation"]
 packages = ["lib"]
 
 [tool.pytest.ini_options]

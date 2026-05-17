@@ -138,7 +138,7 @@ If audit fires (in 2–3 weeks per the forward-asymmetry observation clock) and 
 | Production read on MC correlation | DONE (per pre-condition A report) |
 | Pre-Q drafted | NO (unblocked, awaits Joshua pacing decision) |
 | Inquire phase opened | NO |
-| STATE.md open-questions row | N/A (STATE.md does not exist in this repo; adapted to `docs/briefs/notice/` index pattern per CC report §1) |
+| STATE.md open-questions row | DONE — [STATE.md → Active investigations → Q-CORR-2](../../../STATE.md#q-corr-2--pyramid-conditional-correlation-dj30--nas100) + Open questions / queued bullet (pre-condition A report §7 C2 was a false negative; spawn's `Glob STATE.md` missed it but it exists at repo root) |
 | Notion Command Center entry | DEFERRED (until Pre-Q) |
 
 **Next action (owner: Joshua):** decide whether to draft the Pre-Q now or hold based on competing priorities. Both §6 pre-conditions are resolved; Pre-Q drafting is unblocked. Carry-forward items for the Pre-Q author: C3 (lock-date 2026-05-15 vs 2026-05-16 merge), C4 (blocks_per_sim 30→300 shift under PR #85), and the `pyramid_fired` column extension to `build_daily_panel` per the B note §4.

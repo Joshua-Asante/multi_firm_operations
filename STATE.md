@@ -78,6 +78,17 @@ The 2026-05-14 panel refresh (which produced the 98.65/0.25/4.69 panel-refresh-o
 
 ## Active investigations
 
+### Q-CORR-2 — pyramid-conditional correlation (DJ30 × NAS100)
+
+**Status:** NOTICE-OPEN 2026-05-16; §6 pre-conditions both RESOLVED 2026-05-17. Pre-Q drafting unblocked.
+**Notice:** [docs/briefs/notice/2026-05-16-q-corr-2-pyramid-conditional-correlation.md](docs/briefs/notice/2026-05-16-q-corr-2-pyramid-conditional-correlation.md).
+**Conjecture:** strategy-level correlation between DJ30 and NAS100 under pyramid-active conditioning may diverge materially from unconditional correlation, making the MC's joint-tail estimate structurally optimistic on the unmodeled wing.
+**Pre-condition A — joint-sampling assumption:** RESOLVED as **A1 — empirical block bootstrap** ([report](docs/briefs/notice/q-corr-2-precondition-a-report.md), DONE_WITH_CONCERNS). `portfolio_mc.py` uses non-overlapping Monday-anchored 5-day block bootstrap on union-aligned daily panel (`build_daily_panel` → `build_week_blocks` → `run_seed` at L151–258). No correlation matrix, no copula, no parametric coupling — joint structure preserved implicitly within blocks, washed across blocks.
+**Pre-condition B — pyramid-active definition:** RESOLVED as **B2 primary + B1 adjacent** ([note](docs/briefs/notice/2026-05-16-q-corr-2-precondition-b-note.md)). B2 (both-fire) is the direct operational form of the §3 conjecture; B1 (any-fire) runs as parallel cut on same panel for 2×2 mechanism-vs-regime disambiguation. B3 (depth-threshold) and B4 (continuous) deferred to follow-up Pre-Q gated on B2 signal.
+**Pre-Q falsifier shape (fixed under A1):** `corr(B2 subset) − corr(unconditional panel)` with Δ threshold to be set at Pre-Q drafting time.
+**Carry-forwards for Pre-Q author:** (a) PR #85 changed `blocks_per_sim` 30→300 via `HORIZON_CAP=1500` (20× more independent block draws per sim — may affect Δ threshold under across-block correlation washing); (b) parent docs cite "2026-05-15 FXIFY-correct lock" but merge commit `43aa187` timestamp is 2026-05-16 22:16 -0400 — reconcile; (c) data extraction step at Pre-Q time: extend `build_daily_panel` with a `pyramid_fired` boolean per strategy per business day.
+**Next action (owner: Joshua):** decide whether to draft Pre-Q now or hold based on competing priorities. Both §6 pre-conditions are resolved; no blocker.
+
 ### Q-CORR-1.2 — Guardian-family Silver (XAGUSD) WFO admission
 
 **Status:** LOCKED 2026-05-13. Path B (TradingView-native coarse grid) admission gate.
@@ -175,3 +186,4 @@ INQHIORI vs OODA loop selection (reactivated 2026-05-01): INQHIORI for structura
 - **Phase 0 (Q-CORR-1.2 dependency):** Joshua-side TV reconnaissance to confirm strategy-tester depth on Pepperstone XAGUSD M15 covers fold window `2022-01-11 → 2026-04-20`. Q-CORR-1.2 cannot resume sweep execution until determinate.
 - **OANDA panel migration** (open question, no deadline): `archive/strategies/striker/striker_dj30_v4.4.pine` retained for OANDA-panel back-compat; potential retire after OANDA mirror regenerated against v4.5.
 - **C2→C0 revert trigger**: first quarterly check 2026-08-08 (~12 weeks out). Now covers both the 2026-05-08 dd_protection override and the 2026-05-14 allocation-refresh override (same cadence, same instrumentation).
+- **Q-CORR-2 Pre-Q drafting (2026-05-17):** both §6 pre-conditions RESOLVED; Pre-Q is unblocked but not scheduled. Owner Joshua. See [Active investigations → Q-CORR-2](#q-corr-2--pyramid-conditional-correlation-dj30--nas100).

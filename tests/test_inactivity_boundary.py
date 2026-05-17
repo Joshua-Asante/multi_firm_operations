@@ -1,36 +1,45 @@
-"""Boundary tests for the FXIFY-correct inactivity simulator (Q-MCTO-1 Phase 1).
+"""Boundary tests for the FXIFY-correct inactivity simulator.
 
-Per Q-MCTO-1 §7, three boundary properties must hold:
+Originally authored as Phase 1 boundary tests against the work-product
+simulator at `scripts/inactivity_simulator.py`. Re-pointed 2026-05-16 to
+exercise the **production** simulator at `portfolio_mc._simulate_path`
+after ADR 2026-05-16-fxify-correct-timeout-semantic.md adopted the
+FXIFY-correct semantic in production code.
+
+Three boundary properties must hold:
   1. consecutive_idle == 59 does NOT trigger bust_inactivity
   2. consecutive_idle == 60 DOES trigger bust_inactivity
   3. A single non-zero day resets the counter
-  4. (added) Inactivity bust has culprit=None (semantically "no one traded")
-  5. (added) Offsetting non-zero pnls (e.g. +$100/-$100) are NOT idle
-
-The simulator lives at `scripts/inactivity_simulator.py`. This test does not
-import `portfolio_mc.py` — it tests the simulator in isolation.
+  4. Inactivity bust has culprit=None (semantically "no one traded")
+  5. Offsetting non-zero pnls (e.g. +$100/-$100) are NOT idle
 """
 
 from __future__ import annotations
-import sys
-from pathlib import Path
-
-REPO = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(REPO / "scripts"))
 
 import numpy as np
 import pytest
 
-from inactivity_simulator import (
-    simulate_path,
-    INACTIVITY_LIMIT,
+from portfolio_mc import (
     HORIZON_CAP,
+    INACTIVITY_LIMIT,
     STARTING_EQUITY,
+    _simulate_path,
 )
 
 N_STRATS = 4
 DD_TRIGGER = 0.015
 DD_SCALE = 0.40
+
+
+def simulate_path(path: np.ndarray, dd_trigger: float, dd_scale: float):
+    """Adapter — production signature requires explicit horizon.
+
+    For boundary tests with synthetic paths shorter than HORIZON_CAP, walk
+    only as far as the constructed path; production callers always pass
+    paths sized to HORIZON_CAP via the bootstrap.
+    """
+    horizon = min(HORIZON_CAP, len(path))
+    return _simulate_path(path, dd_trigger, dd_scale, horizon)
 
 
 def _build_path(rows: list[list[float]]) -> np.ndarray:

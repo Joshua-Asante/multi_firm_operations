@@ -1,11 +1,11 @@
 # Q-MCTO-1 — Portfolio MC timeout semantics
 
-**Status:** OPEN
+**Status:** **CLOSED-RESOLVED 2026-05-16** via [`docs/adr/2026-05-16-fxify-correct-timeout-semantic.md`](../adr/2026-05-16-fxify-correct-timeout-semantic.md). All six H-MCTO-1 clauses PASS. Production simulator at `portfolio_mc._simulate_path` migrated from 150-bday horizon-runout to 60-bday inactivity bust + 1500-bday safety ceiling. Canonical anchor updated to 99.88 / 0.12 / 4.21 (Pepperstone) / 99.51 / 0.49 / 4.82 (OANDA). Sub-question Q-MCTO-1.a NOT triggered (inactivity rate empirically 0.00%). See §11 closure for the final clause-evaluation summary.
 **Authored:** 2026-05-15
-**Closed:** N/A
-**Authors:** web Claude (parent session); Claude Code (executor — TBD)
+**Closed:** 2026-05-16 — CLOSED-RESOLVED
+**Authors:** web Claude (parent session); Claude Code (executor)
 **Parent question:** N/A
-**Sub-questions opened:** Q-MCTO-1.a (provisional — auto-forks if inactivity rate >0.5% empirically; see §7)
+**Sub-questions opened:** Q-MCTO-1.a (provisional — auto-forks if inactivity rate >0.5% empirically; see §7) — **NOT triggered** (rate = 0.00% on the 2026-05-14 Pepperstone panel)
 
 ---
 
@@ -358,3 +358,57 @@ $ git log -1 -- portfolio_mc.py firm_rules.py dd_protection.py tests/test_mc_anc
 $ grep -n "HORIZON_DAYS = 150\|inactivity_max_idle_days" portfolio_mc.py firm_rules.py
 $ grep -n "98.78\|99.88\|p99 DD 4.17" CLAUDE.md
 ```
+
+---
+
+## §11 — Closure (CLOSED-RESOLVED 2026-05-16)
+
+### Verdict
+
+**CLOSED-RESOLVED** per §6 gate: all six H-MCTO-1 clauses PASS empirically. Production change recommended and adopted via separate ADR [`docs/adr/2026-05-16-fxify-correct-timeout-semantic.md`](../adr/2026-05-16-fxify-correct-timeout-semantic.md), authored before any anchor-literal edits as required by §5 forbidden moves.
+
+### Final clause evaluation
+
+| Clause | Floor | Observed | Verdict |
+|---|---|---|---|
+| 1. Pass-rate shift ≥ +0.50pp | ≥ +0.50pp | +1.10pp (98.78 → 99.88 on 2026-05-14 Pepperstone panel) | ✓ |
+| 2. p99 DD shift ≤ +0.20pp | ≤ +0.20pp | +0.04pp (4.17 → 4.21) | ✓ |
+| 3. Inactivity bust rate ≤ 0.10% | ≤ 0.10% | 0.00% (zero across 30K Pepperstone sims; bootstrap structure precludes 60-day all-zero runs) | ✓ |
+| 4. Horizon_cap rate ≤ 0.10% | ≤ 0.10% | 0.00% (1500-bday safety never fires) | ✓ |
+| 5. Lock gates (bust <1% AND p99 DD <5%) | bust <1%, p99 DD <5% | bust 0.12%, p99 DD 4.21% — both clear with the widest margin on record | ✓ |
+| 6. Regime-robustness (Phase 2) | bootstrap p05 ≥97.5% AND H1/H2 ≥97.5% | bootstrap p05 99.35% (+1.85pp margin); H1 99.64%, H2 99.95%; H1↔H2 spread 0.31pp (vs Q-DDP-1's failing 12.9pp) | ✓ |
+
+Phase 1 reproducibility (Phase 1.C): 3-rerun spread 0.00000pp (deterministic byte-identical).
+
+Sub-question Q-MCTO-1.a (auto-fork if inactivity rate >0.5% empirically) **NOT triggered** — rate = 0.00%.
+
+### Production change landed
+
+- `portfolio_mc.py`: `HORIZON_DAYS = 150` → `INACTIVITY_LIMIT = 60` + `HORIZON_CAP = 1500`. `_simulate_path` adds symmetric idle-day check + returns `"bust_inactivity"` (culprit=None) on 60 consecutive idle bdays. `"timeout"` outcome renamed to `"horizon_cap"`. Outcome dict + aggregation + printout updated.
+- `tests/test_mc_anchors.py`: Pepperstone pin 0.9878/0.0012/0.0417 → 0.9988/0.0012/0.0421; OANDA pin 0.9633/0.0040/0.0473 → 0.9951/0.0049/0.0482. Docstrings updated to cite this brief + the ADR.
+- `tests/test_inactivity_boundary.py`: re-pointed from `scripts/inactivity_simulator.py` to `portfolio_mc._simulate_path`. All 10 boundary tests PASS against production.
+- `CLAUDE.md`: anchor block updated to FXIFY-correct headline; prior 2026-05-14 allocation-refresh anchor (98.78/0.12/4.17) moved to "Prior anchors (historical)" with explicit semantic-change context.
+- `docs/analytics/mc_anchor_evolution/`: A8 + O8 anchors added to data.csv; plot.py + charts regenerated.
+
+### Verification at closure
+
+```
+$ pytest tests/test_inactivity_boundary.py tests/test_mc_anchors.py -v
+# Output: 18 passed in 139.72s — all clauses validated against production code
+
+$ python portfolio_mc.py --panel pepperstone | grep -E "Pass:|Bust:|p99 DD:"
+# Pass:               99.88% (sigma 0.04%)
+# Bust:                0.12% (sigma 0.04%)
+# p99 DD:       4.21%
+
+$ python portfolio_mc.py --panel oanda | grep -E "Pass:|Bust:|p99 DD:"
+# Pass:               99.51% (sigma 0.11%)
+# Bust:                0.49% (sigma 0.11%)
+# p99 DD:       4.82%
+```
+
+### Carried forward
+
+- Forward revert trigger (per ADR §Falsifier): if rolling 6-month MC pass-rate on the live-extended Pepperstone panel falls below 95% for two consecutive 6-month windows at next quarterly check (2026-08-08, 2026-11-08, 2027-02-08, 2027-05-08), or if forward live-PnL shows ≥3 inactivity busts in any rolling 6-month window, the ADR is invalidated. Minimum action: revert to 150-bday semantics, restore 98.78/0.12/4.17 anchor pins.
+- Out-of-scope follow-ups: `references/baselines.md` (skill-side) sync, `docs/notion/repo_context.md` headline update, Notion Command Center "Repo Context" page anchor citation update. Tracked as standalone work, not blocking the ADR or this closure.
+- `scripts/inactivity_simulator.py` retained with documentation-only banner pointing to the production migration. The script is no longer load-bearing but its docstring is the simplest reference for the semantic; deleting it would require also touching `scripts/q_mcto_1_phase1.py` and `scripts/q_mcto_1_phase2.py` which still reference it.

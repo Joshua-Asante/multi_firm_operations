@@ -87,6 +87,10 @@ The Pre-Q's falsifier threshold depends on which is true:
 
 Pre-Q cannot be authored honestly without this. The CC handoff or your direct read closes this gap.
 
+**RESOLVED 2026-05-17 — A1 (empirical block bootstrap).** Per [`q-corr-2-precondition-a-report.md`](q-corr-2-precondition-a-report.md). `portfolio_mc.py` uses non-overlapping Monday-anchored 5-day block bootstrap on a union-aligned daily panel (`build_daily_panel` → `build_week_blocks` → `run_seed` at L151–258). No correlation matrix, no copula, no parametric coupling — joint structure inherited implicitly from realized historical daily co-movement baked into the blocks. Falsifier shape fixed under A1: `corr(pyramid-active subset) − corr(unconditional panel)` with Δ threshold to be set at Pre-Q drafting time. **Material carry-forwards for Pre-Q author:**
+- **C3 (lock-date reconciliation):** parent docs (this Notice §1, CLAUDE.md) cite "2026-05-15 FXIFY-correct lock"; actual merge commit `43aa187` timestamp is 2026-05-16 22:16 -0400. Possibly anchor-computation-date vs merge-date split; reconcile at Pre-Q time.
+- **C4 (blocks_per_sim shift):** PR #85 changed `blocks_per_sim = (horizon + 4) // 5` from 30 (horizon=150) to 300 (HORIZON_CAP=1500). 20× increase in independent block draws per sim. Does not change the A1 classification, but may matter for falsifier-threshold setting under across-block correlation washing.
+
 **Pre-condition B — pyramid-active definition operationalized.** "Pyramid-active" must be specified precisely enough to subset the panel. Candidate definitions, all defensible:
 - B1: any day on which either strategy fired pyramid orders
 - B2: any day on which both strategies fired pyramid orders
@@ -95,7 +99,9 @@ Pre-Q cannot be authored honestly without this. The CC handoff or your direct re
 
 B2 is the strongest test of the conjecture as stated. B1 is the weakest but most data-rich. B4 is most informative but most expensive. Pre-Q picks one as primary and may carry the others as sensitivity.
 
-Once both pre-conditions are resolved, this Notice can be closed (transitioning to Pre-Q) or held open (if pre-conditions resolve in a way that suggests the question is not worth pursuing — e.g., A2/B2 with negligible pyramid-day overlap).
+**RESOLVED 2026-05-17 — B2 primary + B1 adjacent.** Per [`2026-05-16-q-corr-2-precondition-b-note.md`](2026-05-16-q-corr-2-precondition-b-note.md). B2 (both-fire) is the direct operational form of the §3 conjecture; B1 (any-fire) runs as a parallel cut on the same panel at near-zero marginal cost and provides a 2×2 mechanism-vs-regime disambiguation table. B3 (depth-threshold) and B4 (continuous) deferred to follow-up Pre-Q gated on B2 signal — defers researcher-DoF inflation. Data extraction at Pre-Q draft time: extend `build_daily_panel` with a `pyramid_fired` boolean per strategy per business day (CSV-column verification step in B note §4; HIGH-confidence prediction that data exists in source CSVs).
+
+Both pre-conditions resolved 2026-05-17. Pre-Q drafting is unblocked. This Notice does not auto-transition — Joshua decides whether to draft Pre-Q now or hold based on competing priorities.
 
 ---
 
@@ -126,14 +132,16 @@ If audit fires (in 2–3 weeks per the forward-asymmetry observation clock) and 
 
 | Item | Status |
 |---|---|
-| Q-CORR-2 Notice filed | YES (this document) |
-| Pre-Q drafted | NO (gated on §6 pre-conditions) |
+| Q-CORR-2 Notice filed | YES (commit `317e43a`, 2026-05-16) |
+| Pre-condition A resolved | **YES (A1 — empirical block bootstrap; commit `6890bf8`, 2026-05-17)** |
+| Pre-condition B resolved | **YES (B2 primary + B1 adjacent; uncommitted note 2026-05-17, awaiting Joshua review)** |
+| Production read on MC correlation | DONE (per pre-condition A report) |
+| Pre-Q drafted | NO (unblocked, awaits Joshua pacing decision) |
 | Inquire phase opened | NO |
-| Production read on MC correlation | PENDING (CC handoff or direct) |
-| STATE.md open-questions row | PENDING (this commit) |
+| STATE.md open-questions row | N/A (STATE.md does not exist in this repo; adapted to `docs/briefs/notice/` index pattern per CC report §1) |
 | Notion Command Center entry | DEFERRED (until Pre-Q) |
 
-**Next action (owner: Joshua):** decide whether to resolve §6 pre-condition A via direct read or via CC handoff. Pre-condition B requires no production read — it's a Pre-Q drafting choice and can be made at Pre-Q time.
+**Next action (owner: Joshua):** decide whether to draft the Pre-Q now or hold based on competing priorities. Both §6 pre-conditions are resolved; Pre-Q drafting is unblocked. Carry-forward items for the Pre-Q author: C3 (lock-date 2026-05-15 vs 2026-05-16 merge), C4 (blocks_per_sim 30→300 shift under PR #85), and the `pyramid_fired` column extension to `build_daily_panel` per the B note §4.
 
 ---
 

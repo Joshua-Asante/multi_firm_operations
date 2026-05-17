@@ -9,11 +9,13 @@ on:
       - "data/**/SHA256SUMS"
       - ".gitignore"
       - "scripts/check_data_manifests.py"
+      - ".github/workflows/manifest-check.yml"
   pull_request:
     paths:
       - "data/**/SHA256SUMS"
       - ".gitignore"
       - "scripts/check_data_manifests.py"
+      - ".github/workflows/manifest-check.yml"
 
 jobs:
   format:

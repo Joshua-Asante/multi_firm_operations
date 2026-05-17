@@ -18,6 +18,51 @@ _Queued changes. Move to a dated entry on commit._
 
 ---
 
+## 2026-05-17 — Canonical reference panel migrated to BT-OFF + static-equity
+
+No parameter change. Canonical Pepperstone reference panel for Striker DJ30
+v4.5 moves from `Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv`
+(BT-ON compounded, n=224 = 197 base + 27 pyramid) to `Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-17_c0b35.csv`
+(BT-OFF, n=210 = 185 base + 25 pyramid). Static-equity recomputation
+(per-trade `Net P&L USD × (INITIAL / equity_at_entry)`) is the new
+FXIFY-equivalent headline.
+
+### Headline (BT-OFF + static-equity, 2026-05-17 canonical)
+| Metric | Compounded (TV) | Static (FXIFY-equivalent) |
+|---|---:|---:|
+| N | 210 (185 base + 25 pyramid) | 210 |
+| WR | 69.52% (146W / 64L) | 69.52% |
+| PF | 2.347 | **2.27** |
+| Net P&L | +$260,708.70 | **+$173,569.89** (+86.78% on $200K) |
+| Max DD % | 4.70% | **4.72%** |
+| Max DD $ | — | $9,490.13 |
+| RF | — | 18.29 |
+| 1R (mean full-stop, n=47) | — | $2,593.29 |
+
+Static/compounded Net ratio = **67%**.
+
+**BT-mode trade-count delta:** BT-ON 12175 panel had 197 base + 27 pyramid =
+224 trades; BT-OFF c0b35 has 185 base + 25 pyramid = 210 trades. 14 trades
+(12 base + 2 pyramid) that fire under deterministic BT-ON fills do not fire
+under BT-OFF's pessimistic intra-bar resolution. WR profile shifts modestly
+(higher WR under BT-OFF — losing entries don't fire).
+
+### Methodology change rationale
+See [`data/reconciles/2026-05-17_guardian_bt_off_static_canonical.md`](../../data/reconciles/2026-05-17_guardian_bt_off_static_canonical.md)
+for the full methodology change documentation. Pine sizing line
+`calcSize(stopDist) => risk = strategy.equity * (riskPerTrade / 100)` is
+the same on DJ30 as on Guardian (user-confirmed 2026-05-17).
+
+### Reconcile vs prior BT-ON anchor
+- 05-05 BT-ON panel (`12175.csv`): retained on disk + in SHA256SUMS as
+  historical reference; no longer the canonical reference.
+- v4.5 §"Portfolio MC anchors (2026-05-05)" table below retained unchanged
+  — captures the 4-strategy MC at the v4.5 lock decision under the prior
+  compounded panels. The current 4-strategy MC will re-anchor in Stage 3
+  of this methodology cascade against all four new BT-OFF panels.
+
+---
+
 ## 2026-05-08 — NAS100 split-out + dd_protection C2 relock (cross-ref)
 
 - **`striker_nas100_v1.pine` moved `strategies/striker/` → `strategies/nas/`.** No DJ30 parameter change; DJ30 v4.5 stays in this folder. The split codifies the architecture-family-but-instrument-tuned distinction (NAS: 0.40% / 1000% pyramid / Mon+Tue; DJ30: 1.00% / 350% pyramid / [DJ30-locked DOW set]). Cross-references repaired in `REPO_MAP.md`, `docs/briefs/striker_nas100_q_nas_1_results.md`, and `docs/briefs/striker_nas100_q_nas_3_mc_addition.md`.

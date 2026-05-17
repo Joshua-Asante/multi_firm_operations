@@ -16,6 +16,53 @@ _(none)_
 
 ---
 
+## 2026-05-17 — Canonical reference panel migrated to BT-OFF + static-equity
+
+No parameter change. Canonical Pepperstone reference panel for NAS100 v1
+moves from `Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-05_7ca6f.csv`
+(BT-ON compounded, n=200 = 166 base + 34 pyramid) to `Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-17_cd2b6.csv`
+(BT-OFF, n=193 = 160 base + 33 pyramid). Static-equity recomputation
+(per-trade `Net P&L USD × (INITIAL / equity_at_entry)`) is the new
+FXIFY-equivalent headline.
+
+### Headline (BT-OFF + static-equity, 2026-05-17 canonical)
+| Metric | Compounded (TV) | Static (FXIFY-equivalent) |
+|---|---:|---:|
+| N | 193 (160 base + 33 pyramid) | 193 |
+| WR | 55.96% (108W / 85L) | 55.96% |
+| PF | 3.648 | **3.63** |
+| Net P&L | +$392,300.39 | **+$226,876.78** (+113.44% on $200K) |
+| Max DD % | 7.02% | **6.20%** |
+| Max DD $ | — | $14,401.76 |
+| RF | — | 15.75 |
+| 1R (mean full-stop, n=8) | — | $4,025.31 |
+
+Static/compounded Net ratio = **58%**.
+
+**BT-mode trade-count delta:** BT-ON 7ca6f panel had 166 base + 34 pyramid =
+200 trades; BT-OFF cd2b6 has 160 base + 33 pyramid = 193 trades. 7 trades
+(6 base + 1 pyramid) that fire under deterministic BT-ON fills do not fire
+under BT-OFF's pessimistic intra-bar resolution. **Pyramid-load fragility
+to fill quality is the load-bearing concern flagged in v1.0 §"Known
+concerns"** — the BT-OFF panel suggests pyramid contribution holds at this
+fill level, but live pyramid attribution remains the forward tripwire.
+
+### Methodology change rationale
+See [`data/reconciles/2026-05-17_guardian_bt_off_static_canonical.md`](../../data/reconciles/2026-05-17_guardian_bt_off_static_canonical.md)
+for the full methodology change documentation. Pine sizing line
+`calcSize(stopDist) => risk = strategy.equity * (riskPerTrade / 100)` is
+the same on NAS100 as on Guardian (user-confirmed 2026-05-17).
+
+### Reconcile vs prior BT-ON anchor
+- 05-05 BT-ON panel (`7ca6f.csv`): retained on disk + in SHA256SUMS as
+  historical reference; no longer the canonical reference.
+- v1.0 §"Backtest (Pepperstone NAS100 15m, 2022-01-01 → 2026-04-20, 4y4m)"
+  retained unchanged — captures the BT-ON anchor at lock decision. The
+  current 4-strategy MC will re-anchor in Stage 3 of this methodology
+  cascade against all four new BT-OFF panels.
+
+---
+
 ## 2026-05-08 — Folder split + 4-strategy MC re-anchor (C2)
 
 - **Strategy file moved `strategies/striker/` → `strategies/nas/`.** No parameter change. Codifies the architecture-family-but-instrument-tuned distinction from DJ30 (separate risk %, separate DOW set, separate pyramid size). DJ30 family stays in `strategies/striker/`. Cross-references in `REPO_MAP.md`, `docs/briefs/striker_nas100_q_nas_1_results.md`, and `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` repaired in the same commit.

@@ -108,7 +108,7 @@ def test_select_prefers_lower_dd_at_equal_pf(run_with_manifest):
 
 
 def test_ingest_guardian_renamed_silver_train(tmp_path):
-    src = PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv"
+    src = PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-17_90bb1.csv"
     if not src.is_file():
         pytest.skip("Pepperstone Guardian CSV not present")
     sys.path.insert(0, str(WFO))
@@ -357,7 +357,7 @@ def test_section_13_fold_window_pinned():
 
 def test_batch_ingest_directory_dispatch(tmp_path):
     """Batch ingest finds *.csv files in a directory and routes each through ingest_tv_csv."""
-    src = PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv"
+    src = PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-17_90bb1.csv"
     if not src.is_file():
         pytest.skip("Pepperstone Guardian CSV not present")
 

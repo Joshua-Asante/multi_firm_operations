@@ -19,22 +19,38 @@ EOL bytes; trust the values below.
                    `alert()` push calls — see indicator file's 2026-05-07 patch header)
 - Anticipation: combined into indicator file (see indicator blob above)
 
-## Reference backtest
+## Reference backtest (canonical 2026-05-17 — BT-OFF + static-equity)
 
-- Pepperstone canonical: `data/tv_exports/pepperstone/Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv`
-  (post-reconcile panel; 8 phantom v5.5 signals removed; see
-  `data/reconciles/2026-05-05_guardian_n_reconcile.md`)
-- Trade count: **201** _(extracted from CSV: max Trade # = 201)_
-- Net P&L:     **$577,936.90** _(extracted from CSV: final Cumulative P&L USD; +288.97% on $200K)_
-- PF:          `<verify against backtest CSV>`
-- WR:          `<verify against backtest CSV>`
-- Max DD:      `<verify against backtest CSV>`
-- 1R:          `<verify against backtest CSV>` _(1R methodology: docs/methodology/1r_estimation.md — equity-compounding normalization for Guardian-style equity-sized strategies)_
+- Pepperstone canonical: `data/tv_exports/pepperstone/Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-17_90bb1.csv`
+  (TradingView export with Backtest mode OFF; SHA256 `10f00ef62dcd0c4589103a8b50de7a77847f2581c43c652b8d5e99a6b5495cff` pinned
+  in `data/tv_exports/pepperstone/SHA256SUMS`; methodology change documented in
+  `data/reconciles/2026-05-17_guardian_bt_off_static_canonical.md`)
 
-The four placeholder metrics require either a full CSV reduction (PF / WR / Max
-DD over the cumulative-P&L curve) or applying the 1R-estimation methodology.
-Filling them is variable cost deferred to a follow-up session — not a memory
-copy. Do not source from CLAUDE.md, prior briefs, or chat memory.
+**Static-equity recomputation** (per-trade Net P&L USD × (INITIAL /
+equity_at_entry), no compounding — the FXIFY-correct measurement for live
+execution at fixed initial capital; Pine sizing line `calcSize(stopDist) =>
+risk = strategy.equity * (riskPerTrade / 100)` compounds in the TV export,
+requiring this recomputation to surface the live-FXIFY-equivalent profile):
+
+- Trade count:        **207** _(max Trade # in CSV)_
+- Net P&L (static):   **$245,424** _(+122.71% on $200K static)_
+- Net P&L (TV compounded): $452,478.70 _(retained for cross-reference; not the lock anchor)_
+- PF (static):        **3.26**
+- WR:                 **22.71%** _(47/207; count-based, identical under both conventions)_
+- Max DD % (static):  **6.92%**
+- Max DD $ (static):  **$16,013**
+- RF (static):        **15.33**
+- 1R (median loss):   **$689** _(1R methodology: docs/methodology/1r_estimation.md)_
+
+### Prior anchor — ARCHIVED 2026-05-17 (BT-ON compounded, superseded)
+
+Retained for historical reference; **not the lock-of-record**. Replaced under
+the BT-OFF + static-equity canonical methodology change (see reconcile note
+above).
+
+- Pepperstone (BT-ON compounded): `data/tv_exports/pepperstone/Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv`
+- Trade count: 201 · Net P&L: $577,936.90 (+288.97% on $200K, compounded) ·
+  Max DD: 4.56%
 
 ## Lock decision Notion anchor
 

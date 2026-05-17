@@ -26,20 +26,20 @@ def test_xagusd_price_column_registered():
     "csv_name, strategy, version, symbol, n_trades, n_base, n_pyramid",
     [
         (
-            "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv",
-            "Guardian", "v5.5", "XAUUSD", 201, 201, 0,
+            "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-17_90bb1.csv",
+            "Guardian", "v5.5", "XAUUSD", 207, 207, 0,
         ),
         (
-            "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv",
-            "Striker", "v4.5", "US30", 224, 197, 27,
+            "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-17_c0b35.csv",
+            "Striker", "v4.5", "US30", 210, 185, 25,
         ),
         (
-            "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv",
+            "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-05-17_836cc.csv",
             "Aegis", "v4.3", "USDJPY", 123, 123, 0,
         ),
         (
-            "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-05_7ca6f.csv",
-            "Striker", "v1", "NAS100", 200, 166, 34,
+            "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-17_cd2b6.csv",
+            "Striker", "v1", "NAS100", 193, 160, 33,
         ),
     ],
 )

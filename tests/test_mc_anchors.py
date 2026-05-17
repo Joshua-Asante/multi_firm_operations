@@ -75,15 +75,22 @@ def oanda_result():
 
 @requires_pepperstone
 def test_pepperstone_anchor(pepperstone_result):
-    """2026-05-08 Pepperstone 4-strategy C2 anchor (code-reproducible).
+    """2026-05-17 Pepperstone 4-strategy C2 anchor (code-reproducible).
 
-    DJ30 v4.5 + NAS100 v1 (0.40% allocation) added 2026-05-05.
-    dd_protection relaxed 2026-05-08 from C0 (1.0%/0.40×) to C2 (1.5%/0.40×)
-    after bust_attribution_flip resolved broker-feed-confirmed.
+    Canonical panel switched to BT-OFF + static-equity (4 new CSVs landed
+    2026-05-17). Both lock criteria still clear with margin. Pass rate
+    drops 0.53 pp vs the 2026-05-08 BT-ON anchor (98.09 → 97.56); bust
+    edges up 0.04 pp (0.36 → 0.40); median days-to-pass returns to 23
+    (was 22 under BT-ON C2). NOT a re-lock event — anchor update only.
+
+    Per-strategy heads: G $245K (54% of compounded), A $130K (73%),
+    DJ30 $174K (67%), NAS $227K (58%). Lock methodology unchanged.
+
+    See data/reconciles/2026-05-17_guardian_bt_off_static_canonical.md.
     """
-    assert pepperstone_result["pass_rate"] == pytest.approx(0.9809, abs=1e-4)
-    assert pepperstone_result["bust_rate"] == pytest.approx(0.0036, abs=1e-4)
-    assert pepperstone_result["p99_dd"]    == pytest.approx(0.0473, abs=1e-4)
+    assert pepperstone_result["pass_rate"] == pytest.approx(0.9756, abs=1e-4)
+    assert pepperstone_result["bust_rate"] == pytest.approx(0.0040, abs=1e-4)
+    assert pepperstone_result["p99_dd"]    == pytest.approx(0.0479, abs=1e-4)
 
 
 @requires_oanda

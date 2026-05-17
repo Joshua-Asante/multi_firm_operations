@@ -16,6 +16,50 @@ _(none)_
 
 ---
 
+## 2026-05-17 — Canonical reference panel migrated to BT-OFF + static-equity
+
+No parameter change. Canonical Pepperstone reference panel for Aegis v4.3
+moves from `Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv`
+(BT-ON compounded, n=123) to `Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-05-17_836cc.csv`
+(BT-OFF, n=123). Static-equity recomputation (per-trade `Net P&L USD ×
+(INITIAL / equity_at_entry)`) is the new FXIFY-equivalent headline.
+
+### Headline (BT-OFF + static-equity, 2026-05-17 canonical)
+| Metric | Compounded (TV) | Static (FXIFY-equivalent) |
+|---|---:|---:|
+| N | 123 | 123 |
+| WR | 60.16% (74W / 49L) | 60.16% |
+| PF | 4.186 | **3.81** |
+| Net P&L | +$178,208.44 | **+$130,381.27** (+65.19% on $200K) |
+| Max DD % | 4.30% | **4.37%** |
+| Max DD $ | — | $8,730.10 |
+| RF | — | 14.93 |
+| 1R (mean full-stop, n=9) | — | $2,961.34 |
+
+Static/compounded Net ratio = **73%** — Aegis has the smallest compounding
+distortion of the four locked strategies (bounded per-trade returns and
+short hold times mean equity compounding has less amplifier effect than
+on Guardian or NAS100).
+
+### Methodology change rationale
+See [`data/reconciles/2026-05-17_guardian_bt_off_static_canonical.md`](../../data/reconciles/2026-05-17_guardian_bt_off_static_canonical.md)
+for the full methodology change documentation. Q-GDN-DDcap (2026-05-17)
+investigation surfaced that TV's `strategy.equity` compounded sizing
+overstates the live-FXIFY-equivalent P&L; user (2026-05-17) confirmed
+Option A canonical replacement across all 4 locked strategies. Pine sizing
+line `calcSize(stopDist) => risk = strategy.equity * (riskPerTrade / 100)`
+is the same on Aegis as on Guardian (user-confirmed 2026-05-17).
+
+### Reconcile vs prior BT-ON anchor
+- 04-26 BT-ON panel (`0bf1b.csv`, n=123): retained on disk + in SHA256SUMS
+  as historical reference; no longer the canonical reference.
+- v4.3 §"Full-panel impact (Pepperstone 52mo)" table below retained
+  unchanged — captures v4.2 → v4.3 OOS delta on the prior anchor and is
+  load-bearing for the v4.3 lock decision, not the current operational
+  headline.
+
+---
+
 ## 2026-05-05 — Open queue closeout
 
 - **BOJ April 28, 2026 meeting watch — closed.** Monitoring window from the prior Unreleased entry elapsed 2026-04-28 → 2026-05-05 with no parameter change required and no dated regime-shift entry written. No behavioral note merits backfill at this point; closing the watch.

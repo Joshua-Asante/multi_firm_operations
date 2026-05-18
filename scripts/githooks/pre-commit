@@ -1,10 +1,15 @@
 #!/bin/sh
-# Vendor-data manifest gate (GH #62). Runs only when staging paths under
-# data/tv_exports/, data/bar_data/, or data/external/ (including SHA256SUMS).
+# Pre-commit gate. Two checks:
+#   1. Parameter manifest drift (always — sub-second; covers Pine/.py/CLAUDE.md).
+#   2. Vendor-data SHA256SUMS (only when staging under data/).
 ROOT="$(git rev-parse --show-toplevel)" || exit 1
 cd "$ROOT" || exit 1
 
+# (1) Always-on parameter validator.
+python scripts/validate_params.py || exit 1
+
+# (2) Conditional vendor-data manifest gate (GH #62).
 if git diff --cached --name-only | grep -qE '^data/(tv_exports|bar_data|external)/'; then
-  exec python scripts/check_data_manifests.py --check
+  python scripts/check_data_manifests.py --check || exit 1
 fi
 exit 0

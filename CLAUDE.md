@@ -157,6 +157,22 @@ See [`docs/adr/2026-05-10-manifest-integrity-gate.md`](docs/adr/2026-05-10-manif
 hash gate. CI cannot replace it when the bytes aren't in the repo. Manual regen
 drifts silently. [`docs/methodology/lessons/methodology_lessons.md`](docs/methodology/lessons/methodology_lessons.md)
 
+### Parameter manifest gate
+
+[`config/params.toml`](config/params.toml) is a derived mirror — NOT canonical.
+Pine source is canonical for strategy behavior per Rule 0; `dd_protection.py`
+/ `firm_rules.py` are canonical for live-sizing constants. The manifest exists
+so doc/code drift between production and `CLAUDE.md`/`LOCK.md` can be flagged
+mechanically. [`scripts/validate_params.py`](scripts/validate_params.py)
+hard-fails on drift in those sources and against Pine `input.float` defaults
+when Pine files are present locally (no-op WARN on CI / public clones). The
+same `scripts/githooks/pre-commit` installer wires it in.
+
+```bash
+make validate         # both gates
+python scripts/validate_params.py
+```
+
 ## Key Principle
 
 The portfolio and strategies are LOCKED. This pipeline manages the *operational layer* — it never touches strategy parameters.

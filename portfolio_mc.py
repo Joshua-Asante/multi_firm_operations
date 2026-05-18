@@ -45,9 +45,9 @@ SEEDS = (42, 123, 2026)
 
 ALLOCATIONS: Dict[str, float] = {
     "guardian":       0.0034,
-    "striker":        0.0100,
+    "striker":        0.0070,
     "aegis":          0.0150,
-    "striker_nas100": 0.0040,
+    "striker_nas100": 0.0037,
 }
 STRATS = tuple(ALLOCATIONS.keys())
 
@@ -71,9 +71,9 @@ OANDA_PANELS: Dict[str, Path] = {
 PEPPERSTONE_DIR = Path(__file__).parent / "data" / "tv_exports" / "pepperstone"
 PEPPERSTONE_PANELS: Dict[str, Path] = {
     "guardian":       PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv",
-    "striker":        PEPPERSTONE_DIR / "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv",
+    "striker":        PEPPERSTONE_DIR / "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-18_ca15e.csv",
     "aegis":          PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv",
-    "striker_nas100": PEPPERSTONE_DIR / "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-05_7ca6f.csv",
+    "striker_nas100": PEPPERSTONE_DIR / "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-18_d2c59.csv",
 }
 
 # Pepperstone is the CLAUDE.md canonical lock anchor; OANDA is the pattern-spotting proxy

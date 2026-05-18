@@ -38,22 +38,23 @@ Multipliers update weekly when balances update (via `python cli.py update`), not
 ## Strategy Reference (LOCKED — do not modify)
 
 Unified allocations (locked 2026-04-17): challenge phase = funded phase. No re-sizing at pass.
-Most recent version locks: Guardian v5.5 (2026-04-23), Aegis v4.3 (2026-04-23), Striker DJ30 **v4.4 → v4.5** (2026-05-05), Striker NAS100 **v1** (locked 2026-05-05; operational integration 2026-05-07 after DXTrade contractValue=10 broker-verified). v4.4 archived to `archive/strategies/striker/`. See lock MC notes below the table.
+Most recent version locks: Guardian v5.5 (2026-04-23), Aegis v4.3 (2026-04-23), Striker DJ30 **v4.4 → v4.5** (2026-05-05), Striker NAS100 **v1** (locked 2026-05-05; operational integration 2026-05-07 after DXTrade contractValue=10 broker-verified). v4.4 archived to `archive/strategies/striker/`. **2026-05-18 re-lock**: DJ30 risk 1.00% → 0.70% with pyramid 350% → 750% + maxDailyDD 1.00% → 1.15%; NAS100 risk 0.40% → 0.37%. See lock MC notes below the table.
 
 | Strategy        | Instrument / TF | Risk/trade              | Version       | DXTrade contractValue                             |
 |-----------------|-----------------|-------------------------|---------------|---------------------------------------------------|
 | Guardian Gold   | XAUUSD 15m      | 0.34% (cold-start base) | v5.5 LOCKED   | 100                                               |
-| Striker DJ30    | DJ30 15m        | 1.00%                   | v4.5 LOCKED   | **10** (critical — default of 1 gives ~7% risk)   |
+| Striker DJ30    | DJ30 15m        | 0.70% (pyramid 750%, maxDailyDD 1.15%) | v4.5 LOCKED   | **10** (critical — default of 1 gives ~7% risk)   |
 | Aegis USDJPY    | USDJPY 15m      | 1.50%                   | v4.3 LOCKED   | default (1)                                       |
-| Striker NAS100  | NAS100 15m      | 0.40%                   | v1 LOCKED     | 10                                                |
+| Striker NAS100  | NAS100 15m      | 0.37%                   | v1 LOCKED     | 10                                                |
 
 Operational tooling scope: `firm_rules.py`, `dd_protection.py`, `accounts.py`, and `cli.py lots` cover all four strategies (NAS100 added 2026-05-07 after DXTrade contractValue=10 broker-verified). `portfolio_mc.py` already covered NAS100 from the 2026-05-05 lock anchor.
 
-2026-05-08 lock MC anchor (4-strategy + dd_protection C2, current canonical):
-* Pepperstone 4-strategy (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, dd_protection 1.5%/0.40×, 10K × 3 seeds): **98.09% pass / 0.36% bust (0.00% daily + 0.36% static) / 1.55% timeout**, p99 DD 4.73%, median days-to-pass 22. **Bust attribution**: striker 44.4% / aegis 24.1% / guardian 21.3% / NAS 10.2%. NAS remains the lowest contributor consistent with the diversification thesis. Reproducible under `python portfolio_mc.py --panel pepperstone`. `tests/test_mc_anchors.py` pins these. Lock criteria (bust <1%, p99 DD <5%) — both pass with margin. Relocked 2026-05-08 from prior C0 (1.0%/0.40×) anchor 97.88/0.22/4.55 after `bust_attribution_flip` closed broker-feed-confirmed via same-date Pepperstone+OANDA TV re-export and Q-DDP-1 C2 was adopted (median days-to-pass 23 → 22; risk controls met). See `docs/briefs/Q-DDP-1/recommendation.md` override note + `docs/briefs/bust_attribution_flip.md` closure.
-* OANDA pattern-spotting proxy at C2 (3-strategy, DJ30 still v4.4): **96.23% pass / 0.69% bust / p99 DD 4.91%**, median days-to-pass 25. Both lock criteria clear with thinner margin than Pepperstone, consistent with OANDA's pattern-spotting role. Reproducible under `python portfolio_mc.py --panel oanda`.
+2026-05-18 lock MC anchor (4-strategy + dd_protection C2, current canonical):
+* Pepperstone 4-strategy (G 0.34% / DJ30 v4.5 0.70% with pyramid 750% / A 1.50% / NAS v1 0.37%, dd_protection 1.5%/0.40×, 10K × 3 seeds): **97.42% pass / 0.14% bust (0.00% daily + 0.14% static) / 2.44% timeout**, p99 DD 4.29%, median days-to-pass 25. **Bust attribution**: guardian 48.8% / striker 24.4% / aegis 19.5% / NAS 7.3%. Reproducible under `python portfolio_mc.py --panel pepperstone`. `tests/test_mc_anchors.py` pins these. Lock criteria (bust <1%, p99 DD <5%) — both pass with comfortable margin (0.86pp under bust gate, 0.71pp under DD gate). Re-locked 2026-05-18 from prior 2026-05-08 anchor 98.09/0.36/4.73 after side-by-side MC (`scripts/compare_dj30_nas100_configs.py`) showed −60% bust rate and −0.44pp p99 DD at a 0.67pp pass-rate cost — see [`docs/adr/2026-05-18-relock-to-test-values.md`](docs/adr/2026-05-18-relock-to-test-values.md).
+* OANDA pattern-spotting proxy at C2 (3-strategy, DJ30 still v4.4): **96.30% pass / 0.33% bust / p99 DD 4.69%**, median days-to-pass 26. Both lock criteria clear with thinner margin than Pepperstone, consistent with OANDA's pattern-spotting role. OANDA panel pyramid/maxDD effects NOT captured (v4.5 OANDA re-export queued); only risk_pct scaling reflects the re-lock. Reproducible under `python portfolio_mc.py --panel oanda`.
 
 Prior anchors (historical):
+* 2026-05-08 4-strategy at C2 (G 0.34% / DJ30 v4.5 **1.00%** with **350% pyramid** + **1.00% maxDD** / A 1.50% / NAS v1 **0.40%**): **98.09% pass / 0.36% bust / 4.73% p99 DD**, median days-to-pass 22. Bust attribution: DJ30 44.4% / A 24.1% / G 21.3% / NAS 10.2%. Superseded by the 2026-05-18 re-lock; [`docs/adr/2026-05-08-dd-trigger-c2-relock.md`](docs/adr/2026-05-08-dd-trigger-c2-relock.md) retains the historical record.
 * 2026-05-05 4-strategy at C0 (1.0%/0.40×): **97.88% pass / 0.22% bust / 4.55% p99 DD**, median days-to-pass 23. Bust attribution: DJ30 40.9% / G 25.8% / A 22.7% / NAS 10.6%. Re-anchored same day after Guardian Pepperstone re-export (87e73 → 33781, 209 → 201 trades; 04-26 export contained 8 phantom v5.5 signals — see `data/reconciles/2026-05-05_guardian_n_reconcile.md`). See `docs/briefs/striker_nas100_q_nas_3_mc_addition.md` for the addition decision audit.
 * 2026-04-23 lock cohort (G 0.34% / S v4.4 1.00% / A v4.3 1.50%, Pepperstone 04-26 panel, C0): **93.78% pass / 0.58% bust / 4.92% p99 DD** — code-reproducible against pre-2026-05-05 portfolio_mc.py + v4.4 panel. Bust attribution at that lock: A 25.1% / S 43.4% / G 31.4%. The 2026-04-23 in-flight lock-decision used 92.73% pass / 0.65% bust / 4.94% p99 DD against an in-flight panel that was not committed.
 * Alchemy reference (2026-04-20, Striker v4.4 + Aegis v4.2 era — pre-2026-04-23 lock): **99.21% pass / 0.03% bust**.
@@ -67,14 +68,14 @@ and are NOT duplicated here. See Key Principle.
 
 Source of truth: https://www.notion.so/346dc0b53c1181d1b8d5e12df4bd3810
 
-## Protection (single-tier, production-locked 2026-04-17; revalidated 2026-04-23; relocked C2 2026-05-08)
+## Protection (single-tier, production-locked 2026-04-17; revalidated 2026-04-23; relocked C2 2026-05-08; allocations re-locked 2026-05-18)
 
 Single rule in `dd_protection.py`. `portfolio_mc` validates.
 
 * **DD tier**: if `(equity - peak) / peak <= -0.015`, multiply day's sizing by 0.40×.
 * Clears automatically when equity returns to peak.
-* MC at current 4-strategy config (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, dd_protection C2 1.5%/0.40×, Pepperstone 2022→2026, 223 week-blocks, 10K × 3 seeds):
-  **98.09% pass / 0.36% bust (0.00% daily + 0.36% static) / 1.55% timeout**, p99 DD 4.73%, median days-to-pass 22. Both lock gates clear with margin.
+* MC at current 4-strategy config (G 0.34% / DJ30 v4.5 0.70% with pyramid 750% + maxDailyDD 1.15% / A 1.50% / NAS v1 0.37%, dd_protection C2 1.5%/0.40×, Pepperstone 2022→2026, 223 week-blocks, 10K × 3 seeds):
+  **97.42% pass / 0.14% bust (0.00% daily + 0.14% static) / 2.44% timeout**, p99 DD 4.29%, median days-to-pass 25. Both lock gates clear with comfortable margin.
 * 2026-05-08 relock from C0 (1.0%/0.40×) → C2 (1.5%/0.40×). Override grounds: `bust_attribution_flip` resolved broker-feed-confirmed via same-date Pepperstone+OANDA TV re-export, and Q-DDP-1's C2 sweep showed risk-controls-met + median-pass-time benefit (23 → 22 days). Q-DDP-1's regime-robustness gate (criterion 5) failed for C2; the 2026-05-08 override accepts that risk on the broker-feed + median-pass-time grounds. See `docs/adr/2026-05-08-dd-trigger-c2-relock.md` (canonical ADR) and `docs/briefs/Q-DDP-1/recommendation.md` override note.
 * **Forward revert trigger (quarterly review):** if rolling 6-month MC pass-rate falls below 95% for two consecutive 6-month windows, revert to C0. Run `python analysis/time_to_pass.py --regime-check` quarterly (next dates: 2026-08-08, 2026-11-08, 2027-02-08, 2027-05-08).
 * The prior equity tier was deleted on 2026-04-17 after it was proven to be dead code under the live `min()` combining semantics. Revert triggers for reintroducing a second tier are documented in the FINAL decision page.
@@ -150,6 +151,22 @@ See [`docs/adr/2026-05-10-manifest-integrity-gate.md`](docs/adr/2026-05-10-manif
 **M-9 (methodology):** Gitignored vendor-data manifests need a local pre-commit
 hash gate. CI cannot replace it when the bytes aren't in the repo. Manual regen
 drifts silently. [`docs/methodology/lessons/methodology_lessons.md`](docs/methodology/lessons/methodology_lessons.md)
+
+### Parameter manifest gate
+
+[`config/params.toml`](config/params.toml) is a derived mirror — NOT canonical.
+Pine source is canonical for strategy behavior per Rule 0; `dd_protection.py`
+/ `firm_rules.py` are canonical for live-sizing constants. The manifest exists
+so doc/code drift between production and `CLAUDE.md`/`LOCK.md` can be flagged
+mechanically. [`scripts/validate_params.py`](scripts/validate_params.py)
+hard-fails on drift in those sources and warn-only on opportunistic Pine grep
+(Pine files gitignored; check no-ops on CI / public clones). The same
+`scripts/githooks/pre-commit` installer wires it in.
+
+```bash
+make validate         # both gates
+python scripts/validate_params.py
+```
 
 ## Key Principle
 

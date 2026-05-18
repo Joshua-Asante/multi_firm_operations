@@ -25,9 +25,14 @@ FIRM_RULES = {
 # Pepperstone-sourced CSVs (2022→2026) showed headroom under 1% bust + 5% p99 DD.
 # Striker NAS100 v1 added 2026-05-07 at 0.40% (DXTrade contractValue=10
 # broker-verified; 4-strategy MC anchor 97.88/0.22/4.55 already covers it).
+# Striker DJ30 + NAS100 re-locked 2026-05-18 to (0.70% / 0.37%) plus DJ30
+# pyramid 350% -> 750% + maxDailyDD 1.00% -> 1.15%; the lower base risk +
+# bigger pyramid produced 60% fewer busts (0.35% -> 0.14%) and lower p99 DD
+# (4.75% -> 4.29%) in the 4-strategy Pepperstone C2 MC, at a 0.4pp pass-rate
+# cost. See docs/adr/2026-05-18-relock-to-test-values.md.
 # Phase axis retained as a lookup key for downstream callers, but both phases
 # are byte-identical by construction so a future re-lock can't desync them.
-_BASE_RISK = {"guardian": 0.0034, "striker": 0.0100, "aegis": 0.0150, "striker_nas100": 0.0040}
+_BASE_RISK = {"guardian": 0.0034, "striker": 0.0070, "aegis": 0.0150, "striker_nas100": 0.0037}
 RISK_TIERS = {phase: _BASE_RISK for phase in ("challenge", "funded")}
 
 # Baseline: Pine Script indicators output lot sizes for this account

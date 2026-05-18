@@ -1,0 +1,95 @@
+# config/params.toml — derived parameter manifest
+#
+# DERIVED MIRROR — NOT canonical. Pine source is canonical for strategy
+# behavior per Rule 0. `dd_protection.py` / `firm_rules.py` are canonical
+# for live-sizing constants. This file mirrors what those sources declare
+# so that drift between production and documentation can be flagged
+# mechanically.
+#
+# Editing this file does NOT change strategy behavior. To change a parameter:
+#   1. Edit Pine source.
+#   2. Update `dd_protection.py` and/or `firm_rules.py` if it is a
+#      sizing / risk-control constant.
+#   3. Re-run `python portfolio_mc.py --panel pepperstone` (and update
+#      `tests/test_mc_anchors.py` if anchor numbers shift).
+#   4. Update this manifest.
+#   5. Update `CLAUDE.md` Strategy Reference table.
+# All five in the same commit. Validator at `scripts/validate_params.py`
+# enforces 1-4 mechanically. (5) lives in code-review.
+#
+# File format note: TOML (not YAML) — `tomllib` is Python 3.11 stdlib;
+# pyyaml is not a declared dependency in `pyproject.toml`.
+#
+# Last sync: 2026-05-18
+
+[strategies.guardian_gold_v5_5]
+pine_path     = "strategies/guardian/guardian_gold_v5.5.pine"
+lock_md       = "strategies/guardian/LOCK.md"
+risk_pct      = 0.34
+instrument    = "XAUUSD"
+contract_value = 100
+days          = ["mon", "tue", "thu"]
+version       = "v5.5"
+lock_date     = "2026-04-23"
+
+[strategies.striker_dj30_v4_5]
+pine_path     = "strategies/striker/striker_dj30_v4.5.pine"
+risk_pct      = 0.70           # re-locked 2026-05-18 from 1.00
+instrument    = "DJ30"
+contract_value = 10
+days          = ["tue", "fri"]
+pyramid_pct   = 750.0          # re-locked 2026-05-18 from 350
+max_daily_dd_pct = 1.15        # re-locked 2026-05-18 from 1.00
+max_daily_trades = 2
+version       = "v4.5"
+lock_date     = "2026-05-18"
+# 2026-05-18 re-lock: see docs/adr/2026-05-18-relock-to-test-values.md.
+
+[strategies.aegis_usdjpy_v4_3]
+pine_path     = "strategies/aegis/aegis_usdjpy_v4.3.pine"
+risk_pct      = 1.50
+instrument    = "USDJPY"
+contract_value = 1
+days          = ["mon", "tue", "wed"]
+version       = "v4.3"
+lock_date     = "2026-04-23"
+
+[strategies.striker_nas100_v1]
+pine_path     = "strategies/nas/striker_nas100_v1.pine"
+risk_pct      = 0.37           # re-locked 2026-05-18 from 0.40
+instrument    = "NAS100"
+contract_value = 10
+days          = ["mon", "tue"]
+pyramid_pct   = 1000.0
+max_daily_dd_pct = 1.00
+max_daily_trades = 2
+version       = "v1"
+lock_date     = "2026-05-18"
+# 2026-05-18 re-lock: see docs/adr/2026-05-18-relock-to-test-values.md.
+
+[dd_protection]
+# 2026-05-08 C2 relock (DD_TRIGGER 0.010 → 0.015, DD_SCALE 0.40 held).
+# Pinned mirror of `dd_protection.py:49-50`.
+trigger_pct  = 1.5
+scale_factor = 0.40
+config       = "C2"
+lock_date    = "2026-05-08"
+
+# Reference-only. NOT drift-checked. Re-MC cycles change these legitimately;
+# hard-failing on them would create friction. Tracked here for cross-reference.
+[mc_anchor_pepperstone]
+pass_pct      = 97.42
+bust_pct      = 0.14
+p99_dd_pct    = 4.29
+median_days   = 25
+anchor_date   = "2026-05-18"
+panel         = "4-strategy"
+note          = "Reference only. Pinned in tests/test_mc_anchors.py for code-reproducibility. 2026-05-18 re-lock."
+
+[mc_anchor_oanda]
+pass_pct      = 96.30
+bust_pct      = 0.33
+p99_dd_pct    = 4.69
+anchor_date   = "2026-05-18"
+panel         = "3-strategy (DJ30 v4.4)"
+note          = "Reference only. Pattern-spotting proxy. OANDA v4.5 re-export queued."

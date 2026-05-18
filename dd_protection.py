@@ -51,11 +51,15 @@ DD_SCALE = 0.40               # multiply risk by 0.40x when triggered
 
 # Unified allocations (locked 2026-04-17, Guardian re-locked 2026-04-23; challenge = funded)
 # Striker NAS100 added 2026-05-07 (DXTrade contractValue=10 broker-verified).
+# Striker DJ30 + NAS100 re-locked 2026-05-18 from (1.00% / 0.40%) to
+# (0.70% / 0.37%) with DJ30 pyramid 350% -> 750% and maxDailyDD 1.00% -> 1.15%;
+# see docs/adr/2026-05-18-relock-to-test-values.md. New 4-strategy Pepperstone
+# C2 anchor: 97.42% pass / 0.14% bust / p99 DD 4.29%, median days to pass 25.
 BASE_RISK = {
     "Guardian":       0.0034,       # 0.34%
-    "Striker":        0.0100,       # 1.00%
+    "Striker":        0.0070,       # 0.70% (re-locked 2026-05-18 from 1.00%)
     "Aegis":          0.0150,       # 1.50%
-    "Striker NAS100": 0.0040,       # 0.40%
+    "Striker NAS100": 0.0037,       # 0.37% (re-locked 2026-05-18 from 0.40%)
 }
 
 STATE_FILE = Path(__file__).parent / "dd_protection_state.json"

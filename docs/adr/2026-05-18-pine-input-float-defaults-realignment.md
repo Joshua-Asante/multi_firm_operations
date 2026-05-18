@@ -1,20 +1,36 @@
 # ADR: Pine `input.float` default realignment + validator HARD-tier promotion
 
 **Date:** 2026-05-18
-**Status:** **SUPERSEDED** by [`2026-05-18-relock-to-test-values.md`](2026-05-18-relock-to-test-values.md) (same day).
+**Status:** **SUPERSEDED-BY-MERGE.** The 4 Pine fixes in this ADR are not adopted (the worktree was branched from a pre-2026-05-14 baseline; main's actual lock is 0.75% / 0.45% / 500% pyramid, not 1.00% / 0.40% / 350%). The validator and HARD-tier machinery from this ADR **remain in effect**.
+**Same-day successor (also superseded):** [`2026-05-18-relock-to-test-values.md`](2026-05-18-relock-to-test-values.md).
+**Superseded by:** [`2026-05-14-allocation-refresh.md`](2026-05-14-allocation-refresh.md) (on main).
 **Related:** [`scripts/validate_params.py`](../../scripts/validate_params.py), [`config/params.toml`](../../config/params.toml)
 
-> **Superseding note (2026-05-18):** The 4 fixes in this ADR realigned Pine
-> defaults *upward* toward the then-locked spec (DJ30 0.70 → 1.00 etc.).
-> Same-day portfolio MC comparison via
-> [`scripts/compare_dj30_nas100_configs.py`](../../scripts/compare_dj30_nas100_configs.py)
-> showed the *unfixed* Pine defaults (0.70 / 0.37 with pyramid 750 + maxDD
-> 1.15) were a materially better operational config (−60% bust rate,
-> −0.44pp p99 DD, at −0.67pp pass cost). The lock was therefore moved *to*
-> the Pine defaults rather than fixing Pine to the lock. All 4 fixes in
-> this ADR were reverted (defaults now match the new lock). The validator
-> machinery and tier-promotion in this ADR remain in effect; only the
-> direction-of-fix is superseded. See the new ADR for the re-lock rationale.
+> **Superseded-by-merge note (2026-05-18):** This ADR fixed 4 Pine
+> `input.float` defaults to match a lock spec (1.00% / 0.40%) that had
+> already been superseded by main's 2026-05-14 allocation refresh
+> (0.75% / 0.45% / 500% pyramid). The worktree was branched before that
+> refresh, so the validator's "drift" findings here were measured
+> against the wrong canonical. The 4 specific Pine edits in this ADR
+> are not adopted on main — they corrected drift to a defunct spec.
+>
+> **What does remain in effect:**
+> - The parameter validator ([`scripts/validate_params.py`](../../scripts/validate_params.py))
+>   and its self-test, manifest, pre-commit-hook integration.
+> - The Pine-vs-manifest HARD-tier promotion (with "Pine entirely
+>   absent on CI / public clones" staying as a status WARN).
+> - The "check both strategy + indicator" extension.
+> - The methodology lessons captured in this ADR's text — particularly
+>   the cycle "validator surfaces drift → comparison MC → re-lock or
+>   accept-the-drift" that this ADR documented (even though the
+>   specific drift findings here pointed at an outdated baseline).
+>
+> The validator's first run after merge surfaced a *real*
+> pre-existing drift on main: `dd_protection.py BASE_RISK` was still
+> at 1.00% / 0.40% while `firm_rules.py` and `portfolio_mc.py` had
+> moved to 0.75% / 0.45% in the 2026-05-14 refresh. That drift is
+> fixed in this branch by aligning `BASE_RISK` to the post-refresh
+> values. The validator caught its first real production issue.
 
 ## Context
 

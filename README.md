@@ -42,10 +42,15 @@ canonical Pine-anchored values.
 
 DD protection: **single-tier, 1.5% / 0.40×** — C2 relock 2026-05-08, see
 [`docs/adr/2026-05-08-dd-trigger-c2-relock.md`](docs/adr/2026-05-08-dd-trigger-c2-relock.md).
-Pepperstone MC anchor: **98.09 / 0.36 / 4.73** (pass / bust / p99 DD), pinned
-by `tests/test_mc_anchors.py`. Bust attribution: striker 44.4% / aegis 24.1% /
-guardian 21.3% / NAS 10.2%. Revert trigger: rolling 6-month MC pass-rate < 95%
-across two consecutive windows → revert to C0; quarterly check via
+Pepperstone MC anchor: **98.78 / 0.12 / 4.17** (pass / bust / p99 DD) on the
+2026-05-14 allocation refresh, pinned by `tests/test_mc_anchors.py`. Bust
+attribution: guardian 34.3% / aegis 28.6% / striker 25.7% / NAS 11.4%. Prior
+2026-05-14 panel-refresh-only anchor (98.65 / 0.25 / 4.69 at DJ30 1.00%/pyr 350%,
+NAS 0.40%) and 2026-05-08 C2 anchor (98.09 / 0.36 / 4.73) preserved in CLAUDE.md
+"Prior anchors (historical)". The allocation refresh override of the
+regime-robustness gate is documented in `docs/adr/2026-05-14-allocation-refresh.md`.
+Revert trigger: rolling 6-month MC pass-rate < 95% across two consecutive windows
+→ revert to C0 dd_protection / pre-refresh allocations; quarterly check via
 `python analysis/time_to_pass.py --regime-check`.
 
 ## Portfolio MC

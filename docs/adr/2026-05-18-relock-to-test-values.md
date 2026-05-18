@@ -1,9 +1,42 @@
 # ADR: Re-lock DJ30 + NAS100 to TEST values
 
 **Date:** 2026-05-18
-**Status:** Accepted
+**Status:** **SUPERSEDED-BY-MERGE** — the lock action in this ADR is **not adopted**. The validator infrastructure landed alongside it remains in effect.
 **Supersedes (same day):** [`2026-05-18-pine-input-float-defaults-realignment.md`](2026-05-18-pine-input-float-defaults-realignment.md) — the *direction* of that ADR (fix Pine to match lock); the validator/HARD-tier machinery from that ADR is preserved.
-**Related:** [`scripts/compare_dj30_nas100_configs.py`](../../scripts/compare_dj30_nas100_configs.py), [`tests/test_mc_anchors.py`](../../tests/test_mc_anchors.py), [`docs/adr/2026-05-08-dd-trigger-c2-relock.md`](2026-05-08-dd-trigger-c2-relock.md)
+**Superseded by:** [`2026-05-14-allocation-refresh.md`](2026-05-14-allocation-refresh.md) (already on main; the re-lock proposed here was authored against the pre-2026-05-14 baseline of 1.00% / 0.40% / 350 pyramid / 1.00 maxDD, which had already been superseded by main's 0.75% / 0.45% / 500 pyramid refresh four days earlier; the comparison MC therefore did not speak to main's actual canonical).
+**Related:** [`scripts/compare_dj30_nas100_configs.py`](../../scripts/compare_dj30_nas100_configs.py), [`tests/test_mc_anchors.py`](../../tests/test_mc_anchors.py), [`docs/adr/2026-05-08-dd-trigger-c2-relock.md`](2026-05-08-dd-trigger-c2-relock.md), [`docs/adr/2026-05-16-fxify-correct-timeout-semantic.md`](2026-05-16-fxify-correct-timeout-semantic.md)
+
+> **Superseded-by-merge note (2026-05-18):** This ADR was authored in a
+> worktree that had branched from `main` at a point before the 2026-05-14
+> allocation refresh and 2026-05-16 FXIFY-correct timeout-semantic ADRs
+> landed. Main's actual canonical as of 2026-05-18 is **0.75% / 0.45% /
+> 500% pyramid / 1.00 maxDD** with anchor **99.88 / 0.12 / 4.21** under
+> the new timeout semantic — not the **1.00% / 0.40% / 350 / 1.00**
+> baseline this ADR compared against. The −60% bust improvement claimed
+> here is therefore against a baseline that no longer exists on main;
+> the comparison does not show that the proposed 0.70% / 0.37% / 750 /
+> 1.15 config is better than main's 0.75% / 0.45% / 500 / 1.00, only
+> that it was better than the older 1.00% / 0.40% / 350 / 1.00.
+>
+> An apples-to-apples comparison would require (a) fresh TV exports at
+> 0.70% / 0.37% / 750% / 1.15% against main's 2026-05-14 panel window,
+> (b) MC under the FXIFY-correct timeout semantic, (c) side-by-side
+> with main's 99.88 / 0.12 / 4.21 anchor. That work was not done; the
+> lock proposed here is **not adopted**.
+>
+> What remains in effect from this work:
+> - The parameter validator ([`scripts/validate_params.py`](../../scripts/validate_params.py))
+>   and its self-test, manifest, and pre-commit-hook integration.
+> - The "check both strategy + indicator" extension (catches per-file
+>   drift that diverges between the two).
+> - The methodology lesson that drift findings should run a comparison
+>   MC before defaulting to "fix Pine to match the lock."
+> - The fix to main's pre-existing `dd_protection.py BASE_RISK` drift
+>   (which still had 1.00% / 0.40% while `firm_rules.py` and
+>   `portfolio_mc.py` were at 0.75% / 0.45%) — landed in this branch
+>   bringing BASE_RISK into alignment.
+> - The historical record of how the day unfolded; useful for future
+>   re-lock attempts on the same axis.
 
 ## Context
 

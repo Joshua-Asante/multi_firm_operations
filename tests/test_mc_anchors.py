@@ -1,26 +1,28 @@
 """Locked MC anchor pins.
 
-Pepperstone is the CLAUDE.md canonical lock-anchor source. The 2026-05-18
-re-lock applied DJ30 risk_pct 1.00% -> 0.70% with pyramid 350% -> 750%
-and maxDailyDD 1.00% -> 1.15%, plus NAS100 risk_pct 0.40% -> 0.37%, on
-the 4-strategy Pepperstone panel. dd_protection C2 (1.5% / 0.40x) held.
-The re-lock reproduces 97.42 / 0.14 / 4.29 deterministically — both
-lock criteria (bust <1%, p99 DD <5%) clear with comfortable margin
-(0.86pp under bust gate, 0.71pp under DD gate). Median days-to-pass
-moves from 22 to 25. Pass-rate moves from 98.09 to 97.42 (-0.67pp) at
-the cost of -60% bust rate. See override grounds in
-docs/adr/2026-05-18-relock-to-test-values.md. Prior 4-strategy 2026-05-08
-anchor (98.09 / 0.36 / 4.73 at C2 with 1.00% / 0.40% / 350 pyramid) and
-2026-05-05 anchor (97.88 / 0.22 / 4.55 at C0) remain in
-docs/adr/2026-05-08-dd-trigger-c2-relock.md and CLAUDE.md "Prior anchors
-(historical)" for historical comparison.
+Pepperstone is the CLAUDE.md canonical lock-anchor source. The 2026-05-16
+ADR replaced the 150-bday horizon-runout timeout with the FXIFY-correct
+semantic (60-bday inactivity bust + 1500-bday safety ceiling), closing
+Q-MCTO-1 CLOSED-RESOLVED. The canonical 4-strategy config (G 0.34% /
+DJ30 v4.5 0.75% pyr 500% / A v4.3 1.50% / NAS v1 0.45%, dd_protection C2)
+on the 2026-05-14 Pepperstone panel reproduces 99.88 / 0.12 / 4.21
+deterministically — both lock criteria (bust <1%, p99 DD <5%) clear with
+the widest margin on record, and median days-to-pass holds at 21. Bust
+attribution under the FXIFY-correct semantic: guardian 40.0% / aegis
+37.1% / striker_nas100 14.3% / striker 8.6% (35 total busts across 30K
+sims). Prior 2026-05-14 allocation-refresh anchor (98.78 / 0.12 / 4.17
+under 150-bday semantics) and 2026-05-08 C2 anchor (98.09 / 0.36 / 4.73)
+remain in CLAUDE.md "Prior anchors (historical)" for comparison. See
+docs/adr/2026-05-16-fxify-correct-timeout-semantic.md for the lock
+decision.
 
 OANDA is the pattern-spotting proxy per the two-tier canonical rule. OANDA
-NAS100 panel does not exist; OANDA still on DJ30 v4.4 (no v4.5 OANDA
-fetch yet — adding TV-export with re-locked v4.5 inputs is queued). OANDA
-re-lock anchor (96.30 / 0.33 / 4.69) clears the lock criteria
-(bust <1%, p99 DD <5%) with thinner margin than Pepperstone, consistent
-with OANDA's pattern-spotting role.
+NAS100 panel does not exist; OANDA still on DJ30 v4.4 (no v4.5 OANDA fetch
+yet). OANDA C2 anchor under FXIFY-correct semantic reproduces 99.51% pass /
+0.49% bust / 4.82% p99 DD on the 1120-bday / 223-block OANDA panel — both
+lock criteria clear with thinner margin than Pepperstone, consistent with
+OANDA's pattern-spotting role. The 2026-05-14 panel refresh did not include
+OANDA — OANDA panel remains 2026-04-25 / 2026-05-08 vintage.
 
 Both anchors are deterministic given fixed SEEDS = (42, 123, 2026) in
 portfolio_mc.py. Tolerance abs=1e-4 is comfortably tighter than any
@@ -37,7 +39,8 @@ from dd_protection import DD_SCALE, DD_TRIGGER
 from portfolio_mc import (
     ALLOCATIONS,
     DAILY_LOSS_PCT,
-    HORIZON_DAYS,
+    HORIZON_CAP,
+    INACTIVITY_LIMIT,
     OANDA_PANELS,
     PEPPERSTONE_PANELS,
     STARTING_EQUITY,
@@ -77,38 +80,59 @@ def oanda_result():
 
 @requires_pepperstone
 def test_pepperstone_anchor(pepperstone_result):
-    """2026-05-18 Pepperstone 4-strategy re-lock anchor (code-reproducible).
+    """2026-05-16 FXIFY-correct timeout-semantic Pepperstone 4-strategy C2 anchor.
 
-    DJ30 v4.5 re-locked from (1.00% risk / 350 pyramid / 1.00 maxDD) to
-    (0.70% / 750 pyramid / 1.15 maxDD). NAS100 v1 re-locked from 0.40% to
-    0.37%. Guardian and Aegis unchanged. dd_protection C2 (1.5% / 0.40x)
-    unchanged. Bust rate dropped 60% (0.36% -> 0.14%); p99 DD tightened
-    0.44pp (4.73% -> 4.29%). Pass rate -0.67pp; median days +3.
+    portfolio_mc.py's 150-bday horizon-runout timeout was replaced with the
+    FXIFY-correct semantic (60-bday inactivity bust + 1500-bday safety
+    ceiling) per ADR 2026-05-16-fxify-correct-timeout-semantic.md (closes
+    Q-MCTO-1 CLOSED-RESOLVED). Allocations + dd_protection C2 unchanged
+    from 2026-05-14 allocation refresh. The new semantic re-validates with
+    the widest margin on record:
+      pass 98.78% → 99.88%   (+1.10pp; ex-timeout paths now resolve as passes)
+      bust 0.12% → 0.12%     (unchanged; risk behavior unchanged)
+      p99 DD 4.17% → 4.21%   (+0.04pp; within sampling noise)
+      median days 21 → 21    (unchanged)
+    Both gates clear with margin. See ADR §Locked MC numbers.
     """
-    assert pepperstone_result["pass_rate"] == pytest.approx(0.9742, abs=1e-4)
-    assert pepperstone_result["bust_rate"] == pytest.approx(0.0014, abs=1e-4)
-    assert pepperstone_result["p99_dd"]    == pytest.approx(0.0429, abs=1e-4)
+    assert pepperstone_result["pass_rate"] == pytest.approx(0.9988, abs=1e-4)
+    assert pepperstone_result["bust_rate"] == pytest.approx(0.0012, abs=1e-4)
+    assert pepperstone_result["p99_dd"]    == pytest.approx(0.0421, abs=1e-4)
 
 
 @requires_oanda
 def test_oanda_anchor(oanda_result):
-    """2026-05-18 OANDA re-lock anchor (pattern-spotting proxy).
+    """2026-05-16 FXIFY-correct timeout-semantic OANDA C2 anchor (pattern-spotting).
 
-    OANDA still on DJ30 v4.4 with v4.4-era pyramid/maxDD baked into the
-    panel; only ALLOCATIONS risk_pct shifts apply here (Striker 1.00 ->
-    0.70, NAS100 absent from OANDA panel). Clears lock criteria with
-    thinner margin than Pepperstone, consistent with pattern-spotting role.
+    OANDA panel unchanged (2026-04-25 / 2026-05-08 vintage; no re-export).
+    The FXIFY-correct timeout-semantic ADR (2026-05-16) reshapes the OANDA
+    anchor identically in principle to Pepperstone — ex-timeout paths now
+    resolve as passes:
+      pass 96.33% → 99.51%   (+3.18pp; OANDA had a larger timeout bucket)
+      bust 0.40% → 0.49%     (+0.09pp; some ex-timeout paths bust later)
+      p99 DD 4.73% → 4.82%   (+0.09pp; longer horizon exposes deeper paths)
+      median days 26 → 27    (small +1d shift)
+    Both lock criteria clear with thinner margin than Pepperstone (bust
+    0.51pp headroom vs 0.88pp; p99 DD 0.18pp headroom vs 0.79pp),
+    consistent with OANDA's pattern-spotting role.
     """
-    assert oanda_result["pass_rate"] == pytest.approx(0.9630, abs=1e-4)
-    assert oanda_result["bust_rate"] == pytest.approx(0.0033, abs=1e-4)
-    assert oanda_result["p99_dd"]    == pytest.approx(0.0469, abs=1e-4)
+    assert oanda_result["pass_rate"] == pytest.approx(0.9951, abs=1e-4)
+    assert oanda_result["bust_rate"] == pytest.approx(0.0049, abs=1e-4)
+    assert oanda_result["p99_dd"]    == pytest.approx(0.0482, abs=1e-4)
 
 
 @requires_pepperstone
 def test_pepperstone_panel_shape(pepperstone_result):
-    """Panel cardinality MVD: 1120 bdays, 223 week-blocks (Pepperstone)."""
-    assert pepperstone_result["n_bdays"] == 1120
-    assert pepperstone_result["n_blocks"] == 223
+    """Panel cardinality MVD: 1039 bdays, 207 week-blocks (Pepperstone 2026-05-14).
+
+    Panel shape unchanged from the 2026-05-14 panel-refresh anchor (1039
+    bdays / 207 week-blocks). The 2026-05-14 allocation refresh swapped
+    DJ30 + NAS100 CSV vintages but preserved the union date range —
+    Aegis's 2022-07-18 first signal still defines the union-start.
+    Drops from 1120 / 223 (pre-2026-05-14) reflect the strict 4yr window
+    (2022-05-14 → 2026-05-14) vs the prior all-data exports back to 2022-01.
+    """
+    assert pepperstone_result["n_bdays"] == 1039
+    assert pepperstone_result["n_blocks"] == 207
 
 
 @requires_oanda
@@ -130,9 +154,10 @@ def test_default_panel_is_pepperstone():
     If a future refactor flips any of these back to "oanda", the anchor
     tests stay green but `python portfolio_mc.py` (no flags) starts
     producing OANDA numbers (96.23/0.69/4.91 at C2) instead of the CLAUDE.md
-    canonical headline (Pepperstone, 98.09/0.36/4.73 at C2). This test
-    catches that drift before it reaches the CLAUDE.md / code asymmetry
-    surface we just spent effort closing.
+    canonical headline (Pepperstone, 98.78/0.12/4.17 at C2 under the
+    2026-05-14 allocation refresh). This test catches that drift before
+    it reaches the CLAUDE.md / code asymmetry surface we just spent effort
+    closing.
     """
     import inspect
 
@@ -179,7 +204,8 @@ def test_serial_parallel_equivalence():
     )
     for key in (
         "pass_rate", "bust_rate", "p50_dd", "p95_dd", "p99_dd",
-        "bust_daily_rate", "bust_static_rate", "timeout_rate",
+        "bust_daily_rate", "bust_static_rate",
+        "bust_inactivity_rate", "horizon_cap_rate",
         "n_bdays", "n_blocks", "median_days_to_pass",
     ):
         assert serial[key] == parallel[key], (
@@ -206,13 +232,17 @@ def test_simulate_path_direct_call_at_daily_loss_boundary():
     the simulation as `bust_daily` on day 1.
 
     Pre-fix: this path would NOT bust (raw FP comparison fails to fire),
-    and the rest of the path is zeros, so outcome would be "timeout".
-    Post-fix: outcome is "bust_daily" on day 1.
+    and the rest of the path is zeros, so outcome would be "horizon_cap"
+    (under FXIFY-correct semantics) — but if inactivity counter trips at
+    INACTIVITY_LIMIT, it would be "bust_inactivity" first. Either way it
+    is NOT "bust_daily". Post-fix: outcome is "bust_daily" on day 1.
 
     Q-MCFP-1 §2.7 Rule 0-T compliance evidence.
     """
     n_strats = len(STRATS)
-    horizon = HORIZON_DAYS
+    # Horizon must be large enough to exercise the bust-on-day-1 path, but small
+    # enough to keep the test fast. INACTIVITY_LIMIT + 1 is sufficient.
+    horizon = INACTIVITY_LIMIT + 1
 
     # Path[0]: realize a loss whose pnl/S lands one ULP above -0.05 in raw FP.
     # Allocate the entire loss to one strategy (any will do); rest get 0.

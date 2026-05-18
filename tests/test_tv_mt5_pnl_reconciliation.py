@@ -1,4 +1,4 @@
-"""ADR-NNN anchor: TV <30-day JPY ~153× P&L inflation defect (Q-MT5-TV)."""
+"""ADR 2026-05-16-fixture-test-requirement anchor: TV <30-day JPY ~153× P&L inflation defect (Q-MT5-TV)."""
 
 from pathlib import Path
 
@@ -21,7 +21,7 @@ def usdjpy_fixtures() -> pd.DataFrame:
 
 
 def test_usdjpy_pnl_within_tolerance(usdjpy_fixtures: pd.DataFrame) -> None:
-    """ADR-NNN anchor: TV <30-day JPY ~153x inflation defect.
+    """ADR 2026-05-16-fixture-test-requirement anchor: TV <30-day JPY ~153x inflation defect.
 
     For each fixture, computed P&L must match reference within tolerance.
     Tolerance is wide enough for legitimate spread/rounding,

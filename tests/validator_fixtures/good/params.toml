@@ -1,0 +1,52 @@
+# Validator self-test — KNOWN-GOOD fixture.
+# All values match the production-source mocks in this directory.
+
+[strategies.guardian_gold_v5_5]
+pine_path     = "guardian.pine"  # absent on purpose — exercises opportunistic-Pine warn path
+risk_pct      = 0.34
+instrument    = "XAUUSD"
+contract_value = 100
+days          = ["mon", "tue", "thu"]
+version       = "v5.5"
+lock_date     = "2026-04-23"
+
+[strategies.striker_dj30_v4_5]
+pine_path     = "striker_dj30.pine"
+risk_pct      = 1.00
+instrument    = "DJ30"
+contract_value = 10
+version       = "v4.5"
+lock_date     = "2026-05-05"
+
+[strategies.aegis_usdjpy_v4_3]
+pine_path     = "aegis.pine"
+risk_pct      = 1.50
+instrument    = "USDJPY"
+contract_value = 1
+days          = ["mon", "tue", "wed"]
+version       = "v4.3"
+lock_date     = "2026-04-23"
+
+[strategies.striker_nas100_v1]
+pine_path     = "nas100.pine"
+risk_pct      = 0.40
+instrument    = "NAS100"
+contract_value = 10
+days          = ["mon", "tue"]
+version       = "v1"
+lock_date     = "2026-05-05"
+
+[dd_protection]
+trigger_pct  = 1.5
+scale_factor = 0.40
+config       = "C2"
+lock_date    = "2026-05-08"
+
+[mc_anchor_pepperstone]
+pass_pct    = 98.09
+bust_pct    = 0.36
+p99_dd_pct  = 4.73
+median_days = 22
+anchor_date = "2026-05-08"
+panel       = "4-strategy"
+note        = "fixture"

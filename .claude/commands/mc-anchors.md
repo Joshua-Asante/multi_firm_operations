@@ -15,12 +15,12 @@ Steps:
 3. **Format** the anchor block to match the existing CLAUDE.md "Protection" section line style:
 
    ```
-   * MC at current config (G 0.34% / S 1.00% / A 1.50%, Pepperstone 2022→2026, 223 week-blocks, 10K × 3 seeds):
+   * MC at current 4-strategy config (G 0.34% / DJ30 v4.5 1.00% / A 1.50% / NAS v1 0.40%, dd_protection C2 1.5%/0.40×, Pepperstone <vintage>, <N> week-blocks, 10K × 3 seeds):
      **XX.XX% pass / X.XX% bust (X.XX% daily + X.XX% static) / X.XX% timeout**, p99 DD X.XX%, median days-to-pass XX.
    ```
 
-4. **Diff** the formatted block against the current "MC at current config" line in CLAUDE.md.
+4. **Diff** the formatted block against the current "MC at current 4-strategy config" line in CLAUDE.md.
 5. **Output** the proposed replacement as a unified diff. Do NOT auto-apply.
 6. If diff is empty: report "MC anchors current — no update needed."
 
-Note: also check the "Strategy Reference" section's `2026-04-23 lock MC anchors` block — the post-Guardian-risk-relock MC line there mirrors the Protection block headline.
+Note: also check the "Strategy Reference" section's latest panel-refresh MC anchor block — the headline MC line there mirrors the Protection block headline.

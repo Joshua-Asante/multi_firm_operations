@@ -1,4 +1,4 @@
-# ADR-NNN — independent derivations (do not copy from compute_pnl):
+# ADR 2026-05-16-fixture-test-requirement — independent derivations (do not copy from compute_pnl):
 # Formula: pnl_usd = (exit - entry) * direction * lot_size * 100000 / exit_price
 # canonical_long_lt30d: (150.25-149.50)*1*100000/150.25 = 499.17 USD (14d hold, <30)
 # inverse_short_lt30d: (149.80-151.00)*(-1)*100000/149.80 = 801.07 USD (19d hold, <30)

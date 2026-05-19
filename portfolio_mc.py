@@ -39,15 +39,24 @@ PROFIT_TARGET = 210_000
 DAILY_LOSS_PCT = -0.05
 STATIC_DD_PCT = -0.05
 MIN_TRADING_DAYS = 5
-HORIZON_DAYS = 150
+# FXIFY-correct timeout semantic, locked 2026-05-16 — see
+# docs/adr/2026-05-16-fxify-correct-timeout-semantic.md (closes Q-MCTO-1).
+# INACTIVITY_LIMIT models the actual FXIFY challenge-fail rule at
+# firm_rules.py:14 `inactivity_max_idle_days = 60` (60 consecutive idle bdays
+# terminates the challenge). HORIZON_CAP = 1500 is a runtime-tractability
+# safety; bootstrap-of-week-blocks structure makes both 60-day and 1500-day
+# runouts vanishingly rare (empirically 0.00% on the 2026-05-14 panel under
+# C2 + 0.75/0.45 allocations).
+INACTIVITY_LIMIT = 60
+HORIZON_CAP = 1500
 SIMS_PER_SEED = 10_000
 SEEDS = (42, 123, 2026)
 
 ALLOCATIONS: Dict[str, float] = {
     "guardian":       0.0034,
-    "striker":        0.0100,
+    "striker":        0.0075,
     "aegis":          0.0150,
-    "striker_nas100": 0.0040,
+    "striker_nas100": 0.0045,
 }
 STRATS = tuple(ALLOCATIONS.keys())
 
@@ -70,10 +79,10 @@ OANDA_PANELS: Dict[str, Path] = {
 
 PEPPERSTONE_DIR = Path(__file__).parent / "data" / "tv_exports" / "pepperstone"
 PEPPERSTONE_PANELS: Dict[str, Path] = {
-    "guardian":       PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-05_33781.csv",
-    "striker":        PEPPERSTONE_DIR / "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-05_12175.csv",
-    "aegis":          PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-04-26_0bf1b.csv",
-    "striker_nas100": PEPPERSTONE_DIR / "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-05_7ca6f.csv",
+    "guardian":       PEPPERSTONE_DIR / "Guardian_Gold_v5.5_PEPPERSTONE_XAUUSD_2026-05-14_3b689.csv",
+    "striker":        PEPPERSTONE_DIR / "Striker_DJ30_v4.5_PEPPERSTONE_US30_2026-05-14_e4dd7.csv",
+    "aegis":          PEPPERSTONE_DIR / "Aegis_USDJPY_v4.3_PEPPERSTONE_USDJPY_2026-05-14_d2682.csv",
+    "striker_nas100": PEPPERSTONE_DIR / "Striker_NAS100_v1_PEPPERSTONE_NAS100_2026-05-14_da880.csv",
 }
 
 # Pepperstone is the CLAUDE.md canonical lock anchor; OANDA is the pattern-spotting proxy
@@ -116,12 +125,17 @@ def load_trades(path: Path) -> pd.DataFrame:
     out = exits[["exit_date", "pnl"]].sort_values("exit_date").reset_index(drop=True)
     if not out.empty:
         # MVD window — catches "4yr panel actually 14mo" class (audit instance #8).
+        # Tolerance 100d (was 60d): on strict-window exports (e.g. 2022-05-14 →
+        # 2026-05-14), Aegis's restrictive filters delay first trade ~2 months,
+        # leaving a 1367-day span vs the 1460-day expected. The 1400d threshold
+        # would have caught the prior 681-day Aegis sub-panel (2024-06 → 2026-04)
+        # — the floor still rejects ≥3-month coverage gaps.
         assert_window(
             out["exit_date"].iloc[0].to_pydatetime(),
             out["exit_date"].iloc[-1].to_pydatetime(),
             expected_min_days=4 * 365,
             label=f"MC input panel {path.name}",
-            tolerance_days=60,
+            tolerance_days=100,
         )
     return out
 
@@ -187,9 +201,21 @@ def build_week_blocks(panel: pd.DataFrame) -> np.ndarray:
 def _simulate_path(path: np.ndarray, dd_trigger: float, dd_scale: float,
                    horizon: int) -> Tuple[str, int, float, int | None]:
     """Run one deterministic sim over a (horizon, n_strats) path.
-    Returns (outcome, day_terminated, max_dd, culprit_strat_idx)."""
+
+    Returns (outcome, day_terminated, max_dd, culprit_strat_idx).
+
+    Outcomes (FXIFY-correct semantic, locked 2026-05-16):
+      - "pass": equity >= PROFIT_TARGET with trade_days >= MIN_TRADING_DAYS
+      - "bust_daily": single-day pnl <= -5% of starting equity (culprit = argmin strat)
+      - "bust_static": equity - starting <= -5% of starting equity (culprit = argmin strat)
+      - "bust_inactivity": INACTIVITY_LIMIT (60) consecutive idle bdays (culprit = None;
+          inactivity is structurally "no one traded" — no single-strategy attribution)
+      - "horizon_cap": HORIZON_CAP reached (runtime-tractability safety; empirically ~0
+          under bootstrap-of-week-blocks structure)
+    """
     eq = peak = float(STARTING_EQUITY)
     trade_days = 0
+    consecutive_idle = 0
     max_dd = 0.0
 
     for day in range(horizon):
@@ -205,6 +231,17 @@ def _simulate_path(path: np.ndarray, dd_trigger: float, dd_scale: float,
         if round((eq_new - STARTING_EQUITY) / STARTING_EQUITY, 6) <= STATIC_DD_PCT:
             return "bust_static", day + 1, max_dd, int(np.argmin(strat_pnls))
 
+        # Inactivity tracking — symmetric check guards against false-idle
+        # (offsetting non-zero pnls summing to 0 is NOT idle for inactivity purposes).
+        # See docs/adr/2026-05-16-fxify-correct-timeout-semantic.md §Decision.
+        is_idle = (pnl == 0.0) and (not np.any(strat_pnls != 0.0))
+        if is_idle:
+            consecutive_idle += 1
+        else:
+            consecutive_idle = 0
+        if consecutive_idle >= INACTIVITY_LIMIT:
+            return "bust_inactivity", day + 1, max_dd, None
+
         eq = eq_new
         if eq > peak:
             peak = eq
@@ -217,23 +254,28 @@ def _simulate_path(path: np.ndarray, dd_trigger: float, dd_scale: float,
         if round(eq, 2) >= PROFIT_TARGET and trade_days >= MIN_TRADING_DAYS:
             return "pass", day + 1, max_dd, None
 
-    return "timeout", horizon, max_dd, None
+    # Runtime-tractability safety — empirically 0% under bootstrap structure.
+    return "horizon_cap", horizon, max_dd, None
 
 
 def run_seed(seed: int, n_sims: int, blocks: np.ndarray,
-             dd_trigger: float, dd_scale: float, horizon: int = HORIZON_DAYS,
+             dd_trigger: float, dd_scale: float, horizon: int = HORIZON_CAP,
              strats: Tuple[str, ...] = STRATS) -> dict:
     """Run n_sims bootstrap simulations for one seed.
 
     `strats` labels the path's column axis for bust attribution. Defaults to
     the global 4-tuple but callers (via `_load_all`) pass the panel-specific
     tuple — Pepperstone gets all 4, OANDA gets 3.
+
+    `horizon` defaults to HORIZON_CAP (1500-bday runtime safety); the active
+    termination signal under FXIFY-correct semantics is INACTIVITY_LIMIT.
     """
     rng = np.random.default_rng(seed)
     n_blocks = len(blocks)
     blocks_per_sim = (horizon + 4) // 5
 
-    outcomes = {"pass": 0, "bust_daily": 0, "bust_static": 0, "timeout": 0}
+    outcomes = {"pass": 0, "bust_daily": 0, "bust_static": 0,
+                "bust_inactivity": 0, "horizon_cap": 0}
     days_to_pass: list[int] = []
     max_dds: list[float] = []
     bust_attrib = {s: 0 for s in strats}
@@ -249,6 +291,7 @@ def run_seed(seed: int, n_sims: int, blocks: np.ndarray,
             days_to_pass.append(day)
         elif outcome in ("bust_daily", "bust_static") and culprit is not None:
             bust_attrib[strats[culprit]] += 1
+        # bust_inactivity has culprit=None and does not enter attribution.
 
     return {
         "outcomes": outcomes,
@@ -370,7 +413,10 @@ def compute_default_config(dd_trigger: float, dd_scale: float, no_protection: bo
     pass_r = [r["outcomes"]["pass"] / per_seed for r in seeds_results]
     bd_r   = [r["outcomes"]["bust_daily"] / per_seed for r in seeds_results]
     bs_r   = [r["outcomes"]["bust_static"] / per_seed for r in seeds_results]
-    to_r   = [r["outcomes"]["timeout"] / per_seed for r in seeds_results]
+    bi_r   = [r["outcomes"]["bust_inactivity"] / per_seed for r in seeds_results]
+    hc_r   = [r["outcomes"]["horizon_cap"] / per_seed for r in seeds_results]
+    # Headline bust rate stays daily+static for lock-gate continuity with prior
+    # anchors; bust_inactivity is reported separately. See ADR §Decision.
     bust_r = [d + s for d, s in zip(bd_r, bs_r)]
 
     all_days = [d for r in seeds_results for d in r["days_to_pass"]]
@@ -393,7 +439,8 @@ def compute_default_config(dd_trigger: float, dd_scale: float, no_protection: bo
         "bust_sigma": float(np.std(bust_r)),
         "bust_daily_rate": float(np.mean(bd_r)),
         "bust_static_rate": float(np.mean(bs_r)),
-        "timeout_rate": float(np.mean(to_r)),
+        "bust_inactivity_rate": float(np.mean(bi_r)),
+        "horizon_cap_rate": float(np.mean(hc_r)),
         "median_days_to_pass": int(np.median(all_days)) if all_days else None,
         "p50_dd": float(np.percentile(all_dds, 50)),
         "p95_dd": float(np.percentile(all_dds, 95)),
@@ -414,13 +461,14 @@ def report_default(result: dict, dd_trigger: float, dd_scale: float,
     print("=== Portfolio MC ===")
     print(f"Config: {_fmt_config(dd_trigger, dd_scale, no_protection)}")
     print(f"Allocations: {_fmt_alloc(panel_allocs)}")
-    print(f"Sims: {per_seed:,} × {n_seeds} seeds, horizon {HORIZON_DAYS} days")
+    print(f"Sims: {per_seed:,} × {n_seeds} seeds, inactivity {INACTIVITY_LIMIT}d / horizon-cap {HORIZON_CAP}d")
     print()
-    print(f"Pass:         {result['pass_rate']:>6.2%} (sigma {result['pass_sigma']:.2%})")
-    print(f"Bust:         {result['bust_rate']:>6.2%} (sigma {result['bust_sigma']:.2%})")
-    print(f"  Daily:      {result['bust_daily_rate']:>6.2%}")
-    print(f"  Static:     {result['bust_static_rate']:>6.2%}")
-    print(f"Timeout:      {result['timeout_rate']:>6.2%}")
+    print(f"Pass:               {result['pass_rate']:>6.2%} (sigma {result['pass_sigma']:.2%})")
+    print(f"Bust:               {result['bust_rate']:>6.2%} (sigma {result['bust_sigma']:.2%})")
+    print(f"  Daily:            {result['bust_daily_rate']:>6.2%}")
+    print(f"  Static:           {result['bust_static_rate']:>6.2%}")
+    print(f"Bust inactivity:    {result['bust_inactivity_rate']:>6.2%}")
+    print(f"Horizon cap:        {result['horizon_cap_rate']:>6.2%}")
     if result["median_days_to_pass"] is not None:
         print(f"Median days to pass: {result['median_days_to_pass']}")
     print(f"p50 DD:       {result['p50_dd']:.2%}")
@@ -562,10 +610,12 @@ def mode_sensitivity(dd_scale: float, allocs: Dict[str, float],
     def _row(label: str, results: list) -> str:
         pass_r = np.mean([r["outcomes"]["pass"] / SIMS_PER_SEED for r in results])
         bust_r = np.mean([(r["outcomes"]["bust_daily"] + r["outcomes"]["bust_static"]) / SIMS_PER_SEED for r in results])
-        to_r   = np.mean([r["outcomes"]["timeout"] / SIMS_PER_SEED for r in results])
+        # Inactivity + horizon_cap together replace the old "timeout" bucket
+        # under FXIFY-correct semantics (locked 2026-05-16).
+        nt_r   = np.mean([(r["outcomes"]["bust_inactivity"] + r["outcomes"]["horizon_cap"]) / SIMS_PER_SEED for r in results])
         dds    = [d for r in results for d in r["max_dds"]]
         p99    = np.percentile(dds, 99)
-        return f"{label:<12} {pass_r:>8.2%} {bust_r:>8.2%} {to_r:>9.2%} {p99:>8.2%}"
+        return f"{label:<12} {pass_r:>8.2%} {bust_r:>8.2%} {nt_r:>9.2%} {p99:>8.2%}"
 
     for trig in grid:
         print(_row(f"{trig:.3%}", by_trig[trig]))
